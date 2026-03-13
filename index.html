@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+  >
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="PVHS Countdown">
+  <meta name="theme-color" content="#007474">
+  <link rel="apple-touch-icon" href="PV_Logo.png?v=1">
+  <link rel="icon" type="image/png" sizes="192x192" href="PV_Logo.png?v=1">
+  <link rel="icon" type="image/png" sizes="512x512" href="PV_Logo.png?v=1">
+  <link rel="shortcut icon" href="PV_Logo.png?v=1">
+  <title>PVHS School Days Countdown</title>
+  <style>
+    :root {
+      --teal: #007474;
+      --teal-dark: #003c3c;
+      --teal-soft: #0a9a9a;
+      --black: #0b0f10;
+      --white: #f7fbfb;
+      --muted: #b9d3d3;
+      --shadow: 0 20px 46px rgba(0,0,0,0.28);
+      --soft-shadow: 0 12px 24px rgba(0,0,0,0.20);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background:
+        radial-gradient(circle at top left, rgba(0,116,116,0.22), transparent 24%),
+        radial-gradient(circle at top right, rgba(0,0,0,0.10), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(0,116,116,0.18), transparent 24%),
+        linear-gradient(180deg, #eef6f6 0%, #dfeaea 100%);
+      color: var(--white);
+    }
+
+    .app {
+      width: min(100%, 430px);
+      min-height: min(86vh, 820px);
+      min-height: min(86dvh, 820px);
+      border-radius: 32px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,0.14);
+      background:
+        radial-gradient(circle at center, rgba(7,34,34,0.92) 0%, rgba(3,26,26,0.96) 48%, rgba(0,116,116,1) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 24px;
+      text-align: center;
+    }
+
+    .app::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at center, rgba(255,255,255,0.08) 0%, transparent 36%),
+        radial-gradient(circle at top, rgba(0,116,116,0.30) 0%, transparent 45%);
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .logo {
+      width: min(42vw, 142px);
+      max-width: 142px;
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 10px 22px rgba(0,0,0,0.28));
+      margin-bottom: 14px;
+    }
+
+    .eyebrow {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #b9f2f2;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .title {
+      font-size: clamp(34px, 8vw, 52px);
+      line-height: 0.98;
+      font-weight: 900;
+      letter-spacing: -0.8px;
+      margin: 0 0 10px 0;
+    }
+
+    .subtitle {
+      font-size: clamp(17px, 4.5vw, 22px);
+      line-height: 1.25;
+      font-weight: 700;
+      color: var(--muted);
+      margin: 0 0 22px 0;
+      max-width: 320px;
+    }
+
+    .count-card {
+      width: 100%;
+      max-width: 300px;
+      border-radius: 28px;
+      padding: 22px 18px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: var(--soft-shadow);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      margin-bottom: 18px;
+    }
+
+    .count-label {
+      font-size: 18px;
+      font-weight: 800;
+      color: #c8f7f7;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    .count-number {
+      font-size: clamp(76px, 22vw, 118px);
+      line-height: 0.95;
+      font-weight: 900;
+      letter-spacing: -2px;
+      color: #ffffff;
+      text-shadow: 0 6px 18px rgba(0,0,0,0.22);
+    }
+
+    .detail {
+      font-size: 16px;
+      line-height: 1.4;
+      color: #d9f2f2;
+      margin: 6px 0;
+      max-width: 320px;
+    }
+
+    .detail strong {
+      color: #ffffff;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      font-size: 13px;
+      line-height: 1.35;
+      color: #b5d4d4;
+      max-width: 310px;
+    }
+
+    @media (max-width: 390px) {
+      .app {
+        padding: 26px 18px;
+      }
+
+      .count-card {
+        max-width: 280px;
+        padding: 20px 16px;
+      }
+
+      .detail {
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="content">
+      <img src="PV_Logo.png" alt="Pioneer Valley High School logo" class="logo">
+      <div class="eyebrow">Pioneer Valley High School</div>
+      <h1 class="title">School Days<br>Countdown</h1>
+      <p class="subtitle">A live countdown of student school days remaining this year.</p>
+
+      <div class="count-card">
+        <div class="count-label">School Days Left</div>
+        <div class="count-number" id="daysLeft">--</div>
+      </div>
+
+      <p class="detail"><strong>Today:</strong> <span id="todayText">--</span></p>
+      <p class="detail"><strong>Last Student Day:</strong> June 10, 2026</p>
+      <p class="detail"><strong>Time Zone:</strong> California</p>
+
+      <div class="footer-note">
+        This countdown updates using student attendance days only and skips weekends, holidays, breaks, and non-student days.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const schoolDays = [
+      "2026-03-13",
+      "2026-03-17","2026-03-18","2026-03-19","2026-03-20",
+      "2026-03-24","2026-03-25","2026-03-26","2026-03-27",
+      "2026-03-31",
+
+      "2026-04-01","2026-04-02",
+      "2026-04-14","2026-04-15","2026-04-16","2026-04-17",
+      "2026-04-21","2026-04-22","2026-04-23","2026-04-24",
+      "2026-04-28","2026-04-29","2026-04-30",
+
+      "2026-05-01","2026-05-05","2026-05-06","2026-05-07","2026-05-08",
+      "2026-05-12","2026-05-13","2026-05-14","2026-05-15",
+      "2026-05-19","2026-05-20","2026-05-21","2026-05-22",
+      "2026-05-26","2026-05-27","2026-05-28","2026-05-29",
+
+      "2026-06-02","2026-06-03","2026-06-04","2026-06-05",
+      "2026-06-08","2026-06-09","2026-06-10"
+    ];
+
+    const timeZone = "America/Los_Angeles";
+
+    function getCaliforniaDateString() {
+      const now = new Date();
+      const formatter = new Intl.DateTimeFormat("en-CA", {
+        timeZone,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      });
+      return formatter.format(now);
+    }
+
+    function formatLongDate(dateString) {
+      const [year, month, day] = dateString.split("-").map(Number);
+      const date = new Date(year, month - 1, day);
+      return new Intl.DateTimeFormat("en-US", {
+        timeZone,
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        year: "numeric"
+      }).format(date);
+    }
+
+    function updateCountdown() {
+      const todayString = getCaliforniaDateString();
+      const daysLeft = schoolDays.filter(day => day >= todayString).length;
+
+      document.getElementById("daysLeft").textContent = daysLeft;
+      document.getElementById("todayText").textContent = formatLongDate(todayString);
+    }
+
+    updateCountdown();
+  </script>
+</body>
+</html>
