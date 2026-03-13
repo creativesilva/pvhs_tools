@@ -8,24 +8,26 @@
   >
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="PVHS Countdown Clock">
+  <meta name="apple-mobile-web-app-title" content="PVHS Tools">
   <meta name="theme-color" content="#007474">
-  <link rel="apple-touch-icon" href="PV_Logo.png?v=10">
-  <link rel="icon" type="image/png" sizes="192x192" href="PV_Logo.png?v=10">
-  <link rel="icon" type="image/png" sizes="512x512" href="PV_Logo.png?v=10">
-  <link rel="shortcut icon" href="PV_Logo.png?v=10">
-  <title>PVHS Countdown Clock</title>
+  <link rel="apple-touch-icon" href="PV_Logo.png?v=12">
+  <link rel="icon" type="image/png" sizes="192x192" href="PV_Logo.png?v=12">
+  <link rel="icon" type="image/png" sizes="512x512" href="PV_Logo.png?v=12">
+  <link rel="shortcut icon" href="PV_Logo.png?v=12">
+  <title>PVHS Tools</title>
+
   <style>
     :root {
       --teal: #007474;
+      --teal-dark: #003c3c;
       --white: #f7fbfb;
       --muted: #cfe3e3;
       --panel: rgba(255,255,255,0.08);
       --panel-border: rgba(255,255,255,0.12);
       --shadow: 0 20px 46px rgba(0,0,0,0.30);
       --soft-shadow: 0 12px 24px rgba(0,0,0,0.22);
-      --white-gradient: linear-gradient(180deg, #ffffff 0%, #dceaea 100%);
-      --red-gradient: linear-gradient(180deg, #ffb8b8 0%, #ff5b5b 58%, #b80000 100%);
+      --glow: radial-gradient(circle at center, rgba(255,255,255,0.08) 0%, transparent 36%);
+      --card-hover: rgba(255,255,255,0.12);
     }
 
     * {
@@ -40,29 +42,31 @@
       min-height: 100%;
       margin: 0;
       padding: 0;
-      overflow: hidden;
-      background: transparent;
+      overflow-x: hidden;
+      overflow-y: auto;
+      background: #021414;
     }
 
     body {
       font-family: Arial, Helvetica, sans-serif;
       color: var(--white);
+      touch-action: pan-y;
     }
 
     .frame {
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
-      background: transparent;
+      padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom) 16px;
     }
 
     .app {
-      width: min(calc(100vh * 0.6667), 100vw);
-      height: min(100vh, calc(100vw * 1.5));
-      aspect-ratio: 4 / 6;
+      width: min(100%, 430px);
+      min-height: min(92vh, 900px);
+      min-height: min(92dvh, 900px);
       border-radius: 34px;
       overflow: hidden;
       position: relative;
@@ -71,9 +75,8 @@
       background:
         radial-gradient(circle at center, rgba(10,34,34,0.94) 0%, rgba(4,20,20,0.98) 46%, rgba(0,116,116,1) 100%);
       display: flex;
-      align-items: stretch;
       justify-content: center;
-      padding: 18px 18px 16px 18px;
+      padding: 22px 18px 18px 18px;
       text-align: center;
       isolation: isolate;
     }
@@ -84,8 +87,8 @@
       inset: 0;
       pointer-events: none;
       background:
-        radial-gradient(circle at center, rgba(255,255,255,0.06) 0%, transparent 34%),
-        radial-gradient(circle at top, rgba(0,116,116,0.22) 0%, transparent 42%);
+        var(--glow),
+        radial-gradient(circle at top, rgba(0,116,116,0.24) 0%, transparent 42%);
       z-index: 0;
     }
 
@@ -93,10 +96,10 @@
       position: absolute;
       top: 54%;
       left: 50%;
-      width: clamp(128%, 140vw, 155%);
+      width: clamp(155%, 180vw, 205%);
       max-width: none;
       transform: translate(-50%, -50%);
-      opacity: 0.072;
+      opacity: 0.07;
       filter: grayscale(100%) contrast(108%) brightness(114%);
       pointer-events: none;
       z-index: 0;
@@ -111,22 +114,65 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
+      gap: 16px;
+    }
+
+    .header {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       gap: 10px;
+      padding-top: 2px;
+    }
+
+    .logo-clear {
+      width: 92px;
+      max-width: 92px;
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24));
     }
 
     .eyebrow {
       margin: 0;
-      font-size: clamp(15px, 2vw, 22px);
-      line-height: 1.05;
+      font-size: 14px;
+      line-height: 1.1;
       font-weight: 900;
       letter-spacing: 0.8px;
       color: #dff7f7;
       text-transform: uppercase;
     }
 
-    .period-card,
-    .school-card {
+    .title {
+      margin: 0;
+      font-size: clamp(38px, 11vw, 60px);
+      line-height: 0.95;
+      font-weight: 900;
+      letter-spacing: -1px;
+      text-transform: uppercase;
+      text-wrap: balance;
+    }
+
+    .subtitle {
+      margin: 0;
+      max-width: 300px;
+      font-size: 16px;
+      line-height: 1.35;
+      font-weight: 700;
+      color: var(--muted);
+      text-wrap: balance;
+    }
+
+    .launcher-stack {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 6px;
+    }
+
+    .launch-card {
       width: 100%;
       border-radius: 28px;
       background: var(--panel);
@@ -134,153 +180,44 @@
       box-shadow: var(--soft-shadow);
       backdrop-filter: blur(4px);
       -webkit-backdrop-filter: blur(4px);
+      text-decoration: none;
+      color: var(--white);
+      padding: 18px 16px;
+      transition: background 0.18s ease, transform 0.12s ease, border-color 0.18s ease;
+      display: block;
     }
 
-    .period-card {
-      padding: 16px 14px 14px 14px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+    .launch-card:active {
+      transform: scale(0.985);
     }
 
-    .school-card {
-      padding: 14px 14px 12px 14px;
+    .launch-card:hover {
+      background: var(--card-hover);
+      border-color: rgba(255,255,255,0.18);
     }
 
-    .block-label {
-      font-size: clamp(28px, 4.9vw, 54px);
+    .launch-label {
+      margin: 0 0 8px 0;
+      font-size: clamp(26px, 7vw, 38px);
       line-height: 0.95;
       font-weight: 900;
-      letter-spacing: -0.8px;
       text-transform: uppercase;
+      letter-spacing: -0.5px;
+    }
+
+    .launch-desc {
       margin: 0;
-      max-width: 100%;
-      text-wrap: balance;
-    }
-
-    .timer {
-      font-size: clamp(84px, 15.5vw, 172px);
-      line-height: 0.84;
-      font-weight: 900;
-      letter-spacing: -4px;
-      margin: 0;
-      text-transform: uppercase;
-      text-shadow: 0 10px 26px rgba(0,0,0,0.30);
-    }
-
-    .timer.normal {
-      background: var(--white-gradient);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .timer.warning {
-      background: var(--red-gradient);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .subtext {
-      font-size: clamp(12px, 1.7vw, 17px);
-      line-height: 1.3;
-      font-weight: 800;
+      font-size: 14px;
+      line-height: 1.35;
+      font-weight: 700;
       color: var(--muted);
       text-transform: uppercase;
-      margin: 0;
-      max-width: 100%;
-      text-wrap: balance;
-    }
-
-    .status-stack {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      margin-top: 2px;
-    }
-
-    .status-row {
-      font-size: clamp(12px, 1.55vw, 16px);
-      line-height: 1.28;
-      font-weight: 800;
-      color: #d9f2f2;
-      text-transform: uppercase;
-      margin: 0;
-    }
-
-    .weather-row {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin-top: 4px;
-      flex-wrap: wrap;
-    }
-
-    .weather-icon {
-      width: 30px;
-      height: 30px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      line-height: 1;
-    }
-
-    .weather-text {
-      font-size: clamp(12px, 1.55vw, 16px);
-      line-height: 1.28;
-      font-weight: 800;
-      color: #d9f2f2;
-      text-transform: uppercase;
-      margin: 0;
-    }
-
-    .school-label {
-      font-size: clamp(15px, 2vw, 22px);
-      line-height: 1.05;
-      font-weight: 900;
-      color: #ffffff;
-      text-transform: uppercase;
-      letter-spacing: 0.7px;
-      margin-bottom: 6px;
-    }
-
-    .school-number {
-      font-size: clamp(72px, 12.5vw, 132px);
-      line-height: 0.9;
-      font-weight: 900;
-      letter-spacing: -4px;
-      margin: 0;
-      background: var(--white-gradient);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      text-shadow: 0 6px 18px rgba(0,0,0,0.18);
-    }
-
-    .detail-row {
-      font-size: clamp(12px, 1.55vw, 16px);
-      line-height: 1.28;
-      color: #d9f2f2;
-      margin: 0;
-      font-weight: 800;
-      text-transform: uppercase;
-    }
-
-    .detail-row strong {
-      color: #ffffff;
     }
 
     .footer-note {
       margin-top: auto;
-      padding-top: 2px;
-      font-size: 10px;
+      padding-top: 10px;
+      font-size: 11px;
       line-height: 1.3;
       color: #b5d4d4;
       text-transform: uppercase;
@@ -288,35 +225,35 @@
       letter-spacing: 0.35px;
     }
 
-    @media (max-width: 700px) {
+    @media (max-width: 430px) {
       .app {
-        padding: 14px 12px 12px 12px;
+        min-height: 100vh;
+        min-height: 100dvh;
         border-radius: 28px;
+        padding: 18px 14px 14px 14px;
       }
 
-      .ghost-logo {
-        width: clamp(145%, 170vw, 185%);
-        top: 56%;
+      .logo-clear {
+        width: 82px;
+        max-width: 82px;
       }
 
-      .period-card,
-      .school-card {
+      .subtitle {
+        max-width: 280px;
+        font-size: 15px;
+      }
+
+      .launch-card {
+        padding: 16px 14px;
         border-radius: 24px;
       }
 
-      .period-card,
-      .school-card {
-        padding-left: 12px;
-        padding-right: 12px;
-      }
-
-      .school-number,
-      .timer {
-        letter-spacing: -3px;
+      .launch-desc {
+        font-size: 13px;
       }
 
       .footer-note {
-        font-size: 9px;
+        font-size: 10px;
       }
     }
   </style>
@@ -326,416 +263,28 @@
     <div class="app">
       <img src="PV_Logo.png" alt="" class="ghost-logo">
       <div class="content">
-        <p class="eyebrow">PVHS Countdown Clock</p>
-
-        <div class="period-card">
-          <div class="block-label" id="blockLabel">Loading</div>
-          <div class="timer normal" id="timerText">--:--</div>
-          <p class="subtext" id="subText">Checking today’s schedule</p>
-
-          <div class="status-stack">
-            <p class="status-row" id="scheduleText">Schedule: --</p>
-            <p class="status-row" id="timeText">Time: --</p>
-          </div>
-
-          <div class="weather-row">
-            <div class="weather-icon" id="weatherIcon">⛅</div>
-            <p class="weather-text" id="weatherText">Santa Maria Weather Loading</p>
-          </div>
+        <div class="header">
+          <img src="PV_Logo.png" alt="Pioneer Valley High School logo" class="logo-clear">
+          <p class="eyebrow">Official PVHS Tool</p>
+          <h1 class="title">PVHS Tools</h1>
+          <p class="subtitle">Quick access to live campus countdowns and staff extension search.</p>
         </div>
 
-        <div class="school-card">
-          <div class="school-label">School Days Left</div>
-          <div class="school-number" id="daysLeft">--</div>
-          <p class="detail-row">
-            <strong id="todayLabel">Today:</strong> <span id="todayText">--</span>
-          </p>
-          <p class="detail-row">
-            <strong>Last Day of School:</strong> June 10, 2026
-          </p>
+        <div class="launcher-stack">
+          <a class="launch-card" href="countdown.html">
+            <h2 class="launch-label">Countdown Clock</h2>
+            <p class="launch-desc">Live period countdown, school days left, and campus schedule tools.</p>
+          </a>
+
+          <a class="launch-card" href="extension_search.html">
+            <h2 class="launch-label">Extension Search</h2>
+            <p class="launch-desc">Search names, departments, positions, and phone extensions.</p>
+          </a>
         </div>
 
         <div class="footer-note">Created By: Mr. Silva</div>
       </div>
     </div>
   </div>
-
-  <script>
-    const timeZone = "America/Los_Angeles";
-    const SANTA_MARIA_QUERY = "Santa Maria, California";
-
-    const schoolDays = [
-      "2026-01-15","2026-01-16",
-      "2026-01-20","2026-01-21","2026-01-22","2026-01-23",
-      "2026-01-26","2026-01-27","2026-01-28","2026-01-29","2026-01-30",
-
-      "2026-02-02","2026-02-03","2026-02-04","2026-02-05","2026-02-06",
-      "2026-02-10","2026-02-11","2026-02-12","2026-02-13",
-      "2026-02-17","2026-02-18","2026-02-19","2026-02-20",
-      "2026-02-23","2026-02-24","2026-02-25","2026-02-26","2026-02-27",
-
-      "2026-03-02","2026-03-03","2026-03-04","2026-03-05","2026-03-06",
-      "2026-03-09","2026-03-10","2026-03-11","2026-03-12","2026-03-13",
-      "2026-03-16","2026-03-17","2026-03-18","2026-03-19","2026-03-20",
-      "2026-03-23","2026-03-24","2026-03-25","2026-03-26","2026-03-27",
-      "2026-03-30","2026-03-31",
-
-      "2026-04-01","2026-04-02",
-      "2026-04-13","2026-04-14","2026-04-15","2026-04-16","2026-04-17",
-      "2026-04-20","2026-04-21","2026-04-22","2026-04-23","2026-04-24",
-      "2026-04-27","2026-04-28","2026-04-29","2026-04-30",
-
-      "2026-05-01",
-      "2026-05-04","2026-05-05","2026-05-06","2026-05-07","2026-05-08",
-      "2026-05-11","2026-05-12","2026-05-13","2026-05-14","2026-05-15",
-      "2026-05-18","2026-05-19","2026-05-20","2026-05-21","2026-05-22",
-      "2026-05-26","2026-05-27","2026-05-28","2026-05-29",
-
-      "2026-06-01","2026-06-02","2026-06-03","2026-06-04","2026-06-05",
-      "2026-06-08","2026-06-09","2026-06-10"
-    ];
-
-    const noSchoolDays = new Set([
-      "2026-01-01","2026-01-02","2026-01-05","2026-01-06","2026-01-07","2026-01-08","2026-01-09",
-      "2026-01-12","2026-01-13","2026-01-14",
-      "2026-01-19",
-      "2026-02-09","2026-02-16",
-      "2026-04-03","2026-04-06","2026-04-07","2026-04-08","2026-04-09","2026-04-10",
-      "2026-05-25",
-      "2026-06-11"
-    ]);
-
-    const minimumDays = new Set([
-      "2026-02-27",
-      "2026-04-02",
-      "2026-04-24"
-    ]);
-
-    const finalsDays = new Set([
-      "2026-06-08",
-      "2026-06-09",
-      "2026-06-10"
-    ]);
-
-    const regularSchedule = [
-      { label: "1ST PERIOD", start: "08:30", end: "09:20" },
-      { label: "PASSING", start: "09:20", end: "09:30" },
-      { label: "2ND PERIOD", start: "09:30", end: "10:20" },
-      { label: "NUTRITION", start: "10:20", end: "10:35" },
-      { label: "3RD PERIOD", start: "10:35", end: "11:25" },
-      { label: "PASSING", start: "11:25", end: "11:35" },
-      { label: "4TH PERIOD", start: "11:35", end: "12:25" },
-      { label: "LUNCH", start: "12:25", end: "13:05" },
-      { label: "5TH PERIOD", start: "13:05", end: "13:55" },
-      { label: "PASSING", start: "13:55", end: "14:05" },
-      { label: "6TH PERIOD", start: "14:05", end: "14:55" },
-      { label: "PASSING", start: "14:55", end: "15:05" },
-      { label: "7TH PERIOD", start: "15:05", end: "15:55" }
-    ];
-
-    const mondaySchedule = [
-      { label: "1ST PERIOD", start: "08:30", end: "09:10" },
-      { label: "PASSING", start: "09:10", end: "09:20" },
-      { label: "2ND PERIOD", start: "09:20", end: "10:00" },
-      { label: "NUTRITION", start: "10:00", end: "10:15" },
-      { label: "3RD PERIOD", start: "10:15", end: "10:55" },
-      { label: "PASSING", start: "10:55", end: "11:05" },
-      { label: "4TH PERIOD", start: "11:05", end: "11:45" },
-      { label: "LUNCH", start: "11:45", end: "12:25" },
-      { label: "5TH PERIOD", start: "12:25", end: "13:05" },
-      { label: "PASSING", start: "13:05", end: "13:15" },
-      { label: "6TH PERIOD", start: "13:15", end: "13:55" },
-      { label: "PASSING", start: "13:55", end: "14:05" },
-      { label: "7TH PERIOD", start: "14:05", end: "14:45" }
-    ];
-
-    const minimumDaySchedule = [
-      { label: "1ST PERIOD", start: "08:30", end: "09:00" },
-      { label: "PASSING", start: "09:00", end: "09:10" },
-      { label: "2ND PERIOD", start: "09:10", end: "09:40" },
-      { label: "NUTRITION", start: "09:40", end: "09:55" },
-      { label: "3RD PERIOD", start: "09:55", end: "10:25" },
-      { label: "PASSING", start: "10:25", end: "10:35" },
-      { label: "4TH PERIOD", start: "10:35", end: "11:05" },
-      { label: "LUNCH", start: "11:05", end: "11:45" },
-      { label: "5TH PERIOD", start: "11:45", end: "12:15" },
-      { label: "PASSING", start: "12:15", end: "12:25" },
-      { label: "6TH PERIOD", start: "12:25", end: "12:55" },
-      { label: "PASSING", start: "12:55", end: "13:05" },
-      { label: "7TH PERIOD", start: "13:05", end: "13:35" }
-    ];
-
-    let weatherLoaded = false;
-
-    function getCaliforniaNowParts() {
-      const now = new Date();
-
-      const dateFormatter = new Intl.DateTimeFormat("en-CA", {
-        timeZone,
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit"
-      });
-
-      const timeFormatter = new Intl.DateTimeFormat("en-US", {
-        timeZone,
-        hour: "numeric",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: true
-      });
-
-      const weekdayFormatter = new Intl.DateTimeFormat("en-US", {
-        timeZone,
-        weekday: "long"
-      });
-
-      const longDateFormatter = new Intl.DateTimeFormat("en-US", {
-        timeZone,
-        weekday: "long",
-        month: "long",
-        day: "numeric",
-        year: "numeric"
-      });
-
-      const partsFormatter = new Intl.DateTimeFormat("en-US", {
-        timeZone,
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: false
-      });
-
-      const dateString = dateFormatter.format(now);
-      const weekday = weekdayFormatter.format(now);
-      const longDate = longDateFormatter.format(now);
-      const time12 = timeFormatter.format(now);
-
-      const parts = partsFormatter.formatToParts(now);
-      const hour = Number(parts.find(p => p.type === "hour").value);
-      const minute = Number(parts.find(p => p.type === "minute").value);
-      const second = Number(parts.find(p => p.type === "second").value);
-
-      return {
-        dateString,
-        weekday,
-        longDate,
-        time12,
-        minutesNow: hour * 60 + minute,
-        secondsNow: second
-      };
-    }
-
-    function parseTimeString(timeString) {
-      const [hour, minute] = timeString.split(":").map(Number);
-      return hour * 60 + minute;
-    }
-
-    function formatRemaining(totalSeconds) {
-      const safeSeconds = Math.max(0, totalSeconds);
-      const minutes = Math.floor(safeSeconds / 60);
-      const seconds = safeSeconds % 60;
-      return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-    }
-
-    function getTodayLabel(dateString) {
-      if (finalsDays.has(dateString)) {
-        return "Today (Finals):";
-      }
-      if (minimumDays.has(dateString)) {
-        return "Today (Minimum Day):";
-      }
-      return "Today:";
-    }
-
-    function getTodaySchedule(dateString, weekday) {
-      if (finalsDays.has(dateString)) {
-        return { type: "FINALS", blocks: [] };
-      }
-
-      if (noSchoolDays.has(dateString)) {
-        return { type: "NO SCHOOL", blocks: [] };
-      }
-
-      if (minimumDays.has(dateString)) {
-        return { type: "MINIMUM DAY", blocks: minimumDaySchedule };
-      }
-
-      if (weekday === "Monday") {
-        return { type: "COLLABORATION MONDAY", blocks: mondaySchedule };
-      }
-
-      return { type: "REGULAR DAY", blocks: regularSchedule };
-    }
-
-    function updateSchoolDays(california) {
-      const daysLeft = schoolDays.filter(day => day >= california.dateString).length;
-      document.getElementById("daysLeft").textContent = daysLeft;
-      document.getElementById("todayLabel").textContent = getTodayLabel(california.dateString);
-      document.getElementById("todayText").textContent = california.longDate;
-    }
-
-    function updatePeriodClock(california) {
-      const blockLabel = document.getElementById("blockLabel");
-      const timerText = document.getElementById("timerText");
-      const subText = document.getElementById("subText");
-      const scheduleText = document.getElementById("scheduleText");
-      const timeText = document.getElementById("timeText");
-
-      timeText.textContent = `Time: ${california.time12}`;
-      const todaySchedule = getTodaySchedule(california.dateString, california.weekday);
-      scheduleText.textContent = `Schedule: ${todaySchedule.type}`;
-
-      if (todaySchedule.type === "NO SCHOOL") {
-        blockLabel.textContent = "NO SCHOOL";
-        timerText.textContent = "--:--";
-        timerText.className = "timer normal";
-        subText.textContent = "Enjoy your day";
-        return;
-      }
-
-      if (todaySchedule.type === "FINALS") {
-        blockLabel.textContent = "FINALS";
-        timerText.textContent = "--:--";
-        timerText.className = "timer normal";
-        subText.textContent = "Final exam schedule coming soon";
-        return;
-      }
-
-      const currentAbsoluteSeconds = (california.minutesNow * 60) + california.secondsNow;
-      const blocks = todaySchedule.blocks;
-      let activeBlock = null;
-      let activeIndex = -1;
-
-      for (let i = 0; i < blocks.length; i++) {
-        const block = blocks[i];
-        const startSeconds = parseTimeString(block.start) * 60;
-        const endSeconds = parseTimeString(block.end) * 60;
-
-        if (currentAbsoluteSeconds >= startSeconds && currentAbsoluteSeconds < endSeconds) {
-          activeBlock = {
-            ...block,
-            startSeconds,
-            endSeconds
-          };
-          activeIndex = i;
-          break;
-        }
-      }
-
-      if (!activeBlock) {
-        const firstBlockStart = parseTimeString(blocks[0].start) * 60;
-        const lastBlockEnd = parseTimeString(blocks[blocks.length - 1].end) * 60;
-
-        if (currentAbsoluteSeconds < firstBlockStart) {
-          blockLabel.textContent = "SCHOOL STARTS SOON";
-          timerText.textContent = formatRemaining(firstBlockStart - currentAbsoluteSeconds);
-          timerText.className = "timer normal";
-          subText.textContent = "Time remaining until 1st Period";
-          return;
-        }
-
-        if (currentAbsoluteSeconds >= lastBlockEnd) {
-          blockLabel.textContent = "SCHOOL IS OUT";
-          timerText.textContent = "00:00";
-          timerText.className = "timer normal";
-          subText.textContent = "Have a great day";
-          return;
-        }
-      }
-
-      const remainingSeconds = activeBlock.endSeconds - currentAbsoluteSeconds;
-      const warning = remainingSeconds <= 300;
-      const nextBlock = blocks[activeIndex + 1];
-
-      blockLabel.textContent = activeBlock.label;
-      timerText.textContent = formatRemaining(remainingSeconds);
-      timerText.className = warning ? "timer warning" : "timer normal";
-
-      if (nextBlock) {
-        subText.textContent = `Time remaining until ${nextBlock.label}`;
-      } else {
-        subText.textContent = "Time remaining until school is out";
-      }
-    }
-
-    function getWeatherDescription(code) {
-      const map = {
-        0: { label: "Clear", icon: "☀️" },
-        1: { label: "Mostly Clear", icon: "🌤️" },
-        2: { label: "Partly Cloudy", icon: "⛅" },
-        3: { label: "Cloudy", icon: "☁️" },
-        45: { label: "Fog", icon: "🌫️" },
-        48: { label: "Fog", icon: "🌫️" },
-        51: { label: "Light Drizzle", icon: "🌦️" },
-        53: { label: "Drizzle", icon: "🌦️" },
-        55: { label: "Heavy Drizzle", icon: "🌧️" },
-        56: { label: "Freezing Drizzle", icon: "🌧️" },
-        57: { label: "Freezing Drizzle", icon: "🌧️" },
-        61: { label: "Light Rain", icon: "🌦️" },
-        63: { label: "Rain", icon: "🌧️" },
-        65: { label: "Heavy Rain", icon: "🌧️" },
-        66: { label: "Freezing Rain", icon: "🌧️" },
-        67: { label: "Freezing Rain", icon: "🌧️" },
-        71: { label: "Light Snow", icon: "🌨️" },
-        73: { label: "Snow", icon: "🌨️" },
-        75: { label: "Heavy Snow", icon: "❄️" },
-        77: { label: "Snow Grains", icon: "❄️" },
-        80: { label: "Rain Showers", icon: "🌦️" },
-        81: { label: "Rain Showers", icon: "🌧️" },
-        82: { label: "Heavy Showers", icon: "⛈️" },
-        85: { label: "Snow Showers", icon: "🌨️" },
-        86: { label: "Snow Showers", icon: "🌨️" },
-        95: { label: "Thunderstorm", icon: "⛈️" },
-        96: { label: "Storm and Hail", icon: "⛈️" },
-        99: { label: "Storm and Hail", icon: "⛈️" }
-      };
-      return map[code] || { label: "Weather", icon: "⛅" };
-    }
-
-    async function loadWeather() {
-      try {
-        const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(SANTA_MARIA_QUERY)}&count=1&language=en&format=json`;
-        const geoResponse = await fetch(geoUrl);
-        const geoData = await geoResponse.json();
-
-        if (!geoData.results || !geoData.results.length) {
-          throw new Error("No location found");
-        }
-
-        const { latitude, longitude } = geoData.results[0];
-
-        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code&temperature_unit=fahrenheit&timezone=${encodeURIComponent(timeZone)}`;
-        const weatherResponse = await fetch(weatherUrl);
-        const weatherData = await weatherResponse.json();
-
-        const current = weatherData.current;
-        const weather = getWeatherDescription(current.weather_code);
-        const temp = Math.round(current.temperature_2m);
-
-        document.getElementById("weatherIcon").textContent = weather.icon;
-        document.getElementById("weatherText").textContent = `Santa Maria ${temp}°F ${weather.label}`;
-        weatherLoaded = true;
-      } catch (error) {
-        document.getElementById("weatherIcon").textContent = "⛅";
-        document.getElementById("weatherText").textContent = "Santa Maria Weather Unavailable";
-      }
-    }
-
-    function updateApp() {
-      const california = getCaliforniaNowParts();
-      updateSchoolDays(california);
-      updatePeriodClock(california);
-    }
-
-    updateApp();
-    loadWeather();
-    setInterval(updateApp, 1000);
-    setInterval(() => {
-      if (weatherLoaded) {
-        loadWeather();
-      }
-    }, 600000);
-  </script>
 </body>
 </html>
