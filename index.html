@@ -10,10 +10,10 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="PVHS Tools">
   <meta name="theme-color" content="#007474">
-  <link rel="apple-touch-icon" href="PV_Logo.png?v=22">
-  <link rel="icon" type="image/png" sizes="192x192" href="PV_Logo.png?v=22">
-  <link rel="icon" type="image/png" sizes="512x512" href="PV_Logo.png?v=22">
-  <link rel="shortcut icon" href="PV_Logo.png?v=22">
+  <link rel="apple-touch-icon" href="PV_Logo.png?v=23">
+  <link rel="icon" type="image/png" sizes="192x192" href="PV_Logo.png?v=23">
+  <link rel="icon" type="image/png" sizes="512x512" href="PV_Logo.png?v=23">
+  <link rel="shortcut icon" href="PV_Logo.png?v=23">
   <title>PVHS Tools</title>
 
   <style>
@@ -113,7 +113,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
       min-height: 100%;
     }
 
@@ -164,16 +164,6 @@
       filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24));
     }
 
-    .eyebrow {
-      margin: 0;
-      font-size: 13px;
-      line-height: 1.1;
-      font-weight: 900;
-      letter-spacing: 0.8px;
-      color: #dff7f7;
-      text-transform: uppercase;
-    }
-
     .title {
       margin: 0;
       font-size: clamp(34px, 10vw, 56px);
@@ -199,7 +189,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      margin-top: 4px;
+      margin-top: 2px;
     }
 
     .launch-card {
@@ -212,7 +202,7 @@
       -webkit-backdrop-filter: blur(4px);
       text-decoration: none;
       color: var(--white);
-      padding: 16px 16px;
+      padding: 18px 16px;
       transition: background 0.18s ease, transform 0.12s ease, border-color 0.18s ease;
       display: block;
     }
@@ -227,21 +217,12 @@
     }
 
     .launch-label {
-      margin: 0 0 8px 0;
+      margin: 0;
       font-size: clamp(24px, 6.8vw, 36px);
       line-height: 0.95;
       font-weight: 900;
       text-transform: uppercase;
       letter-spacing: -0.5px;
-    }
-
-    .launch-desc {
-      margin: 0;
-      font-size: 13px;
-      line-height: 1.35;
-      font-weight: 700;
-      color: var(--muted);
-      text-transform: uppercase;
     }
 
     .quick-links-wrap {
@@ -250,17 +231,6 @@
       flex-direction: column;
       gap: 10px;
       margin-top: 2px;
-    }
-
-    .quick-links-title {
-      margin: 0;
-      font-size: 11px;
-      line-height: 1.2;
-      font-weight: 900;
-      letter-spacing: 0.7px;
-      color: #dff7f7;
-      text-transform: uppercase;
-      text-align: center;
     }
 
     .quick-links-grid {
@@ -357,12 +327,8 @@
       }
 
       .launch-card {
-        padding: 15px 14px;
+        padding: 16px 14px;
         border-radius: 24px;
-      }
-
-      .launch-desc {
-        font-size: 12px;
       }
 
       .quick-links-grid {
@@ -397,26 +363,21 @@
 
         <div class="header">
           <img src="PV_Logo.png" alt="Pioneer Valley High School logo" class="logo-clear">
-          <p class="eyebrow">Official PVHS Tool</p>
           <h1 class="title">PVHS Tools</h1>
-          <p class="subtitle">Quick access to live campus countdowns, extension search, and teacher links.</p>
+          <p class="subtitle">Quick access to live campus countdowns and staff extension search.</p>
         </div>
 
         <div class="launcher-stack">
           <a class="launch-card" href="countdown.html">
             <h2 class="launch-label">Countdown Clock</h2>
-            <p class="launch-desc">Live period countdown, school days left, and campus schedule tools.</p>
           </a>
 
           <a class="launch-card" href="extension_search.html">
             <h2 class="launch-label">Extension Search</h2>
-            <p class="launch-desc">Search names, departments, positions, rooms, and phone extensions.</p>
           </a>
         </div>
 
         <div class="quick-links-wrap">
-          <p class="quick-links-title">Quick Links</p>
-
           <div class="quick-links-grid">
             <a
               class="quick-link-btn"
@@ -451,7 +412,7 @@
               target="_blank"
               rel="noopener noreferrer"
             >
-              <p class="quick-link-label">In Lieu Spread Sheet</p>
+              <p class="quick-link-label">In Lieu Spreadsheet</p>
             </a>
           </div>
         </div>
