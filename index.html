@@ -10,10 +10,10 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="PVHS Tools">
   <meta name="theme-color" content="#007474">
-  <link rel="apple-touch-icon" href="PV_Logo.png?v=12">
-  <link rel="icon" type="image/png" sizes="192x192" href="PV_Logo.png?v=12">
-  <link rel="icon" type="image/png" sizes="512x512" href="PV_Logo.png?v=12">
-  <link rel="shortcut icon" href="PV_Logo.png?v=12">
+  <link rel="apple-touch-icon" href="PV_Logo.png?v=15">
+  <link rel="icon" type="image/png" sizes="192x192" href="PV_Logo.png?v=15">
+  <link rel="icon" type="image/png" sizes="512x512" href="PV_Logo.png?v=15">
+  <link rel="shortcut icon" href="PV_Logo.png?v=15">
   <title>PVHS Tools</title>
 
   <style>
@@ -26,7 +26,6 @@
       --panel-border: rgba(255,255,255,0.12);
       --shadow: 0 20px 46px rgba(0,0,0,0.30);
       --soft-shadow: 0 12px 24px rgba(0,0,0,0.22);
-      --glow: radial-gradient(circle at center, rgba(255,255,255,0.08) 0%, transparent 36%);
       --card-hover: rgba(255,255,255,0.12);
     }
 
@@ -60,7 +59,11 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom) 16px;
+      padding:
+        max(14px, env(safe-area-inset-top))
+        16px
+        max(14px, env(safe-area-inset-bottom))
+        16px;
     }
 
     .app {
@@ -87,7 +90,7 @@
       inset: 0;
       pointer-events: none;
       background:
-        var(--glow),
+        radial-gradient(circle at center, rgba(255,255,255,0.08) 0%, transparent 36%),
         radial-gradient(circle at top, rgba(0,116,116,0.24) 0%, transparent 42%);
       z-index: 0;
     }
@@ -115,6 +118,36 @@
       flex-direction: column;
       align-items: center;
       gap: 16px;
+    }
+
+    .top-actions {
+      width: 100%;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      min-height: 38px;
+    }
+
+    .popout-btn {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.08);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: var(--soft-shadow);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    .popout-btn:active {
+      transform: scale(0.985);
     }
 
     .header {
@@ -225,6 +258,12 @@
       letter-spacing: 0.35px;
     }
 
+    @media (max-width: 700px) {
+      .popout-btn {
+        display: none;
+      }
+    }
+
     @media (max-width: 430px) {
       .app {
         min-height: 100vh;
@@ -262,7 +301,12 @@
   <div class="frame">
     <div class="app">
       <img src="PV_Logo.png" alt="" class="ghost-logo">
+
       <div class="content">
+        <div class="top-actions">
+          <button id="popoutBtn" class="popout-btn" type="button">Pop Out</button>
+        </div>
+
         <div class="header">
           <img src="PV_Logo.png" alt="Pioneer Valley High School logo" class="logo-clear">
           <p class="eyebrow">Official PVHS Tool</p>
@@ -278,7 +322,7 @@
 
           <a class="launch-card" href="extension_search.html">
             <h2 class="launch-label">Extension Search</h2>
-            <p class="launch-desc">Search names, departments, positions, and phone extensions.</p>
+            <p class="launch-desc">Search names, departments, positions, rooms, and phone extensions.</p>
           </a>
         </div>
 
@@ -286,5 +330,37 @@
       </div>
     </div>
   </div>
+
+  <script>
+    const popoutBtn = document.getElementById("popoutBtn");
+
+    function openPopoutWindow() {
+      const width = 430;
+      const height = 880;
+      const left = Math.max(0, Math.round((window.screen.width - width) / 2));
+      const top = Math.max(0, Math.round((window.screen.height - height) / 2));
+
+      window.open(
+        window.location.href,
+        "pvhsToolsPopout",
+        [
+          `width=${width}`,
+          `height=${height}`,
+          `left=${left}`,
+          `top=${top}`,
+          "resizable=yes",
+          "scrollbars=yes",
+          "toolbar=no",
+          "menubar=no",
+          "location=no",
+          "status=no"
+        ].join(",")
+      );
+    }
+
+    if (popoutBtn) {
+      popoutBtn.addEventListener("click", openPopoutWindow);
+    }
+  </script>
 </body>
 </html>
