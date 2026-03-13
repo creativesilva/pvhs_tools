@@ -1,0 +1,596 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+  >
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="PVHS Extension Search">
+  <meta name="theme-color" content="#007474">
+  <link rel="apple-touch-icon" href="PV_Logo.png?v=14">
+  <link rel="icon" type="image/png" sizes="192x192" href="PV_Logo.png?v=14">
+  <link rel="icon" type="image/png" sizes="512x512" href="PV_Logo.png?v=14">
+  <link rel="shortcut icon" href="PV_Logo.png?v=14">
+  <title>PVHS Extension Search</title>
+
+  <style>
+    :root {
+      --teal: #007474;
+      --white: #f7fbfb;
+      --muted: #cfe3e3;
+      --panel: rgba(255,255,255,0.08);
+      --panel-border: rgba(255,255,255,0.12);
+      --shadow: 0 20px 46px rgba(0,0,0,0.30);
+      --soft-shadow: 0 12px 24px rgba(0,0,0,0.22);
+      --white-gradient: linear-gradient(180deg, #ffffff 0%, #dceaea 100%);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      background: #021414;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--white);
+      touch-action: pan-y;
+    }
+
+    .frame {
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: env(safe-area-inset-top) 14px env(safe-area-inset-bottom) 14px;
+    }
+
+    .app {
+      width: min(100%, 430px);
+      min-height: min(94vh, 920px);
+      min-height: min(94dvh, 920px);
+      border-radius: 34px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,0.12);
+      background:
+        radial-gradient(circle at center, rgba(10,34,34,0.94) 0%, rgba(4,20,20,0.98) 46%, rgba(0,116,116,1) 100%);
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      padding: 16px 14px 14px 14px;
+      text-align: center;
+      isolation: isolate;
+    }
+
+    .app::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at center, rgba(255,255,255,0.06) 0%, transparent 34%),
+        radial-gradient(circle at top, rgba(0,116,116,0.22) 0%, transparent 42%);
+      z-index: 0;
+    }
+
+    .ghost-logo {
+      position: absolute;
+      top: 56%;
+      left: 50%;
+      width: 178%;
+      max-width: none;
+      transform: translate(-50%, -50%);
+      opacity: 0.072;
+      filter: grayscale(100%) contrast(108%) brightness(114%);
+      pointer-events: none;
+      z-index: 0;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topbar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 2px;
+    }
+
+    .logo-clear {
+      width: 52px;
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24));
+      flex: 0 0 auto;
+    }
+
+    .page-title {
+      flex: 1 1 auto;
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.05;
+      font-weight: 900;
+      letter-spacing: 0.8px;
+      color: #dff7f7;
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    .home-link {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 62px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--white);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .search-card,
+    .results-card {
+      width: 100%;
+      border-radius: 28px;
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      box-shadow: var(--soft-shadow);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    .search-card {
+      padding: 16px 14px 14px 14px;
+    }
+
+    .results-card {
+      padding: 12px;
+      text-align: left;
+      min-height: 320px;
+    }
+
+    .search-title {
+      margin: 0 0 8px 0;
+      font-size: clamp(24px, 7vw, 40px);
+      line-height: 0.95;
+      font-weight: 900;
+      letter-spacing: -0.6px;
+      text-transform: uppercase;
+    }
+
+    .helper-text {
+      margin: 0 0 12px 0;
+      font-size: 12px;
+      line-height: 1.35;
+      font-weight: 800;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .search-input {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 18px;
+      padding: 14px 14px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+      background: rgba(0,0,0,0.18);
+      outline: none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .search-input::placeholder {
+      color: #bdd5d5;
+      opacity: 0.9;
+    }
+
+    .result-count {
+      margin: 0 0 10px 0;
+      font-size: 11px;
+      line-height: 1.3;
+      font-weight: 900;
+      color: #dff7f7;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .results-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .result-item {
+      border-radius: 20px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.10);
+      padding: 12px 12px 10px 12px;
+    }
+
+    .result-name {
+      margin: 0 0 4px 0;
+      font-size: 17px;
+      line-height: 1.15;
+      font-weight: 900;
+      color: #ffffff;
+      text-transform: uppercase;
+    }
+
+    .result-role,
+    .result-dept,
+    .result-ext {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.35;
+      font-weight: 800;
+      color: #d8f1f1;
+      text-transform: uppercase;
+    }
+
+    .result-ext {
+      margin-top: 6px;
+      font-size: 15px;
+      color: #ffffff;
+      letter-spacing: 0.2px;
+    }
+
+    .empty-state {
+      margin: 0;
+      padding: 14px 10px;
+      font-size: 13px;
+      line-height: 1.4;
+      font-weight: 800;
+      color: #d8f1f1;
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    .footer-note {
+      margin-top: auto;
+      padding-top: 2px;
+      font-size: 10px;
+      line-height: 1.3;
+      color: #b5d4d4;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.35px;
+    }
+
+    @media (max-width: 430px) {
+      .app {
+        min-height: 100vh;
+        min-height: 100dvh;
+        border-radius: 28px;
+        padding: 14px 12px 12px 12px;
+      }
+
+      .search-card,
+      .results-card {
+        border-radius: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <div class="app">
+      <img src="PV_Logo.png" alt="" class="ghost-logo">
+      <div class="content">
+        <div class="topbar">
+          <img src="PV_Logo.png" alt="Pioneer Valley High School logo" class="logo-clear">
+          <h1 class="page-title">Extension Search</h1>
+          <a class="home-link" href="index.html">Home</a>
+        </div>
+
+        <div class="search-card">
+          <h2 class="search-title">Find Extensions</h2>
+          <p class="helper-text">Search by name, role, department, room, or extension</p>
+          <input
+            id="searchInput"
+            class="search-input"
+            type="text"
+            placeholder="Try Silva, counseling, principal, 5322..."
+            autocomplete="off"
+            autocapitalize="words"
+            spellcheck="false"
+          >
+        </div>
+
+        <div class="results-card">
+          <p class="result-count" id="resultCount">Showing suggested contacts</p>
+          <div class="results-list" id="resultsList"></div>
+        </div>
+
+        <div class="footer-note">Created By: Mr. Silva</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const extensionSearch = [
+      { name: "Chris Silva", role: "Industrial Tech", extension: "5322", department: "Industrial Tech", room: "322", keywords: ["silva","chris","industrial tech","ind tech","room 322","322","teacher","photography"] },
+      { name: "Laura Garcia Solorio", role: "VPA", extension: "5322", department: "VPA", room: "322", keywords: ["laura","garcia","solorio","garcia solorio","vpa","room 322","322","teacher"] },
+      { name: "Dr. Paul Robinson", role: "Principal", extension: "5701", department: "Administration", room: "", keywords: ["robinson","paul","dr robinson","principal","administration"] },
+      { name: "Araceli Mandujano", role: "Admin Assistant", extension: "5702", department: "Administration", room: "", keywords: ["mandujano","araceli","admin assistant","administration"] },
+      { name: "Kevin Ilac", role: "Asst Principal", extension: "5703", department: "Administration", room: "", keywords: ["ilac","kevin","assistant principal","asst principal","administration"] },
+      { name: "Susan Hook", role: "Admin Assistant", extension: "5704", department: "Administration", room: "", keywords: ["hook","susan","admin assistant","administration"] },
+      { name: "Merrie Okie-Goldin", role: "Asst Principal", extension: "5707", department: "Administration", room: "", keywords: ["okie-goldin","merrie","assistant principal","asst principal","administration"] },
+      { name: "Cecilia Baddley", role: "Admin Assistant Sub", extension: "5708", department: "Administration", room: "", keywords: ["baddley","cecilia","admin assistant","sub","administration"] },
+      { name: "Jeff Hromadka", role: "Asst Principal", extension: "5709", department: "Administration", room: "", keywords: ["hromadka","jeff","assistant principal","asst principal","administration"] },
+      { name: "Fabi Etheridge", role: "Admin Assistant", extension: "5710", department: "Administration", room: "", keywords: ["etheridge","fabi","admin assistant","administration"] },
+      { name: "Christian Basulto", role: "Dean", extension: "5122", department: "Administration", room: "", keywords: ["basulto","christian","dean","administration"] },
+      { name: "Karine Perez", role: "Admin Assistant", extension: "5123", department: "Administration", room: "", keywords: ["perez","karine","admin assistant","administration"] },
+      { name: "Receptionist", role: "Front Office", extension: "5770", department: "Administration", room: "", keywords: ["receptionist","front office","office"] },
+      { name: "Attendance Office", role: "Attendance", extension: "5105 / 5107", department: "Attendance", room: "", keywords: ["attendance","attendance office","office"] },
+      { name: "Araceli Castro", role: "Attendance", extension: "5105", department: "Attendance", room: "", keywords: ["castro","araceli","attendance"] },
+      { name: "Laura Mariscal Mendez", role: "Attendance Assistant", extension: "5107", department: "Attendance", room: "", keywords: ["mariscal","mendez","laura","attendance assistant","attendance"] },
+      { name: "Registrar", role: "Records Office", extension: "5764", department: "Records", room: "", keywords: ["registrar","records","records office"] },
+      { name: "Technology Help Desk", role: "Help Desk", extension: "4612", department: "Technology", room: "", keywords: ["technology","tech","help desk","it","computer"] },
+      { name: "Elissa Gonzalez", role: "Tech TOSA", extension: "5696", department: "Technology", room: "", keywords: ["gonzalez","elissa","technology","tech tosa","tosa"] },
+      { name: "Technology Emergency", role: "Technology", extension: "5708", department: "Technology", room: "", keywords: ["technology emergency","tech emergency","technology"] },
+      { name: "Student Store", role: "Student Store", extension: "5104", department: "Student Store", room: "", keywords: ["student store","store"] },
+      { name: "Lisa Walters", role: "Activities", extension: "5508", department: "Activities", room: "", keywords: ["walters","lisa","activities","activities director"] },
+      { name: "Mike Bloodworth", role: "Athletics", extension: "5750", department: "Athletics", room: "", keywords: ["bloodworth","mike","athletics","athletic director"] },
+      { name: "Flor Avila-Suarez", role: "Community Liaison", extension: "5711", department: "Support Services", room: "", keywords: ["avila-suarez","flor","community liaison","liaison"] },
+      { name: "Sergio Orozco", role: "Psychologist", extension: "5705", department: "Psychologists", room: "", keywords: ["orozco","sergio","psychologist","psych"] },
+      { name: "Serina Rodriguez", role: "Psychologist", extension: "5757", department: "Psychologists", room: "", keywords: ["rodriguez","serina","psychologist","psych"] },
+      { name: "Erica Tajon", role: "Psychologist", extension: "5712", department: "Psychologists", room: "", keywords: ["tajon","erica","psychologist","psych"] },
+      { name: "Juan Antonio-Martinez", role: "EAOP Counselor", extension: "5692", department: "Counseling", room: "", keywords: ["antonio-martinez","juan","eaop","counselor","career center"] },
+      { name: "Susan Avrit", role: "Counselor", extension: "5775", department: "Counseling", room: "", keywords: ["avrit","susan","counselor","counseling"] },
+      { name: "Crystal Buchan", role: "Counselor", extension: "5601", department: "Counseling", room: "", keywords: ["buchan","crystal","counselor","counseling"] },
+      { name: "Chris Carrillo", role: "Counselor", extension: "5198", department: "Counseling", room: "", keywords: ["carrillo","chris","christopher","counselor","counseling"] },
+      { name: "Miriana Del Toro", role: "Counselor", extension: "5754", department: "Counseling", room: "", keywords: ["del toro","miriana","counselor","counseling"] },
+      { name: "Heydi Elenes", role: "Counselor", extension: "5768", department: "Counseling", room: "", keywords: ["elenes","heydi","counselor","counseling"] },
+      { name: "Israel Hernandez", role: "Counselor", extension: "5111", department: "Counseling", room: "", keywords: ["hernandez","israel","counselor","counseling"] },
+      { name: "Rebecca Leadbetter", role: "Counselor", extension: "5766", department: "Counseling", room: "", keywords: ["leadbetter","rebecca","counselor","counseling"] },
+      { name: "Nadia Mancha", role: "Counselor", extension: "5767", department: "Counseling", room: "", keywords: ["mancha","nadia","ventura","counselor","counseling"] },
+      { name: "Rocio Trujillo", role: "Counselor", extension: "5763", department: "Counseling", room: "", keywords: ["trujillo","rocio","counselor","counseling"] },
+      { name: "Gabriela Bardawil", role: "Guidance Technician", extension: "5118", department: "Counseling", room: "", keywords: ["bardawil","gabriela","guidance","guidance tech","counseling"] },
+      { name: "Robin Rocco", role: "Guidance Secretary", extension: "5771", department: "Counseling", room: "", keywords: ["rocco","robin","guidance secretary","guidance","counseling"] },
+      { name: "Marina Rodriguez-Vargas", role: "Guidance Technician", extension: "5117", department: "Counseling", room: "", keywords: ["rodriguez","vargas","marina","guidance","guidance tech","counseling"] },
+      { name: "Melissa Diaz", role: "FCS", extension: "5314", department: "FCS", room: "", keywords: ["diaz","melissa","fcs","family consumer science"] },
+      { name: "Kelsey Erbstoesser", role: "FCS", extension: "5313", department: "FCS", room: "", keywords: ["erbstoesser","kelsey","fcs","family consumer science"] },
+      { name: "Hector Guerra", role: "Agriculture", extension: "5207", department: "Agriculture", room: "", keywords: ["guerra","hector","agriculture","ag"] },
+      { name: "Marcie Guerra", role: "Agriculture", extension: "5212", department: "Agriculture", room: "", keywords: ["guerra","marcie","agriculture","ag"] },
+      { name: "Natalie Baldwin", role: "Ag", extension: "5206", department: "Agriculture", room: "", keywords: ["baldwin","natalie","agriculture","ag"] },
+      { name: "Brooke Phillips", role: "Agriculture", extension: "5334", department: "Agriculture", room: "", keywords: ["phillips","brooke","agriculture","ag"] },
+      { name: "Gabriel Ponce", role: "Agriculture", extension: "5208", department: "Agriculture", room: "", keywords: ["ponce","gabriel","agriculture","ag"] },
+      { name: "Tyler Dickinson", role: "Ag", extension: "5311", department: "Agriculture", room: "", keywords: ["dickinson","tyler","agriculture","ag"] },
+      { name: "Erin Nelson", role: "Business", extension: "5435", department: "Business", room: "", keywords: ["nelson","erin","business"] },
+      { name: "Erika Quintana", role: "Business", extension: "5335", department: "Business", room: "", keywords: ["quintana","erika","business"] },
+      { name: "Michelle Allen", role: "Science", extension: "5414", department: "Science", room: "", keywords: ["allen","michelle","science"] },
+      { name: "Arturo Avila-Meza", role: "Science", extension: "5413", department: "Science", room: "", keywords: ["avila-meza","arturo","science"] },
+      { name: "Laura Baines", role: "Science", extension: "5425", department: "Science", room: "", keywords: ["baines","laura","science"] },
+      { name: "Alexis Black-Gotham", role: "Science", extension: "5424", department: "Science", room: "", keywords: ["black-gotham","alexis","science"] },
+      { name: "Sierra Carlberg", role: "Science", extension: "5422", department: "Science", room: "", keywords: ["carlberg","sierra","science"] },
+      { name: "Riccardo Magni", role: "Science", extension: "5411", department: "Science", room: "", keywords: ["magni","riccardo","science"] },
+      { name: "Martinez, Megan", role: "Science / CTE", extension: "5423", department: "Science", room: "", keywords: ["martinez","megan","science","cte"] },
+      { name: "Nikki Knowlson", role: "Science", extension: "5421", department: "Science", room: "", keywords: ["knowlson","nikki","science"] },
+      { name: "Madelyn Schenk", role: "Science", extension: "5402", department: "Science", room: "", keywords: ["schenk","madelyn","science"] },
+      { name: "Nicole Shedd", role: "Science", extension: "5403", department: "Science", room: "", keywords: ["shedd","nicole","science"] },
+      { name: "Brooke Baarstad", role: "Math", extension: "5209", department: "Math", room: "", keywords: ["baarstad","brooke","math"] },
+      { name: "Prubjeet Bajwa", role: "Math", extension: "5618", department: "Math", room: "", keywords: ["bajwa","prubjeet","math"] },
+      { name: "Elvira Camacho", role: "Math", extension: "5453", department: "Math", room: "", keywords: ["camacho","elvira","math"] },
+      { name: "Andy Curtis", role: "Math", extension: "5210", department: "Math", room: "", keywords: ["curtis","andy","math"] },
+      { name: "Hedy Eachus", role: "Math", extension: "5461", department: "Math", room: "", keywords: ["eachus","hedy","math"] },
+      { name: "Neil Eckardt", role: "Math", extension: "5609", department: "Math", room: "", keywords: ["eckardt","neil","math"] },
+      { name: "Laurie Geronimo", role: "Math", extension: "5627", department: "Math", room: "", keywords: ["geronimo","laurie","math"] },
+      { name: "Rogelio Ordonez Aguilar", role: "Math", extension: "5466", department: "Math", room: "", keywords: ["ordonez","aguilar","rogelio","math"] },
+      { name: "Denise Ortiz", role: "Math", extension: "5451", department: "Math", room: "", keywords: ["ortiz","denise","math"] },
+      { name: "Patty Peinado", role: "Math", extension: "5626", department: "Math", room: "", keywords: ["peinado","patty","math"] },
+      { name: "Jennifer Rios", role: "Math", extension: "5462", department: "Math", room: "", keywords: ["rios","jennifer","math"] },
+      { name: "Brooke Bloodworth", role: "Athletics", extension: "5750", department: "Athletics", room: "", keywords: ["athletics","athletic director","bloodworth"] },
+      { name: "Jim Doyle", role: "Physical Ed", extension: "5514", department: "PE", room: "", keywords: ["doyle","jim","pe","physical ed"] },
+      { name: "Sally Hemesath", role: "Physical Ed", extension: "5576", department: "PE", room: "", keywords: ["hemesath","sally","pe","physical ed"] },
+      { name: "Dustin Davis", role: "Physical Education", extension: "5513", department: "PE", room: "", keywords: ["davis","dustin","pe","physical education"] },
+      { name: "Macias, Aundrea", role: "Physical Ed", extension: "5515", department: "PE", room: "", keywords: ["macias","aundrea","pe","physical ed"] },
+      { name: "Rothford, J Ryan", role: "PE", extension: "5516", department: "PE", room: "", keywords: ["rothford","ryan","j ryan","pe"] },
+      { name: "Hallie Smith", role: "PE and ROP", extension: "5517 / 5551", department: "PE", room: "", keywords: ["smith","hallie","pe","rop"] },
+      { name: "Stephanie Fikri", role: "VPA", extension: "5312", department: "VPA", room: "", keywords: ["fikri","stephanie","vpa"] },
+      { name: "Lisbet Barriga Chavez", role: "VPA", extension: "5203", department: "VPA", room: "", keywords: ["barriga","chavez","lisbet","vpa"] },
+      { name: "Selyn Harwin", role: "VPA", extension: "5202", department: "VPA", room: "", keywords: ["harwin","selyn","vpa"] },
+      { name: "Richard Hernandez", role: "VPA Choir", extension: "5201", department: "VPA", room: "", keywords: ["hernandez","richard","choir","vpa"] },
+      { name: "Mankin, Rileigh", role: "VPA", extension: "5331", department: "VPA", room: "", keywords: ["mankin","rileigh","vpa"] },
+      { name: "Christine Linne", role: "Industrial Tech", extension: "5204", department: "Industrial Tech", room: "", keywords: ["linne","christine","industrial tech","ind tech"] },
+      { name: "Scott Wonnell", role: "Industrial Tech", extension: "5205", department: "Industrial Tech", room: "", keywords: ["wonnell","scott","industrial tech","ind tech"] },
+      { name: "Patrick Brickey", role: "Independent Study", extension: "5126", department: "Independent Study", room: "", keywords: ["brickey","patrick","independent study","ind study"] },
+      { name: "Lynette Wyller", role: "Independent Study", extension: "5227", department: "Independent Study", room: "", keywords: ["wyller","lynette","independent study","ind study"] },
+      { name: "Melticia Brown", role: "Xerox", extension: "5112", department: "Office Support", room: "", keywords: ["brown","melticia","xerox"] },
+      { name: "Lisa Bisquera", role: "Textbooks", extension: "5106", department: "Textbooks", room: "", keywords: ["bisquera","lisa","textbooks"] },
+      { name: "Ting, Esther", role: "Lab Specialist", extension: "5102", department: "Technology", room: "", keywords: ["ting","esther","lab specialist","plato","computer room"] },
+      { name: "Cristian Cardenas", role: "ELO", extension: "5103", department: "ELO", room: "", keywords: ["cardenas","cristian","elo","plato"] },
+      { name: "Rule, Adam", role: "Careers", extension: "5608", department: "Careers", room: "", keywords: ["rule","adam","careers","career center"] },
+      { name: "Mederos, Melani", role: "Career Center", extension: "5604", department: "Careers", room: "", keywords: ["mederos","melani","career center","careers"] },
+      { name: "Data Specialist", role: "Data Specialist", extension: "5761", department: "Data", room: "", keywords: ["data specialist","data","torres"] },
+      { name: "Erik Torres", role: "Data Specialist", extension: "5761", department: "Data", room: "", keywords: ["torres","erik","data specialist","data"] }
+    ];
+
+    const searchInput = document.getElementById("searchInput");
+    const resultsList = document.getElementById("resultsList");
+    const resultCount = document.getElementById("resultCount");
+
+    function normalizeText(value) {
+      return String(value || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9\s/]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function levenshtein(a, b) {
+      const m = a.length;
+      const n = b.length;
+      const dp = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
+
+      for (let i = 0; i <= m; i++) dp[i][0] = i;
+      for (let j = 0; j <= n; j++) dp[0][j] = j;
+
+      for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+          const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+          dp[i][j] = Math.min(
+            dp[i - 1][j] + 1,
+            dp[i][j - 1] + 1,
+            dp[i - 1][j - 1] + cost
+          );
+        }
+      }
+      return dp[m][n];
+    }
+
+    function buildSearchText(entry) {
+      return normalizeText([
+        entry.name,
+        entry.role,
+        entry.department,
+        entry.extension,
+        entry.room ? `room ${entry.room}` : "",
+        ...(entry.keywords || [])
+      ].join(" "));
+    }
+
+    function scoreEntry(entry, query) {
+      const q = normalizeText(query);
+      const haystack = buildSearchText(entry);
+
+      if (!q) return 1;
+
+      if (haystack === q) return 200;
+      if (normalizeText(entry.name) === q) return 180;
+      if (normalizeText(entry.extension) === q) return 175;
+      if (haystack.startsWith(q)) return 140;
+      if (normalizeText(entry.name).startsWith(q)) return 150;
+      if (haystack.includes(q)) return 120;
+
+      const keywords = [entry.name, entry.role, entry.department, entry.extension, ...(entry.keywords || [])]
+        .map(normalizeText)
+        .filter(Boolean);
+
+      let best = 0;
+
+      for (const word of keywords) {
+        if (word.startsWith(q)) best = Math.max(best, 110);
+        if (word.includes(q)) best = Math.max(best, 100);
+
+        const distance = levenshtein(q, word);
+        if (q.length >= 4 && distance <= 2) best = Math.max(best, 88 - distance * 10);
+        if (q.length >= 6 && distance <= 3) best = Math.max(best, 82 - distance * 8);
+      }
+
+      const tokens = q.split(" ").filter(Boolean);
+      if (tokens.length > 1) {
+        let matched = 0;
+        for (const token of tokens) {
+          if (haystack.includes(token)) matched++;
+        }
+        if (matched > 0) {
+          best = Math.max(best, 70 + matched * 8);
+        }
+      }
+
+      return best;
+    }
+
+    function getDisplayResults(query) {
+      const q = normalizeText(query);
+
+      if (!q) {
+        return [
+          extensionSearch.find(x => x.name === "Dr. Paul Robinson"),
+          extensionSearch.find(x => x.name === "Receptionist"),
+          extensionSearch.find(x => x.name === "Attendance Office"),
+          extensionSearch.find(x => x.name === "Technology Help Desk"),
+          extensionSearch.find(x => x.name === "Chris Silva"),
+          extensionSearch.find(x => x.name === "Laura Garcia Solorio"),
+          extensionSearch.find(x => x.name === "Christian Basulto"),
+          extensionSearch.find(x => x.name === "Susan Avrit")
+        ].filter(Boolean);
+      }
+
+      const scored = extensionSearch
+        .map(entry => ({ entry, score: scoreEntry(entry, q) }))
+        .filter(item => item.score > 0)
+        .sort((a, b) => b.score - a.score || a.entry.name.localeCompare(b.entry.name))
+        .slice(0, 12)
+        .map(item => item.entry);
+
+      return scored;
+    }
+
+    function renderResults(query) {
+      const results = getDisplayResults(query);
+      resultsList.innerHTML = "";
+
+      if (!normalizeText(query)) {
+        resultCount.textContent = "Showing suggested contacts";
+      } else {
+        resultCount.textContent = `${results.length} result${results.length === 1 ? "" : "s"} found`;
+      }
+
+      if (!results.length) {
+        resultsList.innerHTML = `<p class="empty-state">No close matches found. Try a last name, department, role, room number, or extension.</p>`;
+        return;
+      }
+
+      for (const entry of results) {
+        const item = document.createElement("div");
+        item.className = "result-item";
+
+        const roomLine = entry.room ? `<p class="result-dept">ROOM: ${entry.room}</p>` : "";
+
+        item.innerHTML = `
+          <p class="result-name">${entry.name}</p>
+          <p class="result-role">${entry.role}</p>
+          <p class="result-dept">${entry.department}</p>
+          ${roomLine}
+          <p class="result-ext">EXTENSION: ${entry.extension}</p>
+        `;
+
+        resultsList.appendChild(item);
+      }
+    }
+
+    searchInput.addEventListener("input", () => {
+      renderResults(searchInput.value);
+    });
+
+    renderResults("");
+  </script>
+</body>
+</html>
