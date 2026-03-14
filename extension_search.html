@@ -105,6 +105,15 @@
       background: radial-gradient(circle at center, rgba(10,34,34,0.94) 0%, rgba(4,20,20,0.98) 46%, rgba(0,116,116,1) 100%);
     }
 
+    body.is-standalone::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(10,34,34,0.94) 0%, rgba(4,20,20,0.98) 46%, rgba(0,116,116,1) 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
     body.is-standalone .frame {
       position: fixed;
       top: 0;
@@ -113,6 +122,7 @@
       width: var(--standalone-app-width);
       height: var(--standalone-app-height);
       min-height: var(--standalone-app-height);
+      z-index: 1;
     }
 
     body.is-standalone .app {
@@ -122,9 +132,9 @@
       height: var(--standalone-app-height);
       max-width: none;
       max-height: none;
-      border-radius: 0;
+      border-radius: 0 0 34px 34px;
       border: none;
-      box-shadow: none;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.18);
       padding-top: max(10px, env(safe-area-inset-top));
       padding-right: max(var(--app-spacing), env(safe-area-inset-right));
       padding-bottom: max(var(--app-spacing), calc(var(--app-spacing) + env(safe-area-inset-bottom)));
