@@ -11,8 +11,8 @@
   <meta name="theme-color" content="#007474">
   
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="apple-touch-icon" href="PV_Logo.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="PV_Logo.png">
+  <link rel="apple-touch-icon" href="PV_AppIcon.png">
+  <link rel="icon" type="image/png" sizes="1024x1024" href="PV_AppIcon.png">
   <title>PVHS Tools</title>
 
   <style>
@@ -58,7 +58,7 @@
       position: relative; z-index: 1; width: 100%; height: 100%; 
       display: flex; flex-direction: column; align-items: center; 
       overflow-y: auto; -webkit-overflow-scrolling: touch;
-      padding: 6px var(--app-spacing) 18px var(--app-spacing);
+      padding: 4px var(--app-spacing) 14px var(--app-spacing);
     }
     
     .top-actions { width: 100%; display: flex; justify-content: flex-end; align-items: center; flex-shrink: 0; }
@@ -72,44 +72,44 @@
     }
     .popout-pill:active { background: var(--card-hover); }
 
-    .header { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 3px; margin-top: -3px; }
-    .logo-clear { width: 68px; height: auto; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); }
-    .title { margin: 0; font-size: clamp(36px, 10.5vw, 42px); font-weight: 900; text-transform: uppercase; letter-spacing: -1px; text-align: center; line-height: 0.95; }
-    .greeting { margin: 4px 0 0 0; font-size: 12px; font-weight: 800; color: #00d1d1; text-transform: uppercase; letter-spacing: 1px; }
-    .subtitle { margin: 2px 0 10px 0; max-width: 280px; font-size: 12px; line-height: 1.35; font-weight: 700; color: var(--muted); text-align: center; }
+    .header { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: -4px; }
+    .logo-clear { width: 64px; height: auto; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); }
+    .title { margin: 0; font-size: clamp(34px, 10vw, 40px); font-weight: 900; text-transform: uppercase; letter-spacing: -1px; text-align: center; line-height: 0.95; }
+    .greeting { margin: 2px 0 0 0; font-size: 11px; font-weight: 800; color: #00d1d1; text-transform: uppercase; letter-spacing: 1px; }
+    .subtitle { margin: 2px 0 8px 0; max-width: 292px; font-size: 11px; line-height: 1.25; font-weight: 700; color: var(--muted); text-align: center; }
 
-    .launcher-stack { width: 100%; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
+    .launcher-stack { width: 100%; display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
     .launch-card {
-      width: 100%; min-height: 58px; border-radius: 22px; background: var(--panel); border: 1px solid var(--panel-border);
-      text-decoration: none; color: var(--white); padding: 10px 18px;
+      width: 100%; min-height: 52px; border-radius: 20px; background: var(--panel); border: 1px solid var(--panel-border);
+      text-decoration: none; color: var(--white); padding: 8px 18px;
       display: flex; align-items: center; justify-content: center;
       transition: background 0.2s, transform 0.1s;
     }
     .launch-card:active { transform: scale(0.98); background: var(--card-hover); }
-    .launch-label { font-size: 18px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+    .launch-label { font-size: 17px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
 
-    .quick-links-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+    .quick-links-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
     .quick-link-btn {
-      display: flex; align-items: center; justify-content: center; min-height: 58px;
-      padding: 10px; border-radius: 18px; text-decoration: none; color: #fff;
+      display: flex; align-items: center; justify-content: center; min-height: 52px;
+      padding: 8px; border-radius: 17px; text-decoration: none; color: #fff;
       background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
       backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); text-align: center;
       transition: background 0.2s;
     }
     .quick-link-btn:active { background: var(--card-hover); }
-    .quick-link-label { font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
+    .quick-link-label { font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.45px; }
 
-    .footer-note { margin-top: auto; padding: 14px 0 4px 0; font-size: 10px; color: #b5d4d4; text-transform: uppercase; font-weight: 800; text-align: center; flex-shrink: 0; }
+    .footer-note { margin-top: auto; padding: 10px 0 2px 0; font-size: 10px; color: #b5d4d4; text-transform: uppercase; font-weight: 800; text-align: center; flex-shrink: 0; }
 
     body.is-standalone {
-      background: radial-gradient(circle at center, rgba(10,34,34,0.94) 0%, rgba(4,20,20,0.98) 46%, rgba(0,116,116,1) 100%);
+      background: #021414;
     }
 
     body.is-standalone::before {
       content: "";
       position: fixed;
       inset: 0;
-      background: radial-gradient(circle at center, rgba(10,34,34,0.94) 0%, rgba(4,20,20,0.98) 46%, rgba(0,116,116,1) 100%);
+      background: #021414;
       pointer-events: none;
       z-index: 0;
     }
@@ -127,9 +127,12 @@
 
     body.is-standalone .app {
       position: absolute;
-      inset: 0;
-      width: var(--standalone-app-width);
-      height: var(--standalone-app-height);
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: max(22px, env(safe-area-inset-bottom));
+      width: auto;
+      height: auto;
       max-width: none;
       max-height: none;
       border-radius: 0 0 34px 34px;
@@ -138,9 +141,9 @@
     }
 
     body.is-standalone .content {
-      padding-top: max(6px, env(safe-area-inset-top));
+      padding-top: max(4px, env(safe-area-inset-top));
       padding-right: max(var(--app-spacing), env(safe-area-inset-right));
-      padding-bottom: max(18px, calc(18px + env(safe-area-inset-bottom)));
+      padding-bottom: 12px;
       padding-left: max(var(--app-spacing), env(safe-area-inset-left));
     }
 
@@ -186,7 +189,9 @@
           <a class="quick-link-btn" href="https://login.frontlineeducation.com/login" target="_blank"><p class="quick-link-label">Absences</p></a>
           <a class="quick-link-btn" href="https://smjuhsd-my.sharepoint.com/:x:/g/personal/etorres_smjuhsd_org/IQBiSObgdkR3R68_dXHYrDwfAbA5RpN-scClTiKQddgcsLU" target="_blank"><p class="quick-link-label">In Lieu</p></a>
           <a class="quick-link-btn" href="https://drive.google.com/drive/home" target="_blank"><p class="quick-link-label">Google</p></a>
-          <a class="quick-link-btn" href="https://www.parentsquare.com/" target="_blank"><p class="quick-link-label">ParentSquare</p></a>
+          <a class="quick-link-btn" href="https://www.parentsquare.com/signin" target="_blank"><p class="quick-link-label">ParentSquare</p></a>
+          <a class="quick-link-btn" href="https://santamariajuhsd.aeries.net" target="_blank"><p class="quick-link-label">Aeries</p></a>
+          <a class="quick-link-btn" href="https://smjuhsd.instructure.com/login/saml" target="_blank"><p class="quick-link-label">Canvas</p></a>
         </div>
         <div class="footer-note">CREATED BY: MR. SILVA</div>
       </div>
