@@ -10,8 +10,8 @@
   "theme_color": "#007474",
   "icons": [
     {
-      "src": "/pvhs_tools/PV_Logo.png",
-      "sizes": "3048x3293",
+      "src": "/pvhs_tools/PV_AppIcon.png",
+      "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "any"
     }
