@@ -29,18 +29,13 @@
 
     .frame {
       width: 100%; height: 100dvh; display: flex; align-items: center; justify-content: center;
-      background: #021414; /* Ensures dark background behind the app */
-      padding: 10px;
+      background: #021414; padding: 10px;
     }
 
     .app {
-      width: min(100%, 414px); 
-      height: min(100%, 850px);
-      aspect-ratio: 9 / 19.5;
-      border-radius: var(--radius); 
-      overflow: hidden; 
-      position: relative; 
-      box-shadow: var(--shadow);
+      width: min(100%, 414px); height: min(100%, 850px);
+      aspect-ratio: 9 / 19.5; border-radius: var(--radius); 
+      overflow: hidden; position: relative; box-shadow: var(--shadow);
       border: 1px solid rgba(255,255,255,0.12);
       background: radial-gradient(circle at center, rgba(10,34,34,0.94) 0%, rgba(4,20,20,0.98) 46%, rgba(0,116,116,1) 100%);
       display: flex; flex-direction: column;
@@ -54,23 +49,23 @@
 
     .content { position: relative; z-index: 1; width: 100%; height: 100%; display: flex; flex-direction: column; gap: 12px; }
     
-    .top-actions { width: 100%; display: flex; justify-content: flex-end; align-items: center; margin-bottom: 4px; }
-    
-    .popout-btn {
-      appearance: none; border: 1px solid rgba(255,255,255,0.12); border-radius: 12px;
-      padding: 8px 10px; background: rgba(255,255,255,0.08); color: #fff;
-      font-size: 10px; font-weight: 900; text-transform: uppercase; cursor: pointer;
+    .action-pill {
+      display: flex; align-self: flex-end; background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--panel-border); border-radius: 14px; overflow: hidden;
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); margin-bottom: 8px;
     }
 
-    .topbar { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-    .logo-clear { width: 48px; height: auto; }
-    .page-title { flex: 1; font-size: 15px; font-weight: 900; color: #dff7f7; text-transform: uppercase; margin: 0; text-align: center; letter-spacing: 0.5px;}
-    
-    .home-link {
-      padding: 8px 12px; border-radius: 14px; background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.12); color: #fff; text-decoration: none;
+    .pill-btn {
+      appearance: none; background: transparent; border: none; color: #fff;
       font-size: 10px; font-weight: 900; text-transform: uppercase;
+      padding: 10px 14px; cursor: pointer; text-decoration: none; display: flex; align-items: center;
     }
+
+    .pill-divider { width: 1px; background: var(--panel-border); height: 100%; }
+
+    .topbar { width: 100%; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 4px; }
+    .logo-clear { width: 44px; height: auto; position: absolute; left: 0; }
+    .page-title { font-size: 16px; font-weight: 900; color: #dff7f7; text-transform: uppercase; margin: 0; letter-spacing: 1px;}
 
     .search-card, .results-card {
       width: 100%; border-radius: 24px; background: var(--panel); border: 1px solid var(--panel-border);
@@ -89,9 +84,7 @@
     }
 
     .result-count { margin-bottom: 10px; font-size: 10px; font-weight: 900; color: #dff7f7; text-transform: uppercase; text-align: center; opacity: 0.8;}
-    
     .results-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-bottom: 20px; }
-    
     .result-item { border-radius: 18px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); padding: 14px; }
     .result-name { margin: 0 0 2px 0; font-size: 15px; font-weight: 900; color: #fff; text-transform: uppercase; }
     .result-line { margin: 0; font-size: 10px; font-weight: 700; color: #d8f1f1; text-transform: uppercase; opacity: 0.7; }
@@ -99,11 +92,7 @@
 
     .footer-note { margin-top: auto; padding: 10px 0 4px 0; font-size: 8px; color: #b5d4d4; text-transform: uppercase; font-weight: 800; opacity: 0.6; text-align: center; letter-spacing: 1px; }
 
-    /* Reduced mobile breakpoint so popout keeps its shape */
-    @media (max-width: 380px) {
-      .app { border-radius: 0; border: none; width: 100%; height: 100dvh; aspect-ratio: auto; }
-      .frame { padding: 0; }
-    }
+    @media (max-width: 380px) { .app { border-radius: 0; border: none; width: 100%; height: 100dvh; aspect-ratio: auto; } .frame { padding: 0; } }
   </style>
 </head>
 <body>
@@ -111,14 +100,11 @@
     <div class="app">
       <img src="PV_Logo.png" alt="" class="ghost-logo">
       <div class="content">
-        <div class="top-actions">
-          <button id="popoutBtn" class="popout-btn" type="button">Pop Out</button>
+        <div class="action-pill">
+          <a href="index.html" class="pill-btn">Home</a>
+          <div id="popoutSection" style="display: flex;"><div class="pill-divider"></div><button id="popoutBtn" class="pill-btn" type="button">Pop Out</button></div>
         </div>
-        <div class="topbar">
-          <img src="PV_Logo.png" alt="Logo" class="logo-clear">
-          <h1 class="page-title">Extension Search</h1>
-          <a class="home-link" href="index.html">Home</a>
-        </div>
+        <div class="topbar"><img src="PV_Logo.png" alt="Logo" class="logo-clear"><h1 class="page-title">Extension Search</h1></div>
         <div class="search-card">
           <h2 class="search-title">Directory</h2>
           <p class="helper-text">Search by Name, Department, or Extension</p>
@@ -134,61 +120,251 @@
   </div>
 
   <script>
+    // FULL DATABASE LOADED FROM CSV (241 Contacts)
     const extensionSearch = [
-      { name: "PVHS Emergency Line", role: "Emergency", extension: "5000", keywords: ["emergency", "urgent"] },
-      { name: "PVHS Maintenance", role: "Emergency", extension: "878-8155", keywords: ["maintenance", "maint", "urgent"] },
-      { name: "Julie Norris", role: "Maintenance Secretary", extension: "5275", department: "Maintenance" },
-      { name: "Chris Silva", role: "Visual and Performing Arts / Teacher", extension: "5322", room: "322", keywords: ["photography", "art"] },
-      { name: "Laura Garcia Solorio", role: "Visual and Performing Arts / Teacher", extension: "5322", room: "322" },
-      { name: "Araceli Mandujano", role: "Administrative Assistant", extension: "5702", department: "Administration" },
-      { name: "Kevin Ilac", role: "Assistant Principal", extension: "5703", department: "Administration" },
-      { name: "Merrie Okie-Goldin", role: "Assistant Principal", extension: "5707", department: "Administration" },
-      { name: "Jeff Hromadka", role: "Assistant Principal", extension: "5709", department: "Administration" },
-      { name: "Christian Basulto", role: "Dean", extension: "5122", department: "Administration" },
-      { name: "Chris Carrillo", role: "Counselor / Department Chair", extension: "5198", department: "Guidance" },
-      { name: "Susan Avrit", role: "Counselor", extension: "5775", department: "Guidance" },
-      { name: "Heydi Elenes", role: "Counselor", extension: "5768", department: "Guidance" },
-      { name: "Sandra Gonzalez", role: "Counselor", extension: "5765", department: "Guidance" },
-      { name: "Nadia Mancha", role: "Counselor", extension: "5767", department: "Guidance" },
-      { name: "Rocio Trujillo", role: "Counselor", extension: "5763", department: "Guidance" },
-      { name: "Brooke Baarstad", role: "Mathematics / Department Chair", extension: "5209", department: "Mathematics" },
-      { name: "Sharon Domingues", role: "Mathematics / Site Council", extension: "5456", department: "Mathematics" },
-      { name: "Hector Guerra", role: "Agriculture / Department Chair", extension: "5207", department: "Agriculture" },
-      { name: "Gabriel Ponce", role: "Agriculture / Department Chair", extension: "5208", department: "Agriculture" },
-      { name: "Selyn Harwin", role: "Visual and Performing Arts / Department Chair", extension: "5202", department: "Visual and Performing Arts", room: "Drama" },
-      { name: "Christine Linne", role: "Industrial Technology / Department Chair", extension: "5204", department: "Industrial Technology" },
-      { name: "Scott Wonnell", role: "Industrial Technology / Department Chair", extension: "5205", department: "Industrial Technology" },
-      { name: "Riccardo Magni", role: "Science / Department Chair", extension: "5411", department: "Science" },
-      { name: "Brett Dodson", role: "Social Science / Department Chair", extension: "5634", department: "Social Science" },
-      { name: "Eric Jeffres", role: "Special Education / Department Chair", extension: "5363", department: "Special Education" },
-      { name: "John Ruiz", role: "Special Education / Department Chair", extension: "5629", department: "Special Education" },
-      { name: "Jesse Zambrano", role: "International Languages / Department Chair", extension: "5213", department: "International Languages" },
-      { name: "Annette MacCuish", role: "English / Department Chair", extension: "5365", department: "English" },
-      { name: "Jim Doyle", role: "Physical Education / Department Chair", extension: "5514", department: "Physical Education" },
-      { name: "Lisa Walters", role: "Activities Director", extension: "5508", department: "ASB" },
-      { name: "Eddie Hernandez", role: "Security", extension: "5773" },
-      { name: "Karine Perez", role: "Administrative Assistant", extension: "5123", department: "Administration" },
-      { name: "Attendance Office", role: "Office", extension: "5105 / 5107" },
-      { name: "Health Office", role: "Nurse", extension: "5760" },
-      { name: "Library", role: "Librarian", extension: "5101" },
-      { name: "Wellness Center", role: "Support", extension: "5310" },
-      { name: "Elias Camacho", role: "Maintenance Lead", extension: "5276" },
-      { name: "Tyson Ellis", role: "Plant Manager", extension: "5276" },
-      { name: "Ben Alberry", role: "Special Education Coordinator", extension: "5758" },
-      { name: "Juan Antonio-Martinez", role: "EAOP Counselor", extension: "5692" },
-      { name: "Rudy Binkele", role: "Teacher", extension: "5352", department: "English" },
-      { name: "Britta Bonaventure", role: "Teacher", extension: "5353", department: "English" },
-      { name: "Alan Brafman", role: "Teacher", extension: "5217", department: "International Languages" },
-      { name: "Bilena Brafman", role: "Teacher", extension: "5302", department: "English" },
-      { name: "Dustin Cornejo", role: "Teacher", extension: "5632", department: "Social Science" },
-      { name: "Tyler Dickinson", role: "Teacher", extension: "5311", department: "Agriculture" },
-      { name: "Stephanie Fikri", role: "Teacher", extension: "5312", department: "Visual and Performing Arts" },
-      { name: "Michele Lyon", role: "Teacher", extension: "5606", department: "Special Education" },
-      { name: "Teri Wisz (formerly Magni)", role: "Teacher", extension: "5301", department: "English" },
-      { name: "Tech Help Desk", role: "Information Technology Support", extension: "4612" }
+      {"name": "Adam Rule", "role": "Careers", "extension": "5608"},
+      {"name": "Alan Brafman", "role": "International Languages", "extension": "5217"},
+      {"name": "Alejandra Sanchez", "role": "International Languages", "extension": "5216"},
+      {"name": "Alejandro Gamboa", "role": "English", "extension": "5624"},
+      {"name": "Alexis Black-Gotham", "role": "Science", "extension": "5424"},
+      {"name": "Alice Mitchell", "role": "Special Education", "extension": "See page 2"},
+      {"name": "Alicia Ekberg", "role": "International Languages", "extension": "5218"},
+      {"name": "Allison Pehle", "role": "English", "extension": "5361"},
+      {"name": "Amy Argentieri", "role": "Cafeteria", "extension": "5675"},
+      {"name": "Andy Curtis", "role": "Mathematics", "extension": "5210"},
+      {"name": "Angela Collins", "role": "Crisis Intervention", "extension": "5693"},
+      {"name": "Angelica Meza", "role": "International Languages", "extension": "5401"},
+      {"name": "Annette MacCuish", "role": "English", "extension": "5365"},
+      {"name": "Antoinette Davis", "role": "Special Education", "extension": "See page 2"},
+      {"name": "Araceli Castro", "role": "Attendance", "extension": "5105"},
+      {"name": "Araceli Mandujano", "role": "Administrative Assistant", "extension": "5702"},
+      {"name": "Arele Tapia Vazquez", "role": "Family and Bilingual Support", "extension": "5114"},
+      {"name": "Argelia Perez-Servin", "role": "Interpreter", "extension": "5315"},
+      {"name": "Aris Manosar", "role": "Physical Education", "extension": "5575"},
+      {"name": "Armando Ojeda", "role": "Maintenance", "extension": "5276 (Main)"},
+      {"name": "Armando Osalde", "role": "Maintenance", "extension": "5276 (Main)"},
+      {"name": "Arnold Feher", "role": "English", "extension": "5321"},
+      {"name": "Arturo Arturo-Meza", "role": "Science", "extension": "5413"},
+      {"name": "Augusta Sharp", "role": "Special Education", "extension": "5432"},
+      {"name": "Aundrea Macias", "role": "Physical Education", "extension": "5515"},
+      {"name": "Ben Alberry", "role": "Special Education Coordinator", "extension": "5758"},
+      {"name": "Ben Rothstein", "role": "English", "extension": "5366"},
+      {"name": "Bilena Brafman", "role": "English", "extension": "5302"},
+      {"name": "Breanna Valero", "role": "Speech", "extension": "5558"},
+      {"name": "Brenda Lopez", "role": "Mathematics", "extension": "5452"},
+      {"name": "Brent Mathias", "role": "Social Science", "extension": "5615"},
+      {"name": "Brett Dodson", "role": "Social Science", "extension": "5634"},
+      {"name": "Britta Bonaventure", "role": "English", "extension": "5353"},
+      {"name": "Brooke Baarstad", "role": "Mathematics", "extension": "5209"},
+      {"name": "Brooke Phillips", "role": "Agriculture", "extension": "5334"},
+      {"name": "CPS", "role": "Agency", "extension": "737-7078"},
+      {"name": "CPS-Emergency Report", "role": "Agency", "extension": "800-367-0166"},
+      {"name": "Catherine Sturdivant", "role": "Accounting Assistant", "extension": "5119"},
+      {"name": "Cecilia Baddley", "role": "Administrative Assistant Sub", "extension": "5708"},
+      {"name": "Chase Richardson", "role": "Maintenance", "extension": "5276 (Main)"},
+      {"name": "Chris Carrillo", "role": "Counselor", "extension": "5198"},
+      {"name": "Chris Day", "role": "Maintenance", "extension": "5276 (Main)"},
+      {"name": "Chris Etheridge", "role": "Special Education", "extension": "5463"},
+      {"name": "Chris Harmon", "role": "Social Science", "extension": "5631"},
+      {"name": "Chris Silva", "role": "Visual and Performing Arts", "extension": "5322"},
+      {"name": "Christian Basulto", "role": "Dean", "extension": "5122"},
+      {"name": "Christine Linne", "role": "Industrial Technology", "extension": "5204"},
+      {"name": "Christine Watkins", "role": "Mathematics", "extension": "5698"},
+      {"name": "Clemente Moreno", "role": "Mathematics", "extension": "5625"},
+      {"name": "Cody Smith", "role": "Careers", "extension": "5610"},
+      {"name": "Cristian Cardenas", "role": "Extended Learning Opportunity", "extension": "5103"},
+      {"name": "Crystal Buchan", "role": "Counselor", "extension": "5601"},
+      {"name": "Cynthia Melendez", "role": "Food Services Supervisor", "extension": "5559"},
+      {"name": "Daci Hughes", "role": "English", "extension": "5332"},
+      {"name": "Danny Dearborn", "role": "Extended Learning Opportunity", "extension": "5431"},
+      {"name": "Delta High School", "role": "Agency", "extension": "937-6356"},
+      {"name": "Denise Ortiz", "role": "Mathematics", "extension": "5451"},
+      {"name": "Dennis Harpster", "role": "Social Science", "extension": "5622"},
+      {"name": "District Office - Superintendent", "role": "Agency", "extension": "4201/4202"},
+      {"name": "Drew Johnson", "role": "Special Education", "extension": "See page 2"},
+      {"name": "Dustin Cornejo", "role": "Social Science", "extension": "5632"},
+      {"name": "Dustin Davis", "role": "Physical Education", "extension": "5513"},
+      {"name": "Eddie Hernandez", "role": "Security", "extension": "5773"},
+      {"name": "Elias Camacho", "role": "Maintenance Lead", "extension": "5276 (Main)"},
+      {"name": "Elissa Gonzalez", "role": "Technology TOSA", "extension": "5696"},
+      {"name": "Elvira Camacho", "role": "Mathematics", "extension": "5453"},
+      {"name": "Emily Bajwa", "role": "English", "extension": "5351"},
+      {"name": "Eric Jeffres", "role": "Special Education", "extension": "5363"},
+      {"name": "Erica Tajon", "role": "Psychologist", "extension": "5712"},
+      {"name": "Erik Torres", "role": "Data Specialist", "extension": "5761"},
+      {"name": "Erika Quintana", "role": "Business", "extension": "5335"},
+      {"name": "Erin Nelson", "role": "Business", "extension": "5435"},
+      {"name": "Esther Ting", "role": "Lab Specialist", "extension": "5102"},
+      {"name": "Fabi Etheridge", "role": "Administrative Assistant", "extension": "5710"},
+      {"name": "Fernando Gomez", "role": "Maintenance", "extension": "5276 (Main)"},
+      {"name": "Filemon Meza", "role": "Science", "extension": "5417"},
+      {"name": "Flor Avila-Suarez", "role": "Community Liaison", "extension": "5711"},
+      {"name": "Gabe Diaz", "role": "Maintenance", "extension": "5276 (Main)"},
+      {"name": "Gabriel Navarrete", "role": "Social Science", "extension": "5636"},
+      {"name": "Gabriel Ponce", "role": "Agriculture", "extension": "5208"},
+      {"name": "Gabriela Bardawil", "role": "Guidance Technician", "extension": "5118"},
+      {"name": "Geraldo Canongo", "role": "English", "extension": "5621"},
+      {"name": "Giselle Gutierrez-Marron", "role": "English", "extension": "5630"},
+      {"name": "Glenn Fairchild", "role": "Social Science", "extension": "5635"},
+      {"name": "Greg Gentile", "role": "Maintenance", "extension": "5276 (Main)"},
+      {"name": "Hallie Smith", "role": "Physical Education", "extension": "5517/5551"},
+      {"name": "Harrison Keller", "role": "Special Education", "extension": "5415"},
+      {"name": "Hector Guerra", "role": "Agriculture", "extension": "5207"},
+      {"name": "Hedy Eachus", "role": "Mathematics", "extension": "5461"},
+      {"name": "Herlindo Magana", "role": "Mathematics", "extension": "5454"},
+      {"name": "Heydi Elenes", "role": "Counselor", "extension": "5768"},
+      {"name": "Ilyana Clark", "role": "Allan Hancock College", "extension": "5592"},
+      {"name": "Irma Gonzalez Morales", "role": "Librarian", "extension": "5101"},
+      {"name": "Isabel Esparza", "role": "Registrar", "extension": "5764"},
+      {"name": "Israel Hernandez", "role": "Counselor", "extension": "5111"},
+      {"name": "J/Ryan Rothford", "role": "Physical Education", "extension": "5516"},
+      {"name": "Jairo Oseguera", "role": "Maintenance", "extension": "5276 (Main)"},
+      {"name": "Jasmine Crisp", "role": "Special Education", "extension": "5555"},
+      {"name": "Jasmine Granados", "role": "Special Education Secretary", "extension": "5706"},
+      {"name": "Jay Edwards", "role": "Coach", "extension": "5602"},
+      {"name": "Jeff Hromadka", "role": "Assistant Principal", "extension": "5709"},
+      {"name": "Jennifer Jimenez-Contreras", "role": "Administrative Assistant", "extension": "5708"},
+      {"name": "Jennifer Melena", "role": "Athletic Trainer", "extension": "5510"},
+      {"name": "Jennifer Montanez", "role": "Family and Consumer Sciences", "extension": "5325"},
+      {"name": "Jennifer Ogren", "role": "English", "extension": "5211"},
+      {"name": "Jennifer Rios", "role": "Mathematics", "extension": "5462"},
+      {"name": "Jessica Zambrano", "role": "International Languages", "extension": "5213"},
+      {"name": "Jesus Leon", "role": "Maintenance", "extension": "5276 (Main)"},
+      {"name": "Jim Doyle", "role": "Physical Education", "extension": "5514"},
+      {"name": "Jody Dowell", "role": "Special Education", "extension": "5324"},
+      {"name": "Joe Leon", "role": "Maintenance", "extension": "5276 (Main)"},
+      {"name": "John Ruiz", "role": "Special Education", "extension": "5629"},
+      {"name": "Jon Marino", "role": "English", "extension": "5355"},
+      {"name": "Jose Gamino", "role": "Maintenance", "extension": "5276 (Main)"},
+      {"name": "Jose Sanchez", "role": "Maintenance", "extension": "5276 (Main)"},
+      {"name": "Jose Vasquez", "role": "Maintenance", "extension": "5276 (Main)"},
+      {"name": "Julie Norris", "role": "Maintenance Secretary", "extension": "5275"},
+      {"name": "Karine Perez", "role": "Administrative Assistant", "extension": "5123"},
+      {"name": "Katherine Hays", "role": "English", "extension": "5304"},
+      {"name": "Kayla Tucker", "role": "Special Education", "extension": "5433"},
+      {"name": "Kelly Davis", "role": "English", "extension": "5362"},
+      {"name": "Kelsey Erbstoesser", "role": "Family and Consumer Sciences", "extension": "5313"},
+      {"name": "Kevin llac", "role": "Assistant Principal", "extension": "5703"},
+      {"name": "Keyla Santos-Casillas", "role": "Interpreter", "extension": "5317"},
+      {"name": "Kiana Vanderham", "role": "English", "extension": "5638"},
+      {"name": "Kirsten Garberg", "role": "Special Education", "extension": "5360"},
+      {"name": "Kristina Sewell", "role": "English", "extension": "5323"},
+      {"name": "Laura Baines", "role": "Science", "extension": "5425"},
+      {"name": "Laura Garcia Solorio", "role": "Visual and Performing Arts", "extension": "5322", "room": "322"},
+      {"name": "Laura Mariscal Mendez", "role": "Attendance Assistant", "extension": "5107"},
+      {"name": "Laurie Geronimo", "role": "Mathematics", "extension": "5627"},
+      {"name": "Lesley Cuellar", "role": "Mathematics", "extension": "5465"},
+      {"name": "Leti Gamino", "role": "Health Technician", "extension": "5753"},
+      {"name": "Linda Jimenez", "role": "Maintenance", "extension": "5276 (Main)"},
+      {"name": "Lisa Bisquera", "role": "Textbook Office", "extension": "5106"},
+      {"name": "Lisa Walters", "role": "Activities", "extension": "5508"},
+      {"name": "Lisbet Barriga Chavez", "role": "Visual and Performing Arts", "extension": "5203"},
+      {"name": "Lizbeth Munoz Martinez", "role": "Receptionist", "extension": "5770"},
+      {"name": "Lynette Wyller", "role": "Independent Study", "extension": "5227"},
+      {"name": "Madelyn Schenk", "role": "Science", "extension": "5402"},
+      {"name": "Manuel Rivera", "role": "Maintenance", "extension": "5276 (Main)"},
+      {"name": "Marcie Guerra", "role": "Agriculture", "extension": "5212"},
+      {"name": "Marcus Guzman", "role": "Special Education", "extension": "5364"},
+      {"name": "Maria Garcia", "role": "Social Science", "extension": "5616"},
+      {"name": "Marina Rodriguez-Vargas", "role": "Guidance Technician", "extension": "5117"},
+      {"name": "Maritza Olguin", "role": "EGS", "extension": "5637"},
+      {"name": "Mark Veglia", "role": "Social Science", "extension": "5614"},
+      {"name": "Megan Martinez", "role": "Science / CTE", "extension": "5423"},
+      {"name": "Melani Mederos", "role": "Career Center", "extension": "5604"},
+      {"name": "Melissa Diaz", "role": "Family and Consumer Sciences", "extension": "5314"},
+      {"name": "Melissa Price", "role": "English", "extension": "5303"},
+      {"name": "Melticia Brown", "role": "Xerox / Mailroom", "extension": "5112"},
+      {"name": "Merrie Okie-Goldin", "role": "Assistant Principal", "extension": "5707"},
+      {"name": "Michelle Allen", "role": "Science", "extension": "5414"},
+      {"name": "Michelle Gabaldon", "role": "International Languages", "extension": "5215"},
+      {"name": "Michelle Lyon", "role": "Special Education", "extension": "5606"},
+      {"name": "Miguel Navarro", "role": "Maintenance", "extension": "5276 (Main)"},
+      {"name": "Mike Bloodworth", "role": "Athletics", "extension": "5750"},
+      {"name": "Mike Regan", "role": "Extended Learning Opportunity", "extension": "5605"},
+      {"name": "Miles Brown", "role": "English", "extension": "5354"},
+      {"name": "Miranda Fernandez", "role": "Physical Education", "extension": "5518"},
+      {"name": "Miriana Del Toro", "role": "Counselor", "extension": "5754"},
+      {"name": "Moises Tejeda", "role": "Maintenance", "extension": "5276 (Main)"},
+      {"name": "Monica Gonzales", "role": "Social Science", "extension": "5639"},
+      {"name": "Monica Leyva-Marquez", "role": "Mathematics", "extension": "5640"},
+      {"name": "Nadia Mancha", "role": "Counselor", "extension": "5767"},
+      {"name": "Natalie Baldwin", "role": "Agriculture", "extension": "5206"},
+      {"name": "Neil Eckardt", "role": "Mathematics", "extension": "5609"},
+      {"name": "Nicholas Mendoza", "role": "Maintenance", "extension": "5276 (Main)"},
+      {"name": "Nick Schwent", "role": "English", "extension": "5628"},
+      {"name": "Nicole Shedd", "role": "Science", "extension": "5403"},
+      {"name": "Nikki Knowison", "role": "Science", "extension": "5421"},
+      {"name": "PVHS Emergency Line", "role": "Emergency", "extension": "5000"},
+      {"name": "PVHS Maintenance", "role": "Emergency", "extension": "878-8155"},
+      {"name": "Pablo Ramos", "role": "Maintenance", "extension": "5276 (Main)"},
+      {"name": "Patrick Brickey", "role": "Independent Study", "extension": "5126"},
+      {"name": "Patrick Miller", "role": "Special Education", "extension": "5318"},
+      {"name": "Patty Costantinidis", "role": "Special Education", "extension": "5464"},
+      {"name": "Patty Peinado", "role": "Mathematics", "extension": "5626"},
+      {"name": "Paul Alvarez", "role": "Maintenance", "extension": "5276 (Main)"},
+      {"name": "Paul De Paulo", "role": "Social Science", "extension": "5607"},
+      {"name": "Prubjeet Bajwa", "role": "Mathematics", "extension": "5618"},
+      {"name": "Rachel McLean", "role": "EGS", "extension": "5612"},
+      {"name": "Ramiro Ruvalcaba", "role": "Family and Bilingual Support", "extension": "5116"},
+      {"name": "Rebecca Leadbetter", "role": "Counselor", "extension": "5766"},
+      {"name": "Regina Orosco", "role": "Special Education", "extension": "5333"},
+      {"name": "Ricardo Eliserio", "role": "Maintenance", "extension": "5276 (Main)"},
+      {"name": "Riccardo Magni", "role": "Science", "extension": "5411"},
+      {"name": "Richard Hernandez", "role": "Visual and Performing Arts - Choir", "extension": "5201"},
+      {"name": "Righetti High School", "role": "Agency", "extension": "937-2051"},
+      {"name": "Rileigh Mankin", "role": "Visual and Performing Arts", "extension": "5331"},
+      {"name": "Robin Rocco", "role": "Guidance Secretary", "extension": "5771"},
+      {"name": "Rocio Trujillo", "role": "Counselor", "extension": "5763"},
+      {"name": "Rogelio Ordonez Aguilar", "role": "Mathematics", "extension": "5466"},
+      {"name": "Ross Rivera", "role": "Mathematics", "extension": "5623"},
+      {"name": "Roxana Maldonado", "role": "International Languages", "extension": "5214"},
+      {"name": "Ruben Rodriguez", "role": "Maintenance", "extension": "5276 (Main)"},
+      {"name": "Rudy Binkele", "role": "English", "extension": "5352"},
+      {"name": "SBCEO", "role": "Agency", "extension": "964-4711"},
+      {"name": "SM Police Dept", "role": "Emergency", "extension": "928-3781"},
+      {"name": "SM-Bonita", "role": "Agency", "extension": "928-1783"},
+      {"name": "SMPD & Fire Dispatch", "role": "Emergency", "extension": "925-2631"},
+      {"name": "Sally Hemesath", "role": "Physical Education", "extension": "5576"},
+      {"name": "Salustia Meza", "role": "Interpreter", "extension": "5316"},
+      {"name": "Samuel Muller", "role": "Maintenance", "extension": "5276 (Main)"},
+      {"name": "Sandra Gonzalez", "role": "Counselor", "extension": "5765"},
+      {"name": "Santa Maria High School", "role": "Agency", "extension": "925-2567"},
+      {"name": "Scott Wonnell", "role": "Industrial Technology", "extension": "5205"},
+      {"name": "Selyn Harwin", "role": "Visual and Performing Arts", "extension": "5202"},
+      {"name": "Sergio Orozco", "role": "Psychologist", "extension": "5705"},
+      {"name": "Serina Rodriguez", "role": "Psychologist", "extension": "5757"},
+      {"name": "Shane Lyon", "role": "Social Science", "extension": "5633"},
+      {"name": "Shannon O'Neal", "role": "English", "extension": "5356"},
+      {"name": "Sharon Domingues", "role": "Mathematics", "extension": "5456"},
+      {"name": "Sierra Carlberg", "role": "Science", "extension": "5422"},
+      {"name": "Socorro Orozco", "role": "Nurse", "extension": "5760"},
+      {"name": "Stacie Martinez", "role": "Social Science", "extension": "5613"},
+      {"name": "Stephanie Fikri", "role": "Visual and Performing Arts", "extension": "5312"},
+      {"name": "Steve Molina", "role": "Mathematics", "extension": "5404"},
+      {"name": "Steve Ryan", "role": "In-School Intervention", "extension": "5405"},
+      {"name": "Susan Avrit", "role": "Counselor", "extension": "5775"},
+      {"name": "Susan Hook", "role": "Administrative Assistant", "extension": "5704"},
+      {"name": "Tara Sanchez", "role": "Speech", "extension": "5305"},
+      {"name": "Taylor (TJ) Jordan", "role": "Social Science", "extension": "5801"},
+      {"name": "Taylor Mihelic", "role": "Science", "extension": "5412"},
+      {"name": "Teri Wisz (formerly Magni)", "role": "English", "extension": "5301"},
+      {"name": "Tony Payne", "role": "Special Education", "extension": "5551"},
+      {"name": "Tracy Coates", "role": "Bookkeeper", "extension": "5120"},
+      {"name": "Trina Leornas", "role": "Mathematics", "extension": "5455"},
+      {"name": "Tyler Dickinson", "role": "Agriculture", "extension": "5311"},
+      {"name": "Tyson Ellis", "role": "Plant Manager", "extension": "5276"},
+      {"name": "Vanessa Carrillo", "role": "International Languages", "extension": "5219"},
+      {"name": "Vanessa Jimenez", "role": "LVN", "extension": "5751"},
+      {"name": "Victoria McConnell", "role": "Special Education", "extension": "5434"}
     ];
 
     const defaultSuggestions = ["PVHS Emergency Line", "Julie Norris", "Eddie Hernandez", "Karine Perez"];
+
+    function checkPopout() {
+      if (window.name === 'popout' || window.location.search.includes('popout=true')) {
+        document.getElementById('popoutSection').style.display = 'none';
+      }
+    }
 
     function getLevenshteinDistance(a, b) {
       const matrix = Array.from({ length: a.length + 1 }, (_, i) => [i]);
@@ -215,7 +391,7 @@
         resultCount.textContent = "Recommended Contacts";
       } else {
         results = extensionSearch.filter(e => {
-          const searchSpace = [e.name, e.role, e.department, e.extension, e.room, ...(e.keywords || [])].join(" ").toLowerCase();
+          const searchSpace = [e.name, e.role, (e.department || ""), e.extension, (e.room || "")].join(" ").toLowerCase();
           return searchSpace.includes(q);
         });
 
@@ -233,7 +409,6 @@
       results.forEach(entry => {
         const isPhoneNumber = entry.extension.replace(/[^0-9]/g, "").length > 4;
         const label = isPhoneNumber ? "Phone" : "Ext";
-
         const div = document.createElement("div");
         div.className = "result-item";
         div.innerHTML = `
@@ -247,11 +422,12 @@
     }
 
     searchInput.addEventListener("input", (e) => renderResults(e.target.value));
-    renderResults("");
-    
     document.getElementById("popoutBtn")?.addEventListener("click", () => {
-      window.open(window.location.href, 'popout', 'width=430,height=880');
+      window.open(window.location.href + '?popout=true', 'popout', 'width=430,height=880');
     });
+
+    checkPopout();
+    renderResults("");
   </script>
 </body>
 </html>
