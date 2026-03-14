@@ -21,7 +21,7 @@
       --shadow: 0 20px 46px rgba(0,0,0,0.30);
       --soft-shadow: 0 12px 24px rgba(0,0,0,0.22);
       --card-hover: rgba(255,255,255,0.12);
-      --app-spacing: 18px; /* Consistent padding for all pages */
+      --app-spacing: 18px;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -66,17 +66,31 @@
     
     .top-actions { width: 100%; display: flex; justify-content: flex-end; min-height: 34px; }
     
+    /* Pop Out Pill - Matches Home Button Style */
     .popout-pill {
-      background: rgba(255, 255, 255, 0.08); border: 1px solid var(--panel-border);
-      border-radius: 12px; padding: 8px 12px; color: #fff; font-size: 10px;
-      font-weight: 900; text-transform: uppercase; cursor: pointer; backdrop-filter: blur(4px);
+      appearance: none;
+      background: rgba(255, 255, 255, 0.08); 
+      border: 1px solid var(--panel-border);
+      border-radius: 12px; 
+      padding: 10px 12px; 
+      color: #fff; 
+      font-size: 10px;
+      font-weight: 900; 
+      text-transform: uppercase; 
+      cursor: pointer; 
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      text-decoration: none;
+      box-shadow: var(--soft-shadow);
     }
 
     .header { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; }
     .logo-clear { width: 80px; height: auto; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); }
     .title { margin: 0; font-size: clamp(34px, 10vw, 48px); line-height: 1; font-weight: 900; text-transform: uppercase; letter-spacing: -1px; }
     .greeting { margin: 0; font-size: 14px; font-weight: 800; color: #00d1d1; text-transform: uppercase; letter-spacing: 1px; }
-    .subtitle { margin: 0; max-width: 280px; font-size: 13px; line-height: 1.4; font-weight: 700; color: var(--muted); text-wrap: balance; }
+    
+    /* Subtitle centered */
+    .subtitle { margin: 0; max-width: 280px; font-size: 13px; line-height: 1.4; font-weight: 700; color: var(--muted); text-wrap: balance; text-align: center; }
 
     .launcher-stack { width: 100%; display: flex; flex-direction: column; gap: 12px; }
 
@@ -84,14 +98,14 @@
       width: 100%; border-radius: 24px; background: var(--panel); border: 1px solid var(--panel-border);
       box-shadow: var(--soft-shadow); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
       text-decoration: none; color: var(--white); padding: 20px 18px;
-      display: flex; align-items: center; justify-content: space-between;
+      display: flex; align-items: center; justify-content: center; /* Center buttons */
       transition: background 0.2s, transform 0.1s;
     }
 
     .launch-card:active { transform: scale(0.98); background: var(--card-hover); }
 
-    .launch-label { margin: 0; font-size: 18px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
-    .chevron { width: 18px; height: 18px; opacity: 0.5; }
+    /* Centered label inside buttons */
+    .launch-label { margin: 0; font-size: 18px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
 
     .quick-links-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
 
@@ -134,12 +148,10 @@
         <div class="launcher-stack">
           <a class="launch-card" href="countdown.html">
             <h2 class="launch-label">Classroom Countdown</h2>
-            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
           </a>
 
           <a class="launch-card" href="extension_search.html">
             <h2 class="launch-label">Search Directory</h2>
-            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
           </a>
         </div>
 
