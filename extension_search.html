@@ -20,6 +20,7 @@
       --panel-border: rgba(255,255,255,0.12);
       --shadow: 0 20px 46px rgba(0,0,0,0.30);
       --soft-shadow: 0 12px 24px rgba(0,0,0,0.22);
+      --side-margin: 12px;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -28,11 +29,12 @@
 
     .frame {
       width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
-      padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom)) 12px;
+      /* Added consistent bottom padding */
+      padding: max(12px, env(safe-area-inset-top)) var(--side-margin) max(var(--side-margin), env(safe-area-inset-bottom)) var(--side-margin);
     }
 
     .app {
-      width: min(100%, 430px); aspect-ratio: 430 / 880; max-height: calc(100dvh - 24px);
+      width: min(100%, 430px); aspect-ratio: 430 / 880; max-height: 100%;
       border-radius: 34px; overflow: hidden; position: relative; box-shadow: var(--shadow);
       border: 1px solid rgba(255,255,255,0.12);
       background: radial-gradient(circle at center, rgba(10,34,34,0.94) 0%, rgba(4,20,20,0.98) 46%, rgba(0,116,116,1) 100%);
@@ -44,7 +46,7 @@
       filter: grayscale(100%) contrast(108%) brightness(114%); pointer-events: none; z-index: 0; transform: translate(-50%, -50%);
     }
 
-    .content { position: relative; z-index: 1; width: 100%; display: flex; flex-direction: column; gap: 10px; min-height: 100%; }
+    .content { position: relative; z-index: 1; width: 100%; display: flex; flex-direction: column; gap: 10px; height: 100%; }
     .top-actions { width: 100%; display: flex; justify-content: flex-end; align-items: center; min-height: 34px; }
     
     .popout-btn {
@@ -69,7 +71,7 @@
     }
 
     .search-card { padding: 16px 14px; }
-    .results-card { padding: 12px; text-align: left; flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+    .results-card { padding: 12px 12px 0 12px; text-align: left; flex: 1; overflow: hidden; display: flex; flex-direction: column; }
 
     .search-title { margin: 0 0 4px 0; font-size: clamp(20px, 6vw, 32px); font-weight: 900; text-transform: uppercase; }
     .helper-text { margin: 0 0 12px 0; font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; }
@@ -80,7 +82,15 @@
     }
 
     .result-count { margin-bottom: 8px; font-size: 11px; font-weight: 900; color: #dff7f7; text-transform: uppercase; text-align: center; }
-    .results-list { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; padding-right: 2px; }
+    
+    .results-list { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 10px; 
+      overflow-y: auto; 
+      padding-right: 2px;
+      padding-bottom: 20px; /* This ensures the last item has space at the bottom */
+    }
     
     .result-item {
       border-radius: 20px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.10);
@@ -91,13 +101,11 @@
     .result-line { margin: 0; font-size: 11px; font-weight: 800; color: #d8f1f1; text-transform: uppercase; opacity: 0.9; }
     .result-ext { margin-top: 6px; font-size: 15px; font-weight: 900; color: #ffffff; }
 
-    .empty-state { padding: 20px; font-size: 13px; font-weight: 800; color: #d8f1f1; text-transform: uppercase; text-align: center; }
-    .footer-note { margin-top: auto; padding-top: 6px; font-size: 9px; color: #b5d4d4; text-transform: uppercase; font-weight: 700; }
+    .footer-note { margin-top: auto; padding: 8px 0; font-size: 9px; color: #b5d4d4; text-transform: uppercase; font-weight: 700; }
 
-    @media (max-width: 700px) { .popout-btn { display: none; } }
     @media (max-width: 430px) {
-      .frame { height: 100dvh; padding: 10px; }
-      .app { width: 100%; border-radius: 20px; aspect-ratio: auto; }
+      .frame { padding: 12px; height: 100dvh; }
+      .app { width: 100%; border-radius: 24px; aspect-ratio: auto; }
     }
   </style>
 </head>
@@ -120,7 +128,7 @@
           <input id="searchInput" class="search-input" type="text" placeholder="Silva, Math, 5105..." autocomplete="off">
         </div>
         <div class="results-card">
-          <p class="result-count" id="resultCount">Emergency Contacts</p>
+          <p class="result-count" id="resultCount">Recommended Contacts</p>
           <div class="results-list" id="resultsList"></div>
         </div>
         <div class="footer-note">PVHS Staff Directory 2025-2026</div>
@@ -129,7 +137,6 @@
   </div>
 
   <script>
-    // DATA SOURCE: Processed from PVHS Phone List 2025-2026
     const extensionSearch = [
       { name: "PVHS Emergency Line", role: "Emergency", extension: "5000", keywords: ["emergency", "urgent"] },
       { name: "PVHS Maintenance", role: "Emergency", extension: "878-8155", keywords: ["maint", "urgent"] },
@@ -183,15 +190,27 @@
       { name: "Tech Help Desk", role: "IT Support", extension: "4612" }
     ];
 
-    // Updated suggestions: Removed Dr. Paul Robinson and 911
     const defaultSuggestions = ["PVHS Emergency Line", "PVHS Maintenance", "Eddie Hernandez", "Karine Perez"];
+
+    // Levenshtein Logic for fuzzy searching
+    function getLevenshteinDistance(a, b) {
+      const matrix = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+      for (let j = 1; j <= b.length; j++) matrix[0][j] = j;
+      for (let i = 1; i <= a.length; i++) {
+        for (let j = 1; j <= b.length; j++) {
+          const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+          matrix[i][j] = Math.min(matrix[i - 1][j] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j - 1] + cost);
+        }
+      }
+      return matrix[a.length][b.length];
+    }
 
     const searchInput = document.getElementById("searchInput");
     const resultsList = document.getElementById("resultsList");
     const resultCount = document.getElementById("resultCount");
 
     function normalizeText(text) {
-      return (text || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+      return (text || "").toLowerCase().trim();
     }
 
     function renderResults(query) {
@@ -202,14 +221,24 @@
         results = extensionSearch.filter(e => defaultSuggestions.includes(e.name));
         resultCount.textContent = "Recommended Contacts";
       } else {
+        // Step 1: Filter by direct inclusion (standard search)
         results = extensionSearch.filter(e => {
-          const content = [e.name, e.role, e.department, e.extension, e.room, ...(e.keywords || [])].join(" ");
-          return normalizeText(content).includes(q);
-        }).sort((a, b) => a.name.localeCompare(b.name)).slice(0, 15);
-        resultCount.textContent = `${results.length} found`;
+          const searchSpace = [e.name, e.role, e.department, e.extension, e.room, ...(e.keywords || [])].join(" ").toLowerCase();
+          return searchSpace.includes(q);
+        });
+
+        // Step 2: If no direct matches, use fuzzy logic on names
+        if (results.length === 0 && q.length > 2) {
+          results = extensionSearch
+            .map(e => ({ ...e, dist: getLevenshteinDistance(q, e.name.toLowerCase().split(' ').pop()) })) // check last name
+            .filter(e => e.dist <= 2) // tolerance of 2 typos
+            .sort((a, b) => a.dist - b.dist);
+        }
+        
+        resultCount.textContent = results.length > 0 ? `${results.length} found` : "No results found";
       }
 
-      resultsList.innerHTML = results.length ? "" : '<p class="empty-state">No matches found. Try a last name or department.</p>';
+      resultsList.innerHTML = results.length ? "" : '<p style="text-align:center; padding:20px; opacity:0.6;">No matches found. Try a department or extension.</p>';
 
       results.forEach(entry => {
         const div = document.createElement("div");
@@ -225,11 +254,6 @@
     }
 
     searchInput.addEventListener("input", (e) => renderResults(e.target.value));
-    
-    document.getElementById("popoutBtn")?.addEventListener("click", () => {
-      window.open(window.location.href, 'popout', 'width=460,height=800');
-    });
-
     renderResults("");
   </script>
 </body>
