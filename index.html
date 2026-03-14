@@ -20,14 +20,14 @@
       --teal: #007474; --white: #f7fbfb; --muted: #cfe3e3;
       --panel: rgba(255,255,255,0.08); --panel-border: rgba(255,255,255,0.12);
       --shadow: 0 20px 46px rgba(0,0,0,0.30); --soft-shadow: 0 12px 24px rgba(0,0,0,0.22);
-      --card-hover: rgba(255,255,255,0.12); --app-spacing: 18px; --radius: 34px;
+      --card-hover: rgba(255,255,255,0.12); --app-spacing: 16px; --radius: 34px;
       --standalone-app-width: 100vw; --standalone-app-height: 100dvh;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
     html { height: -webkit-fill-available; }
     html, body { width: 100%; height: 100%; min-height: 100%; background: #021414; overflow: hidden; }
-    body { min-height: 100vh; min-height: 100dvh; min-height: -webkit-fill-available; font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; color: var(--white); touch-action: none; user-select: none; }
+    body { min-height: 100vh; min-height: 100dvh; min-height: -webkit-fill-available; font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; color: var(--white); touch-action: none; user-select: none; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
 
     /* The Frame ensures app stays centered with margins on Desktop/Popout */
     .frame { 
@@ -58,7 +58,7 @@
       position: relative; z-index: 1; width: 100%; height: 100%; 
       display: flex; flex-direction: column; align-items: center; 
       overflow-y: auto; -webkit-overflow-scrolling: touch;
-      padding: 4px var(--app-spacing) 14px var(--app-spacing);
+      padding: 2px var(--app-spacing) 12px var(--app-spacing);
     }
     
     .top-actions { width: 100%; display: flex; justify-content: flex-end; align-items: center; flex-shrink: 0; }
@@ -67,39 +67,39 @@
     .popout-pill {
       display: none; appearance: none;
       background: rgba(255, 255, 255, 0.08); border: 1px solid var(--panel-border);
-      border-radius: 14px; padding: 9px 14px; color: #fff; font-size: 11px; font-weight: 900; 
+      border-radius: 14px; padding: 8px 13px; color: #fff; font-size: 10px; font-weight: 700; 
       text-transform: uppercase; cursor: pointer; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
     }
     .popout-pill:active { background: var(--card-hover); }
 
-    .header { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: -4px; }
-    .logo-clear { width: 64px; height: auto; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); }
-    .title { margin: 0; font-size: clamp(34px, 10vw, 40px); font-weight: 900; text-transform: uppercase; letter-spacing: -1px; text-align: center; line-height: 0.95; }
-    .greeting { margin: 2px 0 0 0; font-size: 11px; font-weight: 800; color: #00d1d1; text-transform: uppercase; letter-spacing: 1px; }
-    .subtitle { margin: 2px 0 8px 0; max-width: 292px; font-size: 11px; line-height: 1.25; font-weight: 700; color: var(--muted); text-align: center; }
+    .header { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0; margin-top: -2px; }
+    .logo-clear { width: 60px; height: auto; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); }
+    .title { margin: 0; font-size: clamp(30px, 9vw, 38px); font-weight: 700; text-transform: uppercase; letter-spacing: -0.03em; text-align: center; line-height: 0.96; }
+    .greeting { margin: 4px 0 0 0; font-size: 10px; font-weight: 600; color: #4be1e1; text-transform: uppercase; letter-spacing: 0.22em; }
+    .subtitle { margin: 6px 0 10px 0; max-width: 296px; font-size: 10.5px; line-height: 1.35; font-weight: 500; color: var(--muted); text-align: center; }
 
-    .launcher-stack { width: 100%; display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+    .launcher-stack { width: 100%; display: flex; flex-direction: column; gap: 6px; margin-bottom: 7px; }
     .launch-card {
-      width: 100%; min-height: 52px; border-radius: 20px; background: var(--panel); border: 1px solid var(--panel-border);
-      text-decoration: none; color: var(--white); padding: 8px 18px;
+      width: 100%; min-height: 48px; border-radius: 18px; background: rgba(255,255,255,0.07); border: 1px solid var(--panel-border);
+      text-decoration: none; color: var(--white); padding: 6px 16px;
       display: flex; align-items: center; justify-content: center;
       transition: background 0.2s, transform 0.1s;
     }
     .launch-card:active { transform: scale(0.98); background: var(--card-hover); }
-    .launch-label { font-size: 17px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+    .launch-label { font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; }
 
-    .quick-links-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
+    .quick-links-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; width: 100%; }
     .quick-link-btn {
-      display: flex; align-items: center; justify-content: center; min-height: 52px;
+      display: flex; align-items: center; justify-content: center; min-height: 46px;
       padding: 8px; border-radius: 17px; text-decoration: none; color: #fff;
       background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
       backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); text-align: center;
       transition: background 0.2s;
     }
     .quick-link-btn:active { background: var(--card-hover); }
-    .quick-link-label { font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.45px; }
+    .quick-link-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; }
 
-    .footer-note { margin-top: auto; padding: 10px 0 4px 0; font-size: 10px; color: #b5d4d4; font-weight: 800; text-align: center; flex-shrink: 0; }
+    .footer-note { margin-top: auto; padding: 9px 0 2px 0; font-size: 9.5px; color: #b5d4d4; font-weight: 600; text-align: center; flex-shrink: 0; }
 
     body.is-standalone {
       background: #021414;
@@ -136,9 +136,9 @@
     }
 
     body.is-standalone .content {
-      padding-top: max(4px, env(safe-area-inset-top));
+      padding-top: max(2px, env(safe-area-inset-top));
       padding-right: max(var(--app-spacing), env(safe-area-inset-right));
-      padding-bottom: 18px;
+      padding-bottom: 14px;
       padding-left: max(var(--app-spacing), env(safe-area-inset-left));
     }
 
