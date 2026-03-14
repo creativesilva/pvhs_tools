@@ -99,7 +99,7 @@
     .quick-link-btn:active { background: var(--card-hover); }
     .quick-link-label { font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.45px; }
 
-    .footer-note { margin-top: auto; padding: 10px 0 2px 0; font-size: 10px; color: #b5d4d4; text-transform: uppercase; font-weight: 800; text-align: center; flex-shrink: 0; }
+    .footer-note { margin-top: auto; padding: 10px 0 4px 0; font-size: 10px; color: #b5d4d4; font-weight: 800; text-align: center; flex-shrink: 0; }
 
     body.is-standalone {
       background: #021414;
@@ -130,20 +130,20 @@
       top: 0;
       left: 0;
       right: 0;
-      bottom: max(22px, env(safe-area-inset-bottom));
+      bottom: max(30px, calc(env(safe-area-inset-bottom) + 8px));
       width: auto;
       height: auto;
       max-width: none;
       max-height: none;
-      border-radius: 0 0 34px 34px;
+      border-radius: 0 0 42px 42px;
       border: none;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.18);
+      box-shadow: 0 24px 46px rgba(0,0,0,0.22);
     }
 
     body.is-standalone .content {
       padding-top: max(4px, env(safe-area-inset-top));
       padding-right: max(var(--app-spacing), env(safe-area-inset-right));
-      padding-bottom: 12px;
+      padding-bottom: 18px;
       padding-left: max(var(--app-spacing), env(safe-area-inset-left));
     }
 
@@ -193,7 +193,7 @@
           <a class="quick-link-btn" href="https://santamariajuhsd.aeries.net" target="_blank"><p class="quick-link-label">Aeries</p></a>
           <a class="quick-link-btn" href="https://smjuhsd.instructure.com/login/saml" target="_blank"><p class="quick-link-label">Canvas</p></a>
         </div>
-        <div class="footer-note">CREATED BY: MR. SILVA</div>
+        <div class="footer-note">By: CreativeSilva</div>
       </div>
     </div>
   </div>
