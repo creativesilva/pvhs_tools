@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="PVHS Tools">
@@ -21,22 +21,22 @@
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
     html, body { width: 100%; height: 100%; background: #021414; overflow: hidden; }
-    body { font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; color: var(--white); touch-action: none; }
+    body { font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; color: var(--white); touch-action: none; user-select: none; }
 
-    /* FORCED IPHONE SIZE IN BROWSER */
+    /* Outer Centering Frame */
     .frame {
       width: 100%; height: 100dvh; display: flex; align-items: center; justify-content: center;
-      padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom) 12px;
+      padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0;
     }
 
+    /* THE LOCKED IPHONE BUBBLE */
     .app {
-      width: 430px; height: 880px; max-width: 100%; max-height: calc(100dvh - 24px);
-      aspect-ratio: 430 / 880; border-radius: 34px; overflow: hidden;
-      position: relative; box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,0.12);
+      width: 430px; height: 880px; 
+      max-width: 100%; max-height: calc(100dvh - 20px);
+      border-radius: 34px; overflow: hidden; position: relative;
+      box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,0.12);
       background: radial-gradient(circle at center, rgba(10,34,34,0.94) 0%, rgba(4,20,20,0.98) 46%, rgba(0,116,116,1) 100%);
-      display: flex; flex-direction: column;
-      padding: 10px var(--app-spacing) var(--app-spacing) var(--app-spacing);
-      isolation: isolate;
+      display: flex; flex-direction: column; isolation: isolate;
     }
 
     .app::before {
@@ -48,22 +48,23 @@
 
     .ghost-logo { position: absolute; top: 56%; left: 50%; width: 182%; opacity: 0.07; transform: translate(-50%, -50%); filter: grayscale(100%) contrast(108%) brightness(114%); pointer-events: none; z-index: 0; }
     
-    .content { position: relative; z-index: 1; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .content { 
+      position: relative; z-index: 1; width: 100%; height: 100%; 
+      display: flex; flex-direction: column; align-items: center; 
+      overflow-y: auto; -webkit-overflow-scrolling: touch;
+      padding: 10px var(--app-spacing) 20px var(--app-spacing);
+    }
     
     .top-actions { width: 100%; height: 44px; display: flex; justify-content: flex-end; align-items: center; flex-shrink: 0; }
 
-    /* MATCHES SUB-PAGE NAV PILLS - NO HEAVY SHADOW */
     .popout-pill {
       display: none; appearance: none;
       background: rgba(255, 255, 255, 0.08); border: 1px solid var(--panel-border);
-      border-radius: 12px; padding: 9px 14px; color: #fff; font-size: 10px; font-weight: 900; 
+      border-radius: 14px; padding: 9px 12px; color: #fff; font-size: 11px; font-weight: 900; 
       text-transform: uppercase; cursor: pointer; backdrop-filter: blur(4px);
-      box-shadow: var(--soft-shadow);
-      transition: background 0.2s;
     }
-    .popout-pill:active { background: var(--card-hover); }
 
-    .header { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: -10px; }
+    .header { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: -5px; }
     .logo-clear { width: 76px; height: auto; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); }
     .title { margin: 0; font-size: 42px; font-weight: 900; text-transform: uppercase; letter-spacing: -1px; text-align: center; }
     .greeting { margin: 6px 0 0 0; font-size: 13px; font-weight: 800; color: #00d1d1; text-transform: uppercase; letter-spacing: 1px; }
@@ -73,11 +74,9 @@
     .launch-card {
       width: 100%; border-radius: 24px; background: var(--panel); border: 1px solid var(--panel-border);
       text-decoration: none; color: var(--white); padding: 22px 18px;
-      display: flex; align-items: center; justify-content: center; 
-      transition: background 0.2s, transform 0.1s;
+      display: flex; align-items: center; justify-content: center;
     }
-    .launch-card:active { transform: scale(0.98); background: var(--card-hover); }
-    .launch-label { font-size: 18px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; text-align: center; }
+    .launch-label { font-size: 18px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
 
     .quick-links-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
     .quick-link-btn {
@@ -88,12 +87,12 @@
     }
     .quick-link-label { font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
 
-    .footer-note { margin-top: auto; padding: 12px 0 4px 0; font-size: 10px; color: #b5d4d4; text-transform: uppercase; font-weight: 800; text-align: center; flex-shrink: 0; }
+    .footer-note { margin-top: auto; padding: 20px 0 4px 0; font-size: 10px; color: #b5d4d4; text-transform: uppercase; font-weight: 800; text-align: center; flex-shrink: 0; }
 
+    /* MOBILE OVERRIDE: Full screen on actual phones */
     @media (max-width: 430px) {
-      .frame { align-items: flex-start; padding: env(safe-area-inset-top) 0 0 0; }
+      .frame { align-items: flex-start; padding: 0; }
       .app { width: 100vw; height: 100dvh; max-height: none; border-radius: 0; border: none; }
-      .popout-pill { display: none !important; }
       body { touch-action: pan-y; }
     }
   </style>
@@ -129,18 +128,20 @@
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
-    const isPopout = urlParams.get('mode') === 'popout';
+    const mode = urlParams.get('mode');
+    const isPopout = mode === 'popout';
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
 
     const popoutBtn = document.getElementById("popoutBtn");
+    const countdownLink = document.getElementById("countdownLink");
+    const directoryLink = document.getElementById("directoryLink");
 
-    // PERSISTENT LOGIC: Only show if NOT in popout mode and NOT on mobile
+    // PERSISTENT LOGIC: Rewrite links if in popout mode
     if (isPopout) {
       popoutBtn.style.display = 'none';
-      // Append mode to internal navigation
-      document.getElementById('countdownLink').href += "?mode=popout";
-      document.getElementById('directoryLink').href += "?mode=popout";
+      countdownLink.href = "countdown.html?mode=popout";
+      directoryLink.href = "extension_search.html?mode=popout";
     } else if (!isMobile && !isStandalone) {
       popoutBtn.style.display = 'block';
     }
@@ -150,7 +151,7 @@
     document.getElementById('greetingText').textContent = greet;
 
     popoutBtn.addEventListener("click", () => {
-      window.open('index.html?mode=popout', 'pvTools', 'width=430,height=880,resizable=yes,scrollbars=no');
+      window.open('index.html?mode=popout', 'pvTools', 'width=430,height=880,resizable=no,scrollbars=no');
     });
   </script>
 </body>
