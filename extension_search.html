@@ -15,7 +15,7 @@
     :root {
       --teal: #007474; --white: #f7fbfb; --muted: #cfe3e3;
       --panel: rgba(255,255,255,0.08); --panel-border: rgba(255,255,255,0.12);
-      --shadow: 0 20px 46px rgba(0,0,0,0.30); --app-spacing: 16px; --radius: 34px;
+      --shadow: 0 20px 46px rgba(0,0,0,0.30); --app-spacing: 18px; --radius: 34px;
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background: #021414; }
@@ -51,7 +51,7 @@
     .pill-divider { width: 1px; background: var(--panel-border); height: 100%; }
 
     .topbar { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 4px; flex-shrink: 0; }
-    .logo-clear { width: 52px; height: auto; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); }
+    .logo-clear { width: 44px; height: auto; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); }
     .page-title { flex: 1; font-size: 18px; font-weight: 900; color: #dff7f7; text-transform: uppercase; margin: 0; text-align: center; letter-spacing: 1px; }
 
     .search-card { padding: 16px 14px; border-radius: 28px; background: var(--panel); border: 1px solid var(--panel-border); backdrop-filter: blur(10px); flex-shrink: 0; box-shadow: var(--soft-shadow); }
@@ -62,13 +62,13 @@
     .results-card { 
       padding: 14px 14px 0 14px; border-radius: 28px; background: var(--panel); border: 1px solid var(--panel-border); 
       backdrop-filter: blur(10px); box-shadow: var(--soft-shadow);
-      display: flex; flex-direction: column; flex: 1; overflow: hidden; /* This locks the card size */
+      display: flex; flex-direction: column; flex: 1; overflow: hidden;
     }
     .result-count { margin-bottom: 10px; font-size: 11px; font-weight: 900; color: #dff7f7; text-transform: uppercase; text-align: center; opacity: 0.8; flex-shrink: 0;}
     
     .results-list { 
       flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-bottom: 20px;
-      -webkit-overflow-scrolling: touch; /* UNLOCKS SMOOTH SCROLLING ON IOS */
+      -webkit-overflow-scrolling: touch;
     }
 
     .result-item { border-radius: 20px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.10); padding: 12px; flex-shrink: 0; }
@@ -76,7 +76,7 @@
     .result-line { margin: 0; font-size: 11px; font-weight: 800; color: #d8f1f1; text-transform: uppercase; opacity: 0.8; }
     .result-ext { margin-top: 6px; font-size: 15px; font-weight: 900; color: #fff; }
 
-    .footer-note { margin-top: auto; padding: 8px 0; font-size: 10px; color: #b5d4d4; text-transform: uppercase; font-weight: 700; text-align: center; flex-shrink: 0; }
+    .footer-note { margin-top: auto; padding-top: 8px; font-size: 10px; color: #b5d4d4; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; text-align: center; flex-shrink: 0; }
 
     @media (max-width: 430px) {
       .frame { align-items: flex-start; }
@@ -113,7 +113,7 @@
           <div class="results-list" id="resultsList"></div>
         </div>
 
-        <div class="footer-note">PVHS Staff Directory 2025-2026</div>
+        <div class="footer-note">CREATED BY: MR. SILVA</div>
       </div>
     </div>
   </div>
