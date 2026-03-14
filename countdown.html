@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -28,20 +28,21 @@
     html, body { width: 100%; height: 100%; background: #021414; overflow: hidden; }
     body { font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; color: var(--white); touch-action: none; user-select: none; }
 
-    /* Forces iPhone Shape on Desktop/Popout */
+    /* The Frame ensures the app stays centered with margins when resized on desktop */
     .frame { 
       width: 100%; height: 100dvh; display: flex; align-items: center; justify-content: center; 
-      padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom) 12px;
+      padding: 10px;
     }
 
+    /* Locked iPhone Bubble Shape */
     .app {
-      width: 430px; height: 880px; max-width: 100%; max-height: calc(100dvh - 24px);
+      width: 430px; height: 880px; max-width: 100%; max-height: 100%;
       aspect-ratio: 430 / 880; border-radius: var(--radius); 
       overflow: hidden; position: relative; box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,0.12);
       background: radial-gradient(circle at center, rgba(10,34,34,0.94) 0%, rgba(4,20,20,0.98) 46%, rgba(0,116,116,1) 100%);
       display: flex; flex-direction: column; padding: 10px var(--app-spacing) var(--app-spacing) var(--app-spacing);
       isolation: isolate;
-      container-type: inline-size; /* Required for dynamic text scaling */
+      container-type: inline-size;
     }
 
     .app::before {
@@ -59,17 +60,17 @@
       overflow-y: auto; -webkit-overflow-scrolling: touch;
     }
 
+    /* Header in one single line */
     .top-row {
       display: flex; align-items: center; justify-content: space-between;
       width: 100%; gap: 8px; height: 44px; flex-shrink: 0; margin-bottom: 6px;
     }
 
-    /* Standardized Pill - No Drop Shadow */
     .action-pill { 
       display: flex; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--panel-border); 
       border-radius: 12px; overflow: hidden; backdrop-filter: blur(4px);
     }
-    .pill-btn { appearance: none; background: transparent; border: none; color: #fff; font-size: 10px; font-weight: 900; text-transform: uppercase; padding: 8px 10px; cursor: pointer; text-decoration: none; display: flex; align-items: center; }
+    .pill-btn { appearance: none; background: transparent; border: none; color: #fff; font-size: 10px; font-weight: 900; text-transform: uppercase; padding: 8px 12px; cursor: pointer; text-decoration: none; display: flex; align-items: center; }
     .pill-divider { width: 1px; background: var(--panel-border); height: 100%; }
 
     .logo-clear { width: 42px; height: auto; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); flex-shrink: 0; }
@@ -82,7 +83,7 @@
 
     .block-label { font-size: clamp(20px, 6vw, 26px); line-height: 1; font-weight: 900; text-transform: uppercase; margin: 0; color: #00d1d1; text-align: center; }
     
-    /* DYNAMIC TIMER SCALING - Never clips */
+    /* Dynamic scaling to prevent clipping */
     .timer { 
       font-size: 22cqw; 
       line-height: 0.9; font-weight: 900; letter-spacing: -3px; margin: 8px 0; text-shadow: 0 10px 26px rgba(0,0,0,0.30); 
@@ -99,12 +100,13 @@
     .detail-row { font-size: 11px; color: #d9f2f2; margin: 2px 0; font-weight: 800; text-transform: uppercase; text-align: center; }
     .detail-row strong { color: #ffffff; }
 
-    .footer-note { margin-top: auto; padding: 12px 0 4px 0; font-size: 10px; color: #b5d4d4; text-transform: uppercase; font-weight: 800; text-align: center; flex-shrink: 0; }
+    .footer-note { margin-top: auto; padding: 20px 0 4px 0; font-size: 10px; color: #b5d4d4; text-transform: uppercase; font-weight: 800; text-align: center; flex-shrink: 0; }
 
+    /* Phone Override: Only used if NOT in popout mode */
     @media (max-width: 430px) {
-      .frame { align-items: flex-start; padding: env(safe-area-inset-top) 0 0 0; }
-      .app { width: 100vw; height: 100dvh; max-height: none; border-radius: 0; border: none; }
-      body { touch-action: pan-y; }
+      body:not(.is-popout) .frame { align-items: flex-start; padding: 0; }
+      body:not(.is-popout) .app { width: 100vw; height: 100dvh; max-height: none; border-radius: 0; border: none; }
+      .popout-pill { display: none !important; }
     }
   </style>
 </head>
@@ -154,10 +156,10 @@
     const popoutSection = document.getElementById("popoutSection");
     const homeLink = document.getElementById("homeLink");
 
-    // PERSISTENT UI LOGIC
     if (isPopout) {
-      popoutSection.remove(); // Physically delete the button from code in pop-out mode
-      homeLink.href = "index.html?mode=popout"; // Keep pop-out mode active
+      document.body.classList.add('is-popout');
+      popoutSection.remove();
+      homeLink.href = "index.html?mode=popout";
     } else if (!isMobile && !isStandalone) {
       popoutSection.style.display = 'flex';
     }
@@ -229,8 +231,8 @@
     function parseToSec(t) { const [h,m] = t.split(":").map(Number); return (h*3600)+(m*60); }
     setInterval(updateApp, 1000); updateApp();
 
-    document.getElementById("popoutBtn")?.addEventListener("click", () => {
-      window.open('countdown.html?mode=popout', 'pvPop', 'width=430,height=880,resizable=no,scrollbars=no');
+    popoutBtn.addEventListener("click", () => {
+      window.open('countdown.html?mode=popout', 'pvPop', 'width=450,height=900,resizable=yes,scrollbars=no');
     });
   </script>
 </body>
