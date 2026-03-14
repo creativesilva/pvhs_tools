@@ -18,45 +18,27 @@
       --teal: #007474; --white: #f7fbfb; --muted: #cfe3e3;
       --panel: rgba(255,255,255,0.08); --panel-border: rgba(255,255,255,0.12);
       --shadow: 0 20px 46px rgba(0,0,0,0.30); --soft-shadow: 0 12px 24px rgba(0,0,0,0.22);
-      --card-hover: rgba(255,255,255,0.12); --app-spacing: 18px;
+      --card-hover: rgba(255,255,255,0.12); --app-spacing: 18px; --radius: 34px;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-    
-    html, body { 
-      width: 100%; height: 100%; 
-      background: #021414; 
-      overflow: hidden; 
-    }
+    html, body { width: 100%; height: 100%; background: #021414; overflow: hidden; }
+    body { font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; color: var(--white); touch-action: none; user-select: none; }
 
-    body { 
-      font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; 
-      color: var(--white); 
-      touch-action: pan-y; 
-      user-select: none;
-    }
-
-    /* THE FIX: This frame ensures the app is always centered and padded */
-    .frame {
-      width: 100%; height: 100dvh;
-      display: flex; align-items: center; justify-content: center;
-      padding: 10px; /* This creates the margin you lost */
+    /* The Frame ensures app stays centered with margins on Desktop/Popout */
+    .frame { 
+      width: 100%; height: 100dvh; display: flex; align-items: center; justify-content: center; 
+      padding: 10px;
     }
 
     /* THE PERMANENT IPHONE BUBBLE */
     .app {
-      width: 430px; 
-      height: 880px; 
-      max-width: 100%; 
-      max-height: 100%;
-      border-radius: 34px; /* Corners restored */
-      overflow: hidden; 
-      position: relative;
-      box-shadow: var(--shadow); /* Shadow restored */
-      border: 1px solid rgba(255,255,255,0.12);
+      width: 430px; height: 880px; max-width: 100%; max-height: 100%;
+      border-radius: var(--radius); 
+      overflow: hidden; position: relative; box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,0.12);
       background: radial-gradient(circle at center, rgba(10,34,34,0.94) 0%, rgba(4,20,20,0.98) 46%, rgba(0,116,116,1) 100%);
-      display: flex; flex-direction: column; 
-      isolation: isolate;
+      display: flex; flex-direction: column; isolation: isolate;
+      container-type: inline-size;
     }
 
     .app::before {
@@ -71,22 +53,20 @@
     .content { 
       position: relative; z-index: 1; width: 100%; height: 100%; 
       display: flex; flex-direction: column; align-items: center; 
-      overflow-y: auto; 
-      -webkit-overflow-scrolling: touch;
+      overflow-y: auto; -webkit-overflow-scrolling: touch;
       padding: 10px var(--app-spacing) 20px var(--app-spacing);
     }
     
     .top-actions { width: 100%; height: 44px; display: flex; justify-content: flex-end; align-items: center; flex-shrink: 0; }
 
+    /* Flat Style Pop Out Pill */
     .popout-pill {
       display: none; appearance: none;
-      background: rgba(255, 255, 255, 0.08); 
-      border: 1px solid var(--panel-border);
-      border-radius: 14px; padding: 9px 14px; 
-      color: #fff; font-size: 11px; font-weight: 900; 
-      text-transform: uppercase; cursor: pointer; 
-      backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      background: rgba(255, 255, 255, 0.08); border: 1px solid var(--panel-border);
+      border-radius: 14px; padding: 9px 14px; color: #fff; font-size: 11px; font-weight: 900; 
+      text-transform: uppercase; cursor: pointer; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
     }
+    .popout-pill:active { background: var(--card-hover); }
 
     .header { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: -5px; }
     .logo-clear { width: 76px; height: auto; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); }
@@ -110,16 +90,19 @@
       padding: 10px; border-radius: 18px; text-decoration: none; color: #fff;
       background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
       backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); text-align: center;
+      transition: background 0.2s;
     }
+    .quick-link-btn:active { background: var(--card-hover); }
     .quick-link-label { font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
 
     .footer-note { margin-top: auto; padding: 20px 0 4px 0; font-size: 10px; color: #b5d4d4; text-transform: uppercase; font-weight: 800; text-align: center; flex-shrink: 0; }
 
-    /* REAL PHONE OVERRIDE: Full screen but only when on a real device */
+    /* Phone Override: Protected if in Pop-Out Mode */
     @media (max-width: 430px) {
       body:not(.is-popout) .frame { align-items: flex-start; padding: 0; }
       body:not(.is-popout) .app { width: 100vw; height: 100dvh; max-height: none; border-radius: 0; border: none; }
       .popout-pill { display: none !important; }
+      body { touch-action: pan-y; }
     }
   </style>
 </head>
@@ -159,23 +142,26 @@
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
 
+    const popoutBtn = document.getElementById("popoutBtn");
+    const navLinks = document.querySelectorAll(".nav-link");
+
     if (isPopout) {
       document.body.classList.add('is-popout');
-      document.getElementById("popoutBtn").remove();
-      document.querySelectorAll(".nav-link").forEach(link => {
+      if (popoutBtn) popoutBtn.remove();
+      navLinks.forEach(link => {
         const url = new URL(link.href, window.location.origin);
         url.searchParams.set('mode', 'popout');
         link.href = url.toString();
       });
     } else if (!isMobile && !isStandalone) {
-      document.getElementById("popoutBtn").style.display = 'block';
+      if (popoutBtn) popoutBtn.style.display = 'block';
     }
 
     const hours = new Date().getHours();
     const greet = hours < 12 ? "Good Morning" : hours < 18 ? "Good Afternoon" : "Good Evening";
     document.getElementById('greetingText').textContent = greet;
 
-    document.getElementById("popoutBtn").addEventListener("click", () => {
+    document.getElementById("popoutBtn")?.addEventListener("click", () => {
       window.open('index.html?mode=popout', 'pvTools', 'width=450,height=900,resizable=yes,scrollbars=no');
     });
   </script>
