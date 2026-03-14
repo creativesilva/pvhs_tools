@@ -3,59 +3,39 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="PVHS Tools">
   <meta name="theme-color" content="#007474">
-  
   <link rel="apple-touch-icon" href="PV_Logo.png">
   <link rel="icon" type="image/png" sizes="192x192" href="PV_Logo.png">
   <title>PVHS Tools</title>
 
   <style>
     :root {
-      --teal: #007474;
-      --white: #f7fbfb;
-      --muted: #cfe3e3;
-      --panel: rgba(255,255,255,0.08);
-      --panel-border: rgba(255,255,255,0.12);
-      --shadow: 0 20px 46px rgba(0,0,0,0.30);
-      --soft-shadow: 0 12px 24px rgba(0,0,0,0.22);
-      --card-hover: rgba(255,255,255,0.12);
-      --app-spacing: 18px;
+      --teal: #007474; --white: #f7fbfb; --muted: #cfe3e3;
+      --panel: rgba(255,255,255,0.08); --panel-border: rgba(255,255,255,0.12);
+      --shadow: 0 20px 46px rgba(0,0,0,0.30); --soft-shadow: 0 12px 24px rgba(0,0,0,0.22);
+      --card-hover: rgba(255,255,255,0.12); --app-spacing: 18px;
     }
 
-    * { 
-      box-sizing: border-box; 
-      -webkit-tap-highlight-color: transparent; 
-      margin: 0; padding: 0;
-    }
+    /* PREVENT ZOOM AND STRETCH */
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; background: #021414; overflow: hidden; }
+    body { font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; color: var(--white); touch-action: none; }
 
-    html, body { 
-      width: 100%; height: 100%; 
-      background: #021414; 
-      overflow: hidden; 
-    }
-
-    body { 
-      font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; 
-      color: var(--white); 
-      /* Strictly disable zooming */
-      touch-action: none; 
-    }
-
+    /* FORCED IPHONE SIZE IN BROWSER */
     .frame {
-      width: 100%; height: 100dvh;
-      display: flex; align-items: center; justify-content: center;
+      width: 100%; height: 100dvh; display: flex; align-items: center; justify-content: center;
       padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom) 12px;
     }
 
     .app {
-      width: min(100%, 430px);
-      height: 100%;
-      aspect-ratio: 430 / 880;
+      width: 430px; /* Locked Width */
+      height: 880px; /* Locked Height */
+      max-width: 100%;
       max-height: calc(100dvh - 24px);
+      aspect-ratio: 430 / 880;
       border-radius: 34px;
       overflow: hidden;
       position: relative;
@@ -74,82 +54,52 @@
       z-index: 0;
     }
 
-    .ghost-logo {
-      position: absolute; top: 56%; left: 50%; width: 182%; opacity: 0.07;
-      transform: translate(-50%, -50%); filter: grayscale(100%) contrast(108%) brightness(114%);
-      pointer-events: none; z-index: 0;
-    }
+    .ghost-logo { position: absolute; top: 56%; left: 50%; width: 182%; opacity: 0.07; transform: translate(-50%, -50%); filter: grayscale(100%) contrast(108%) brightness(114%); pointer-events: none; z-index: 0; }
+    
+    .content { position: relative; z-index: 1; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .top-actions { width: 100%; height: 44px; display: flex; justify-content: flex-end; align-items: center; flex-shrink: 0; }
 
-    /* Scrollable Inner Content to prevent cut-off */
-    .content { 
-      position: relative; z-index: 1; width: 100%; height: 100%; 
-      display: flex; flex-direction: column; align-items: center; 
-      overflow-y: auto; -webkit-overflow-scrolling: touch;
-    }
-
-    .top-actions { 
-      width: 100%; height: 44px; 
-      display: flex; justify-content: flex-end; align-items: center; 
-      flex-shrink: 0; 
-    }
-
-    /* Standardized Pop Out Pill - Match Style properly */
+    /* REPAIRED POP OUT - NO DROP SHADOW, MATCHES COMBO PILL */
     .popout-pill {
-      display: none; /* Controlled by JS */
-      appearance: none;
-      background: rgba(255, 255, 255, 0.08); 
-      border: 1px solid var(--panel-border);
-      border-radius: 14px; 
-      padding: 9px 12px; 
-      color: #fff; 
-      font-size: 11px; font-weight: 900; 
-      text-transform: uppercase; cursor: pointer; 
-      backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-      box-shadow: var(--soft-shadow);
-      transition: background 0.2s, transform 0.1s;
+      display: none; appearance: none;
+      background: rgba(255, 255, 255, 0.08); border: 1px solid var(--panel-border);
+      border-radius: 14px; padding: 9px 12px; color: #fff; font-size: 11px; font-weight: 900; 
+      text-transform: uppercase; cursor: pointer; backdrop-filter: blur(4px);
+      transition: background 0.2s;
     }
+    .popout-pill:active { background: var(--card-hover); }
 
-    .popout-pill:active { transform: scale(0.96); background: var(--card-hover); }
-
-    /* Moving content higher up */
     .header { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: -10px; }
     .logo-clear { width: 76px; height: auto; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); }
-    
-    .title { margin: 0; font-size: clamp(34px, 10vw, 48px); line-height: 1; font-weight: 900; text-transform: uppercase; letter-spacing: -1px; text-align: center; }
-    .greeting { margin: 6px 0 0 0; font-size: 13px; font-weight: 800; color: #00d1d1; text-transform: uppercase; letter-spacing: 1px; text-align: center; }
-    .subtitle { margin: 4px 0 14px 0; max-width: 280px; font-size: 13px; line-height: 1.4; font-weight: 700; color: var(--muted); text-wrap: balance; text-align: center; }
+    .title { margin: 0; font-size: 42px; font-weight: 900; text-transform: uppercase; letter-spacing: -1px; text-align: center; }
+    .greeting { margin: 6px 0 0 0; font-size: 13px; font-weight: 800; color: #00d1d1; text-transform: uppercase; letter-spacing: 1px; }
+    .subtitle { margin: 4px 0 14px 0; max-width: 280px; font-size: 13px; line-height: 1.4; font-weight: 700; color: var(--muted); text-align: center; }
 
     .launcher-stack { width: 100%; display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px; }
-
     .launch-card {
       width: 100%; border-radius: 24px; background: var(--panel); border: 1px solid var(--panel-border);
-      box-shadow: var(--soft-shadow); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
       text-decoration: none; color: var(--white); padding: 22px 18px;
-      display: flex; align-items: center; justify-content: center; /* Centered Text */
-      transition: background 0.2s, transform 0.1s;
+      display: flex; align-items: center; justify-content: center; transition: background 0.2s, transform 0.1s;
     }
-
     .launch-card:active { transform: scale(0.98); background: var(--card-hover); }
-    .launch-label { margin: 0; font-size: 18px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
+    .launch-label { font-size: 18px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
 
     .quick-links-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
-
     .quick-link-btn {
       display: flex; align-items: center; justify-content: center; min-height: 56px;
       padding: 10px; border-radius: 18px; text-decoration: none; color: #fff;
       background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
-      backdrop-filter: blur(4px); text-align: center; transition: background 0.2s;
+      backdrop-filter: blur(4px); text-align: center;
     }
+    .quick-link-label { font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
 
-    .quick-link-btn:active { transform: scale(0.97); background: var(--card-hover); }
-    .quick-link-label { margin: 0; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.3px; line-height: 1.2; text-align: center; }
-
-    .footer-note { margin-top: auto; padding: 12px 0 4px 0; font-size: 10px; color: #b5d4d4; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; text-align: center; flex-shrink: 0; }
+    .footer-note { margin-top: auto; padding: 12px 0 4px 0; font-size: 10px; color: #b5d4d4; text-transform: uppercase; font-weight: 800; text-align: center; flex-shrink: 0; }
 
     @media (max-width: 430px) {
-      .frame { align-items: flex-start; }
-      .app { width: 100%; height: calc(100dvh - 24px); aspect-ratio: auto; border-radius: 28px; }
-      body { touch-action: pan-y; } /* Allow swipe logic but not zoom */
+      .frame { align-items: flex-start; padding: env(safe-area-inset-top) 0 0 0; }
+      .app { width: 100vw; height: 100dvh; max-height: none; border-radius: 0; border: none; }
+      .popout-pill { display: none !important; }
+      body { touch-action: pan-y; }
     }
   </style>
 </head>
@@ -158,55 +108,50 @@
     <div class="app">
       <img src="PV_Logo.png" alt="" class="ghost-logo">
       <div class="content">
-        
         <div class="top-actions">
           <button id="popoutBtn" class="popout-pill" type="button">Pop Out</button>
         </div>
-
         <div class="header">
           <img src="PV_Logo.png" alt="Logo" class="logo-clear">
           <p class="greeting" id="greetingText">Welcome</p>
           <h1 class="title">PVHS Tools</h1>
-          <p class="subtitle">Quick access to campus countdowns and staff directory.</p>
+          <p class="subtitle">Quick access to campus tools and directory.</p>
         </div>
-
         <div class="launcher-stack">
-          <a class="launch-card" href="countdown.html"><h2 class="launch-label">Countdown</h2></a>
-          <a class="launch-card" href="extension_search.html"><h2 class="launch-label">Directory</h2></a>
+          <a id="countdownLink" class="launch-card" href="countdown.html"><h2 class="launch-label">Countdown</h2></a>
+          <a id="directoryLink" class="launch-card" href="extension_search.html"><h2 class="launch-label">Directory</h2></a>
         </div>
-
         <div class="quick-links-grid">
           <a class="quick-link-btn" href="https://maintenance.facilitron.com/anonymous/SantaMariaJUHSD/newworkorder" target="_blank"><p class="quick-link-label">Maintenance</p></a>
           <a class="quick-link-btn" href="https://smjuhsd.incidentiq.com/" target="_blank"><p class="quick-link-label">IT Support</p></a>
           <a class="quick-link-btn" href="https://login.frontlineeducation.com/login" target="_blank"><p class="quick-link-label">Absences</p></a>
           <a class="quick-link-btn" href="https://smjuhsd-my.sharepoint.com/:x:/g/personal/etorres_smjuhsd_org/IQBiSObgdkR3R68_dXHYrDwfAbA5RpN-scClTiKQddgcsLU" target="_blank"><p class="quick-link-label">In Lieu</p></a>
         </div>
-
         <div class="footer-note">CREATED BY: MR. SILVA</div>
       </div>
     </div>
   </div>
 
   <script>
-    // Intelligent platform detection
+    const urlParams = new URLSearchParams(window.location.search);
+    const isPopout = urlParams.get('mode') === 'popout';
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-    const popoutBtn = document.getElementById("popoutBtn");
 
-    // Only show "Pop Out" button if on Desktop browser AND not already popped out
-    if (!isMobile && !isStandalone && !window.location.search.includes('popout=true')) {
-      popoutBtn.style.display = 'block';
+    // PERSISTENT MODE: Carry "?mode=popout" to other pages
+    if (isPopout) {
+      document.getElementById('countdownLink').href += "?mode=popout";
+      document.getElementById('directoryLink').href += "?mode=popout";
+    } else if (!isMobile && !isStandalone) {
+      document.getElementById("popoutBtn").style.display = 'block';
     }
 
     const hours = new Date().getHours();
     const greet = hours < 12 ? "Good Morning" : hours < 18 ? "Good Afternoon" : "Good Evening";
     document.getElementById('greetingText').textContent = greet;
 
-    popoutBtn.addEventListener("click", () => {
-      const width = 460; const height = 980;
-      const left = (window.screen.width - width) / 2;
-      const top = (window.screen.height - height) / 2;
-      window.open(window.location.href + '?popout=true', 'pvTools', `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=no`);
+    document.getElementById("popoutBtn").addEventListener("click", () => {
+      window.open('index.html?mode=popout', 'pvTools', 'width=430,height=880,resizable=yes,scrollbars=no');
     });
   </script>
 </body>
