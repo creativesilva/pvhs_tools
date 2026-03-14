@@ -8,13 +8,13 @@
   >
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="PVHS Tools">
+  <meta name="apple-mobile-web-app-title" content="PVHS Extension Search">
   <meta name="theme-color" content="#007474">
-  <link rel="apple-touch-icon" href="PV_Logo.png?v=23">
-  <link rel="icon" type="image/png" sizes="192x192" href="PV_Logo.png?v=23">
-  <link rel="icon" type="image/png" sizes="512x512" href="PV_Logo.png?v=23">
-  <link rel="shortcut icon" href="PV_Logo.png?v=23">
-  <title>PVHS Tools</title>
+  <link rel="apple-touch-icon" href="PV_Logo.png?v=22">
+  <link rel="icon" type="image/png" sizes="192x192" href="PV_Logo.png?v=22">
+  <link rel="icon" type="image/png" sizes="512x512" href="PV_Logo.png?v=22">
+  <link rel="shortcut icon" href="PV_Logo.png?v=22">
+  <title>PVHS Extension Search</title>
 
   <style>
     :root {
@@ -25,7 +25,6 @@
       --panel-border: rgba(255,255,255,0.12);
       --shadow: 0 20px 46px rgba(0,0,0,0.30);
       --soft-shadow: 0 12px 24px rgba(0,0,0,0.22);
-      --card-hover: rgba(255,255,255,0.12);
     }
 
     * {
@@ -86,8 +85,8 @@
       inset: 0;
       pointer-events: none;
       background:
-        radial-gradient(circle at center, rgba(255,255,255,0.08) 0%, transparent 36%),
-        radial-gradient(circle at top, rgba(0,116,116,0.24) 0%, transparent 42%);
+        radial-gradient(circle at center, rgba(255,255,255,0.06) 0%, transparent 34%),
+        radial-gradient(circle at top, rgba(0,116,116,0.22) 0%, transparent 42%);
       z-index: 0;
     }
 
@@ -98,7 +97,7 @@
       width: 182%;
       max-width: none;
       transform: translate(-50%, -50%);
-      opacity: 0.07;
+      opacity: 0.072;
       filter: grayscale(100%) contrast(108%) brightness(114%);
       pointer-events: none;
       z-index: 0;
@@ -113,7 +112,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       min-height: 100%;
     }
 
@@ -148,51 +147,58 @@
       transform: scale(0.985);
     }
 
-    .header {
+    .topbar {
       width: 100%;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      gap: 8px;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 2px;
     }
 
     .logo-clear {
-      width: 86px;
-      max-width: 86px;
+      width: 52px;
       height: auto;
       object-fit: contain;
       filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24));
+      flex: 0 0 auto;
     }
 
-    .title {
+    .page-title {
+      flex: 1 1 auto;
       margin: 0;
-      font-size: clamp(34px, 10vw, 56px);
-      line-height: 0.95;
+      font-size: 18px;
+      line-height: 1.05;
       font-weight: 900;
-      letter-spacing: -1px;
+      letter-spacing: 0.8px;
+      color: #dff7f7;
       text-transform: uppercase;
-      text-wrap: balance;
+      text-align: center;
     }
 
-    .subtitle {
-      margin: 0;
-      max-width: 290px;
-      font-size: 15px;
-      line-height: 1.35;
-      font-weight: 700;
-      color: var(--muted);
-      text-wrap: balance;
+    .home-link {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 62px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--white);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: var(--soft-shadow);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
     }
 
-    .launcher-stack {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-top: 2px;
-    }
-
-    .launch-card {
+    .search-card,
+    .results-card {
       width: 100%;
       border-radius: 28px;
       background: var(--panel);
@@ -200,86 +206,135 @@
       box-shadow: var(--soft-shadow);
       backdrop-filter: blur(4px);
       -webkit-backdrop-filter: blur(4px);
-      text-decoration: none;
-      color: var(--white);
-      padding: 18px 16px;
-      transition: background 0.18s ease, transform 0.12s ease, border-color 0.18s ease;
-      display: block;
     }
 
-    .launch-card:active {
-      transform: scale(0.985);
+    .search-card {
+      padding: 16px 14px 14px 14px;
     }
 
-    .launch-card:hover {
-      background: var(--card-hover);
-      border-color: rgba(255,255,255,0.18);
-    }
-
-    .launch-label {
-      margin: 0;
-      font-size: clamp(24px, 6.8vw, 36px);
-      line-height: 0.95;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: -0.5px;
-    }
-
-    .quick-links-wrap {
-      width: 100%;
+    .results-card {
+      padding: 12px;
+      text-align: left;
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-top: 2px;
     }
 
-    .quick-links-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      width: 100%;
-    }
-
-    .quick-link-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 58px;
-      padding: 12px 10px;
-      border-radius: 20px;
-      text-decoration: none;
-      color: #ffffff;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.12);
-      box-shadow: var(--soft-shadow);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      transition: background 0.18s ease, transform 0.12s ease, border-color 0.18s ease;
+    .search-title {
+      margin: 0 0 8px 0;
+      font-size: clamp(24px, 7vw, 40px);
+      line-height: 0.95;
+      font-weight: 900;
+      letter-spacing: -0.6px;
+      text-transform: uppercase;
       text-align: center;
     }
 
-    .quick-link-btn:hover {
-      background: var(--card-hover);
-      border-color: rgba(255,255,255,0.18);
+    .helper-text {
+      margin: 0 0 12px 0;
+      font-size: 12px;
+      line-height: 1.35;
+      font-weight: 800;
+      color: var(--muted);
+      text-transform: uppercase;
+      text-align: center;
     }
 
-    .quick-link-btn:active {
-      transform: scale(0.985);
+    .search-input {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 18px;
+      padding: 14px 14px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+      background: rgba(0,0,0,0.18);
+      outline: none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
     }
 
-    .quick-link-label {
+    .search-input::placeholder {
+      color: #bdd5d5;
+      opacity: 0.9;
+    }
+
+    .result-count {
+      margin: 0 0 10px 0;
+      font-size: 11px;
+      line-height: 1.3;
+      font-weight: 900;
+      color: #dff7f7;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      text-align: center;
+    }
+
+    .results-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    .results-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .results-list::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.18);
+      border-radius: 999px;
+    }
+
+    .result-item {
+      border-radius: 20px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.10);
+      padding: 12px 12px 10px 12px;
+    }
+
+    .result-name {
+      margin: 0 0 4px 0;
+      font-size: 17px;
+      line-height: 1.15;
+      font-weight: 900;
+      color: #ffffff;
+      text-transform: uppercase;
+    }
+
+    .result-line,
+    .result-ext {
       margin: 0;
       font-size: 12px;
-      line-height: 1.2;
-      font-weight: 900;
+      line-height: 1.35;
+      font-weight: 800;
+      color: #d8f1f1;
       text-transform: uppercase;
-      letter-spacing: 0.35px;
-      text-wrap: balance;
+    }
+
+    .result-ext {
+      margin-top: 6px;
+      font-size: 15px;
+      color: #ffffff;
+      letter-spacing: 0.2px;
+    }
+
+    .empty-state {
+      margin: 0;
+      padding: 14px 10px;
+      font-size: 13px;
+      line-height: 1.4;
+      font-weight: 800;
+      color: #d8f1f1;
+      text-transform: uppercase;
+      text-align: center;
     }
 
     .footer-note {
       margin-top: auto;
-      padding-top: 8px;
+      padding-top: 6px;
       font-size: 10px;
       line-height: 1.3;
       color: #b5d4d4;
@@ -313,36 +368,12 @@
         min-height: calc(100dvh - 24px);
         aspect-ratio: auto;
         border-radius: 28px;
-        padding: 16px 14px 14px 14px;
+        padding: 14px 12px 12px 12px;
       }
 
-      .logo-clear {
-        width: 78px;
-        max-width: 78px;
-      }
-
-      .subtitle {
-        max-width: 270px;
-        font-size: 14px;
-      }
-
-      .launch-card {
-        padding: 16px 14px;
+      .search-card,
+      .results-card {
         border-radius: 24px;
-      }
-
-      .quick-links-grid {
-        gap: 8px;
-      }
-
-      .quick-link-btn {
-        min-height: 54px;
-        border-radius: 18px;
-        padding: 10px 8px;
-      }
-
-      .quick-link-label {
-        font-size: 11px;
       }
 
       .footer-note {
@@ -361,60 +392,29 @@
           <button id="popoutBtn" class="popout-btn" type="button">Pop Out</button>
         </div>
 
-        <div class="header">
+        <div class="topbar">
           <img src="PV_Logo.png" alt="Pioneer Valley High School logo" class="logo-clear">
-          <h1 class="title">PVHS Tools</h1>
-          <p class="subtitle">Quick access to live campus countdowns and staff extension search.</p>
+          <h1 class="page-title">Extension Search</h1>
+          <a class="home-link" href="index.html">Home</a>
         </div>
 
-        <div class="launcher-stack">
-          <a class="launch-card" href="countdown.html">
-            <h2 class="launch-label">Countdown Clock</h2>
-          </a>
-
-          <a class="launch-card" href="extension_search.html">
-            <h2 class="launch-label">Extension Search</h2>
-          </a>
+        <div class="search-card">
+          <h2 class="search-title">Find Extensions</h2>
+          <p class="helper-text">Search by name, role, department, room, or extension</p>
+          <input
+            id="searchInput"
+            class="search-input"
+            type="text"
+            placeholder="Try Silva, counseling, principal, 5322..."
+            autocomplete="off"
+            autocapitalize="words"
+            spellcheck="false"
+          >
         </div>
 
-        <div class="quick-links-wrap">
-          <div class="quick-links-grid">
-            <a
-              class="quick-link-btn"
-              href="https://maintenance.facilitron.com/anonymous/SantaMariaJUHSD/newworkorder"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <p class="quick-link-label">Maintenance Work Orders</p>
-            </a>
-
-            <a
-              class="quick-link-btn"
-              href="https://smjuhsd.incidentiq.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <p class="quick-link-label">IT Work Orders</p>
-            </a>
-
-            <a
-              class="quick-link-btn"
-              href="https://login.frontlineeducation.com/login?signin=b3c0ce2383586187edfa948e954b74ce&clientId=superSuit#/login"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <p class="quick-link-label">Absence Requests</p>
-            </a>
-
-            <a
-              class="quick-link-btn"
-              href="https://smjuhsd-my.sharepoint.com/:x:/g/personal/etorres_smjuhsd_org/IQBiSObgdkR3R68_dXHYrDwfAbA5RpN-scClTiKQddgcsLU?rtime=Q2eJ9lSB3kg"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <p class="quick-link-label">In Lieu Spreadsheet</p>
-            </a>
-          </div>
+        <div class="results-card">
+          <p class="result-count" id="resultCount">Showing suggested emergency contacts</p>
+          <div class="results-list" id="resultsList"></div>
         </div>
 
         <div class="footer-note">Created By: Mr. Silva</div>
@@ -423,7 +423,206 @@
   </div>
 
   <script>
+    const extensionSearch = [
+      { name: "Chris Silva", role: "VPA", extension: "5322", department: "", room: "322", keywords: ["silva","chris","vpa","room 322","322","teacher","photography"] },
+      { name: "Laura Garcia Solorio", role: "VPA", extension: "5322", department: "", room: "322", keywords: ["laura","garcia","solorio","garcia solorio","vpa","room 322","322","teacher"] },
+
+      { name: "PVHS Emergency Line", role: "Emergency", extension: "5000", department: "", room: "", keywords: ["emergency","pvhs emergency line","5000","urgent"] },
+      { name: "PVHS Maintenance", role: "Emergency", extension: "878-8155", department: "", room: "", keywords: ["maintenance","pvhs maintenance","878-8155","urgent"] },
+      { name: "Police/Fire Emergency", role: "Emergency", extension: "911", department: "", room: "", keywords: ["police","fire","911","emergency","urgent"] },
+      { name: "SM Police Dept", role: "Emergency", extension: "928-3781", department: "", room: "", keywords: ["sm police dept","police","928-3781","emergency","urgent"] },
+      { name: "SMPD & Fire Dispatch", role: "Emergency", extension: "925-2631", department: "", room: "", keywords: ["dispatch","fire dispatch","smpd","925-2631","emergency","urgent"] },
+
+      { name: "Karine Perez", role: "Admin Asst.", extension: "5123", department: "Administration", room: "", keywords: ["perez","karine","admin assistant","admin asst","administration","emergency"] },
+      { name: "Eddie Hernandez", role: "Security", extension: "5773", department: "", room: "", keywords: ["eddie","hernandez","security","front desk","5773","emergency"] },
+
+      { name: "Dr. Paul Robinson", role: "Principal", extension: "5701", department: "Administration", room: "", keywords: ["robinson","paul","dr robinson","principal","administration"] },
+      { name: "Araceli Mandujano", role: "Admin Asst", extension: "5702", department: "Administration", room: "", keywords: ["mandujano","araceli","admin asst","admin assistant","administration"] },
+      { name: "Kevin Ilac", role: "AP", extension: "5703", department: "Administration", room: "", keywords: ["ilac","kevin","assistant principal","asst principal","ap","administration"] },
+      { name: "Merrie Okie-Goldin", role: "AP", extension: "5707", department: "Administration", room: "", keywords: ["okie-goldin","merrie","assistant principal","asst principal","ap","administration"] },
+      { name: "Cecilia Baddley", role: "Admin Asst Sub", extension: "5708", department: "Administration", room: "", keywords: ["baddley","cecilia","admin asst","sub","administration"] },
+      { name: "Jeff Hromadka", role: "AP", extension: "5709", department: "Administration", room: "", keywords: ["hromadka","jeff","assistant principal","asst principal","ap","administration"] },
+      { name: "Fabi Etheridge", role: "Admin Asst", extension: "5710", department: "Administration", room: "", keywords: ["etheridge","fabi","admin asst","administration"] },
+      { name: "Christian Basulto", role: "Dean", extension: "5122", department: "Administration", room: "", keywords: ["basulto","christian","dean","administration"] },
+      { name: "Lizbeth Munoz Martinez", role: "Receptionist", extension: "5770", department: "Administration", room: "", keywords: ["lizbeth","munoz","martinez","receptionist","front office","office"] },
+      { name: "Attendance Office", role: "Attendance", extension: "5105 / 5107", department: "", room: "", keywords: ["attendance","attendance office","office"] },
+      { name: "Araceli Castro", role: "Attendance", extension: "5105", department: "", room: "", keywords: ["castro","araceli","attendance"] },
+      { name: "Laura Mariscal Mendez", role: "Attendance Asst", extension: "5107", department: "Attendance", room: "", keywords: ["mariscal mendez","laura","attendance assistant","attendance asst","attendance"] },
+      { name: "Isabel Esparza", role: "Registrar", extension: "5764", department: "Records", room: "", keywords: ["isabel","esparza","registrar","records"] },
+      { name: "Technology Help Desk", role: "Help Desk", extension: "4612", department: "Technology", room: "", keywords: ["technology","tech","help desk","it","computer"] },
+      { name: "Technology Emergency", role: "Technology", extension: "5708", department: "", room: "", keywords: ["technology emergency","tech emergency","technology"] },
+      { name: "Elissa Gonzalez", role: "Tech TOSA", extension: "5696", department: "Technology", room: "", keywords: ["gonzalez","elissa","technology","tech tosa","tosa"] },
+      { name: "Susan Avrit", role: "Counselor", extension: "5775", department: "Counseling", room: "", keywords: ["avrit","susan","counselor","counseling"] },
+      { name: "Sergio Orozco", role: "Psychologist", extension: "5705", department: "Psychologists", room: "", keywords: ["orozco","sergio","psychologist","psych"] },
+      { name: "Serina Rodriguez", role: "Psychologist", extension: "5757", department: "Psychologists", room: "", keywords: ["rodriguez","serina","psychologist","psych"] },
+      { name: "Erica Tajon", role: "Psychologist", extension: "5712", department: "Psychologists", room: "", keywords: ["tajon","erica","psychologist","psych"] },
+      { name: "Teri Wisz (formerly Magni)", role: "English", extension: "5301", department: "", room: "", keywords: ["teri wisz","wisz","teri magni","magni","formerly magni","english","5301"] },
+      { name: "Riccardo Magni", role: "Science", extension: "5411", department: "", room: "", keywords: ["riccardo","magni","science","5411"] }
+    ];
+
+    const defaultSuggestionNames = [
+      "PVHS Emergency Line",
+      "PVHS Maintenance",
+      "Police/Fire Emergency",
+      "SM Police Dept",
+      "SMPD & Fire Dispatch",
+      "Karine Perez",
+      "Eddie Hernandez"
+    ];
+
+    const searchInput = document.getElementById("searchInput");
+    const resultsList = document.getElementById("resultsList");
+    const resultCount = document.getElementById("resultCount");
     const popoutBtn = document.getElementById("popoutBtn");
+
+    function normalizeText(value) {
+      return String(value || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9\s/.-]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function normalizePhone(value) {
+      return String(value || "").replace(/[^0-9]/g, "");
+    }
+
+    function levenshtein(a, b) {
+      const m = a.length;
+      const n = b.length;
+      const dp = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
+
+      for (let i = 0; i <= m; i++) dp[i][0] = i;
+      for (let j = 0; j <= n; j++) dp[0][j] = j;
+
+      for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+          const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+          dp[i][j] = Math.min(
+            dp[i - 1][j] + 1,
+            dp[i][j - 1] + 1,
+            dp[i - 1][j - 1] + cost
+          );
+        }
+      }
+      return dp[m][n];
+    }
+
+    function buildSearchText(entry) {
+      return normalizeText([
+        entry.name,
+        entry.role,
+        entry.department,
+        entry.extension,
+        entry.room ? `room ${entry.room}` : "",
+        ...(entry.keywords || [])
+      ].join(" "));
+    }
+
+    function scoreEntry(entry, query) {
+      const q = normalizeText(query);
+      const qPhone = normalizePhone(query);
+      const haystack = buildSearchText(entry);
+      const entryPhone = normalizePhone(entry.extension);
+
+      if (!q) return 1;
+
+      if (haystack === q) return 200;
+      if (normalizeText(entry.name) === q) return 180;
+      if (normalizeText(entry.extension) === q) return 175;
+      if (qPhone && entryPhone && entryPhone.includes(qPhone)) return 170;
+      if (haystack.startsWith(q)) return 140;
+      if (normalizeText(entry.name).startsWith(q)) return 150;
+      if (haystack.includes(q)) return 120;
+
+      const keywords = [entry.name, entry.role, entry.department, entry.extension, ...(entry.keywords || [])]
+        .map(normalizeText)
+        .filter(Boolean);
+
+      let best = 0;
+
+      for (const word of keywords) {
+        if (word.startsWith(q)) best = Math.max(best, 110);
+        if (word.includes(q)) best = Math.max(best, 100);
+
+        const distance = levenshtein(q, word);
+        if (q.length >= 4 && distance <= 2) best = Math.max(best, 88 - distance * 10);
+        if (q.length >= 6 && distance <= 3) best = Math.max(best, 82 - distance * 8);
+      }
+
+      const tokens = q.split(" ").filter(Boolean);
+      if (tokens.length > 1) {
+        let matched = 0;
+        for (const token of tokens) {
+          if (haystack.includes(token)) matched++;
+        }
+        if (matched > 0) {
+          best = Math.max(best, 70 + matched * 8);
+        }
+      }
+
+      return best;
+    }
+
+    function getDisplayResults(query) {
+      const q = normalizeText(query);
+
+      if (!q) {
+        return defaultSuggestionNames
+          .map(name => extensionSearch.find(x => x.name === name))
+          .filter(Boolean);
+      }
+
+      return extensionSearch
+        .map(entry => ({ entry, score: scoreEntry(entry, q) }))
+        .filter(item => item.score > 0)
+        .sort((a, b) => b.score - a.score || a.entry.name.localeCompare(b.entry.name))
+        .slice(0, 12)
+        .map(item => item.entry);
+    }
+
+    function renderResults(query) {
+      const results = getDisplayResults(query);
+      resultsList.innerHTML = "";
+
+      if (!normalizeText(query)) {
+        resultCount.textContent = "Showing suggested emergency contacts";
+      } else {
+        resultCount.textContent = `${results.length} result${results.length === 1 ? "" : "s"} found`;
+      }
+
+      if (!results.length) {
+        resultsList.innerHTML = `<p class="empty-state">No close matches found. Try a last name, department, role, room number, or extension.</p>`;
+        return;
+      }
+
+      for (const entry of results) {
+        const item = document.createElement("div");
+        item.className = "result-item";
+
+        const roleText = (entry.role || "").trim();
+        const deptText = (entry.department || "").trim();
+        const roomText = (entry.room || "").trim();
+
+        const roleLine = roleText ? `<p class="result-line">${roleText}</p>` : "";
+        const deptLine = deptText && normalizeText(deptText) !== normalizeText(roleText)
+          ? `<p class="result-line">${deptText}</p>`
+          : "";
+        const roomLine = roomText ? `<p class="result-line">Room: ${roomText}</p>` : "";
+
+        item.innerHTML = `
+          <p class="result-name">${entry.name}</p>
+          ${roleLine}
+          ${deptLine}
+          ${roomLine}
+          <p class="result-ext">Extension: ${entry.extension || "TBD"}</p>
+        `;
+
+        resultsList.appendChild(item);
+      }
+    }
 
     function openPopoutWindow() {
       const width = 460;
@@ -433,7 +632,7 @@
 
       window.open(
         window.location.href,
-        "pvhsToolsPopout",
+        "pvhsExtensionSearchPopout",
         [
           `width=${width}`,
           `height=${height}`,
@@ -452,6 +651,12 @@
     if (popoutBtn) {
       popoutBtn.addEventListener("click", openPopoutWindow);
     }
+
+    searchInput.addEventListener("input", () => {
+      renderResults(searchInput.value);
+    });
+
+    renderResults("");
   </script>
 </body>
 </html>
