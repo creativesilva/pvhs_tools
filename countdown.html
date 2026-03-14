@@ -26,8 +26,9 @@
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
     html, body { width: 100%; height: 100%; background: #021414; overflow: hidden; }
-    body { font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; color: var(--white); touch-action: none; }
+    body { font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; color: var(--white); touch-action: none; user-select: none; }
 
+    /* Forces iPhone Shape on Desktop/Popout */
     .frame { 
       width: 100%; height: 100dvh; display: flex; align-items: center; justify-content: center; 
       padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom) 12px;
@@ -40,6 +41,7 @@
       background: radial-gradient(circle at center, rgba(10,34,34,0.94) 0%, rgba(4,20,20,0.98) 46%, rgba(0,116,116,1) 100%);
       display: flex; flex-direction: column; padding: 10px var(--app-spacing) var(--app-spacing) var(--app-spacing);
       isolation: isolate;
+      container-type: inline-size; /* Required for dynamic text scaling */
     }
 
     .app::before {
@@ -62,6 +64,7 @@
       width: 100%; gap: 8px; height: 44px; flex-shrink: 0; margin-bottom: 6px;
     }
 
+    /* Standardized Pill - No Drop Shadow */
     .action-pill { 
       display: flex; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--panel-border); 
       border-radius: 12px; overflow: hidden; backdrop-filter: blur(4px);
@@ -78,7 +81,12 @@
     .school-card { padding: 18px 14px; text-align: center; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; }
 
     .block-label { font-size: clamp(20px, 6vw, 26px); line-height: 1; font-weight: 900; text-transform: uppercase; margin: 0; color: #00d1d1; text-align: center; }
-    .timer { font-size: 80px; line-height: 0.9; font-weight: 900; letter-spacing: -3px; margin: 8px 0; text-shadow: 0 10px 26px rgba(0,0,0,0.30); }
+    
+    /* DYNAMIC TIMER SCALING - Never clips */
+    .timer { 
+      font-size: 22cqw; 
+      line-height: 0.9; font-weight: 900; letter-spacing: -3px; margin: 8px 0; text-shadow: 0 10px 26px rgba(0,0,0,0.30); 
+    }
     .timer.normal { background: var(--white-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .timer.warning { background: var(--red-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .timer.rest { background: var(--green-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
@@ -91,7 +99,7 @@
     .detail-row { font-size: 11px; color: #d9f2f2; margin: 2px 0; font-weight: 800; text-transform: uppercase; text-align: center; }
     .detail-row strong { color: #ffffff; }
 
-    .footer-note { margin-top: auto; padding: 8px 0 4px 0; font-size: 10px; color: #b5d4d4; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; text-align: center; flex-shrink: 0; }
+    .footer-note { margin-top: auto; padding: 12px 0 4px 0; font-size: 10px; color: #b5d4d4; text-transform: uppercase; font-weight: 800; text-align: center; flex-shrink: 0; }
 
     @media (max-width: 430px) {
       .frame { align-items: flex-start; padding: env(safe-area-inset-top) 0 0 0; }
@@ -105,7 +113,6 @@
     <div class="app">
       <img src="PV_Logo.png" alt="" class="ghost-logo">
       <div class="content">
-        
         <div class="top-row">
           <img src="PV_Logo.png" alt="Logo" class="logo-clear">
           <h1 class="page-title">Countdown</h1>
@@ -138,6 +145,23 @@
   </div>
 
   <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode');
+    const isPopout = mode === 'popout';
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+
+    const popoutSection = document.getElementById("popoutSection");
+    const homeLink = document.getElementById("homeLink");
+
+    // PERSISTENT UI LOGIC
+    if (isPopout) {
+      popoutSection.remove(); // Physically delete the button from code in pop-out mode
+      homeLink.href = "index.html?mode=popout"; // Keep pop-out mode active
+    } else if (!isMobile && !isStandalone) {
+      popoutSection.style.display = 'flex';
+    }
+
     const timeZone = "America/Los_Angeles";
     const schoolDays = ["2026-01-15","2026-01-16","2026-01-20","2026-01-21","2026-01-22","2026-01-23","2026-01-26","2026-01-27","2026-01-28","2026-01-29","2026-01-30","2026-02-02","2026-02-03","2026-02-04","2026-02-05","2026-02-06","2026-02-10","2026-02-11","2026-02-12","2026-02-13","2026-02-17","2026-02-18","2026-02-19","2026-02-20","2026-02-23","2026-02-24","2026-02-25","2026-02-26","2026-02-27","2026-03-02","2026-03-03","2026-03-04","2026-03-05","2026-03-06","2026-03-09","2026-03-10","2026-03-11","2026-03-12","2026-03-13","2026-03-16","2026-03-17","2026-03-18","2026-03-19","2026-03-20","2026-03-23","2026-03-24","2026-03-25","2026-03-26","2026-03-27","2026-03-30","2026-03-31","2026-04-01","2026-04-02","2026-04-13","2026-04-14","2026-04-15","2026-04-16","2026-04-17","2026-04-20","2026-04-21","2026-04-22","2026-04-23","2026-04-24","2026-04-27","2026-04-28","2026-04-29","2026-04-30","2026-05-01","2026-05-04","2026-05-05","2026-05-06","2026-05-07","2026-05-08","2026-05-11","2026-05-12","2026-05-13","2026-05-14","2026-05-15","2026-05-18","2026-05-19","2026-05-20","2026-05-21","2026-05-22","2026-05-26","2026-05-27","2026-05-28","2026-05-29","2026-06-01","2026-06-02","2026-06-03","2026-06-04","2026-06-05","2026-06-08","2026-06-09","2026-06-10"];
     const minimumDays = new Set(["2026-02-27", "2026-04-02", "2026-04-24"]);
@@ -205,24 +229,8 @@
     function parseToSec(t) { const [h,m] = t.split(":").map(Number); return (h*3600)+(m*60); }
     setInterval(updateApp, 1000); updateApp();
 
-    // Persistent State Logic
-    const urlParams = new URLSearchParams(window.location.search);
-    const isPopout = urlParams.get('mode') === 'popout';
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-
-    const popoutSection = document.getElementById("popoutSection");
-    const homeLink = document.getElementById("homeLink");
-
-    if (isPopout) {
-      popoutSection.style.display = 'none';
-      homeLink.href += "?mode=popout";
-    } else if (!isMobile && !isStandalone) {
-      popoutSection.style.display = 'flex';
-    }
-
-    document.getElementById("popoutBtn").addEventListener("click", () => {
-      window.open('countdown.html?mode=popout', 'pvPop', 'width=430,height=880,resizable=yes,scrollbars=no');
+    document.getElementById("popoutBtn")?.addEventListener("click", () => {
+      window.open('countdown.html?mode=popout', 'pvPop', 'width=430,height=880,resizable=no,scrollbars=no');
     });
   </script>
 </body>
