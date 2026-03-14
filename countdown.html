@@ -139,27 +139,22 @@
 
     body.is-standalone .frame {
       position: fixed;
-      top: 0;
-      left: 0;
-      padding: 0;
-      width: var(--standalone-app-width);
-      height: var(--standalone-app-height);
-      min-height: var(--standalone-app-height);
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      min-height: -webkit-fill-available;
+      padding: 0 8px max(24px, calc(env(safe-area-inset-bottom) + 8px)) 8px;
       z-index: 1;
     }
 
     body.is-standalone .app {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: max(30px, calc(env(safe-area-inset-bottom) + 8px));
-      width: auto;
-      height: auto;
-      max-width: none;
-      max-height: none;
-      border-radius: 0 0 42px 42px;
-      border: none;
+      position: relative;
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 34px;
+      border: 1px solid rgba(255,255,255,0.12);
       box-shadow: 0 24px 46px rgba(0,0,0,0.22);
       padding-top: max(10px, env(safe-area-inset-top));
       padding-right: max(var(--app-spacing), env(safe-area-inset-right));
