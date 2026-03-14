@@ -24,6 +24,7 @@
       --red-gradient: linear-gradient(180deg, #ffb8b8 0%, #ff5b5b 58%, #b80000 100%);
       --green-gradient: linear-gradient(180deg, #d2ffcf 0%, #5bff61 58%, #00b806 100%);
       --soft-shadow: 0 12px 24px rgba(0,0,0,0.22); --card-hover: rgba(255,255,255,0.12);
+      --standalone-app-width: 100vw; --standalone-app-height: 100dvh;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
@@ -120,18 +121,19 @@
 
     body.is-standalone .frame {
       position: fixed;
-      inset: 0;
+      top: 0;
+      left: 0;
       padding: 0;
-      width: 100%;
-      height: 100%;
-      min-height: -webkit-fill-available;
+      width: var(--standalone-app-width);
+      height: var(--standalone-app-height);
+      min-height: var(--standalone-app-height);
     }
 
     body.is-standalone .app {
       position: absolute;
       inset: 0;
-      width: auto;
-      height: auto;
+      width: var(--standalone-app-width);
+      height: var(--standalone-app-height);
       max-width: none;
       max-height: none;
       border-radius: 0;
@@ -213,8 +215,39 @@
     const homeLink = document.getElementById("homeLink");
     const navLinks = document.querySelectorAll(".nav-link");
 
+    function updateStandaloneViewportVars() {
+      if (!isStandalone) return;
+      const heightCandidates = [
+        window.innerHeight,
+        window.outerHeight,
+        window.visualViewport ? Math.round(window.visualViewport.height) : 0,
+        window.screen ? window.screen.height : 0,
+        window.screen ? window.screen.availHeight : 0
+      ].filter(Boolean);
+      const widthCandidates = [
+        window.innerWidth,
+        window.outerWidth,
+        window.visualViewport ? Math.round(window.visualViewport.width) : 0,
+        window.screen ? window.screen.width : 0,
+        window.screen ? window.screen.availWidth : 0
+      ].filter(Boolean);
+
+      const appHeight = Math.max(...heightCandidates);
+      const appWidth = Math.max(...widthCandidates);
+
+      document.documentElement.style.setProperty('--standalone-app-height', `${appHeight}px`);
+      document.documentElement.style.setProperty('--standalone-app-width', `${appWidth}px`);
+    }
+
     if (isStandalone) {
       document.body.classList.add('is-standalone');
+      updateStandaloneViewportVars();
+      window.addEventListener('resize', updateStandaloneViewportVars);
+      window.addEventListener('orientationchange', updateStandaloneViewportVars);
+      window.addEventListener('pageshow', updateStandaloneViewportVars);
+      window.visualViewport?.addEventListener('resize', updateStandaloneViewportVars);
+      setTimeout(updateStandaloneViewportVars, 250);
+      setTimeout(updateStandaloneViewportVars, 800);
     }
 
     // PERSISTENT UI LOGIC
