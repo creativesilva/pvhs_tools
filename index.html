@@ -5,10 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="PVHS Tools">
   <meta name="theme-color" content="#007474">
   
+  <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="PV_Logo.png">
   <link rel="icon" type="image/png" sizes="192x192" href="PV_Logo.png">
   <title>PVHS Tools</title>
@@ -22,7 +24,7 @@
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-    html, body { width: 100%; height: 100%; background: #021414; overflow: hidden; }
+    html, body { width: 100%; height: 100%; min-height: 100%; background: #021414; overflow: hidden; }
     body { font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; color: var(--white); touch-action: none; user-select: none; }
 
     /* The Frame ensures app stays centered with margins on Desktop/Popout */
@@ -97,13 +99,35 @@
 
     .footer-note { margin-top: auto; padding: 20px 0 4px 0; font-size: 10px; color: #b5d4d4; text-transform: uppercase; font-weight: 800; text-align: center; flex-shrink: 0; }
 
+    body.is-standalone .frame {
+      padding: 0;
+      height: 100dvh;
+    }
+
+    body.is-standalone .app {
+      width: 100vw;
+      height: 100dvh;
+      max-width: none;
+      max-height: none;
+      border-radius: 0;
+      border: none;
+      box-shadow: none;
+    }
+
+    body.is-standalone .content {
+      padding-top: max(10px, env(safe-area-inset-top));
+      padding-right: max(var(--app-spacing), env(safe-area-inset-right));
+      padding-bottom: calc(20px + env(safe-area-inset-bottom));
+      padding-left: max(var(--app-spacing), env(safe-area-inset-left));
+    }
+
     /* NATIVE APP OVERRIDE (Option B) */
     @media (max-width: 430px) {
-      body:not(.is-popout) .frame { 
+      body:not(.is-popout):not(.is-standalone) .frame { 
         /* Injects Apple's Safe Area padding so it avoids the notch and swipe bar */
         padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom) 12px; 
       }
-      body:not(.is-popout) .app { 
+      body:not(.is-popout):not(.is-standalone) .app { 
         width: 100%; 
         height: 100%; 
         max-height: 100%; 
@@ -154,6 +178,10 @@
     const popoutBtn = document.getElementById("popoutBtn");
     const navLinks = document.querySelectorAll(".nav-link");
 
+    if (isStandalone) {
+      document.body.classList.add('is-standalone');
+    }
+
     if (isPopout) {
       document.body.classList.add('is-popout');
       if (popoutBtn) popoutBtn.remove();
@@ -166,12 +194,13 @@
       if (popoutBtn) popoutBtn.style.display = 'block';
     }
 
-    // iOS PWA Navigation Fix: Stops Safari from hijacking the links
-    if (isMobile || isStandalone) {
+    // Keep internal navigation inside the installed app.
+    if (isStandalone) {
       navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
-          e.preventDefault(); // Stop standard HTML link behavior
-          window.location.href = link.href; // Force internal routing
+          e.preventDefault();
+          const nextHref = link.getAttribute('href');
+          if (nextHref) window.location.assign(nextHref);
         });
       });
     }
