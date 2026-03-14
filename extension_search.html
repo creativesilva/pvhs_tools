@@ -19,93 +19,120 @@
       --panel: rgba(255,255,255,0.08);
       --panel-border: rgba(255,255,255,0.12);
       --shadow: 0 20px 46px rgba(0,0,0,0.30);
-      --soft-shadow: 0 12px 24px rgba(0,0,0,0.22);
-      --side-margin: 12px;
+      --app-spacing: 16px; /* Unified margin for sides and bottom */
+      --radius: 34px;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background: #021414; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--white); touch-action: pan-y; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--white); }
 
+    /* Outer Wrapper for centering */
     .frame {
-      width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
-      /* Added consistent bottom padding */
-      padding: max(12px, env(safe-area-inset-top)) var(--side-margin) max(var(--side-margin), env(safe-area-inset-bottom)) var(--side-margin);
+      width: 100%; height: 100dvh; display: flex; align-items: center; justify-content: center;
+      padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom) 12px;
     }
 
+    /* Main Phone Shape */
     .app {
-      width: min(100%, 430px); aspect-ratio: 430 / 880; max-height: 100%;
-      border-radius: 34px; overflow: hidden; position: relative; box-shadow: var(--shadow);
+      width: min(100%, 414px); 
+      height: min(100%, 850px);
+      aspect-ratio: 9 / 19.5; /* Modern phone ratio */
+      border-radius: var(--radius); 
+      overflow: hidden; 
+      position: relative; 
+      box-shadow: var(--shadow);
       border: 1px solid rgba(255,255,255,0.12);
       background: radial-gradient(circle at center, rgba(10,34,34,0.94) 0%, rgba(4,20,20,0.98) 46%, rgba(0,116,116,1) 100%);
-      display: flex; justify-content: center; padding: 18px 18px 16px 18px; text-align: center; isolation: isolate;
+      display: flex; flex-direction: column;
+      padding: 20px var(--app-spacing) var(--app-spacing) var(--app-spacing); /* Bottom padding matches sides */
     }
 
     .ghost-logo {
-      position: absolute; top: 56%; left: 50%; width: 182%; opacity: 0.072;
-      filter: grayscale(100%) contrast(108%) brightness(114%); pointer-events: none; z-index: 0; transform: translate(-50%, -50%);
+      position: absolute; top: 50%; left: 50%; width: 180%; opacity: 0.06;
+      filter: grayscale(100%); pointer-events: none; z-index: 0; transform: translate(-50%, -50%);
     }
 
-    .content { position: relative; z-index: 1; width: 100%; display: flex; flex-direction: column; gap: 10px; height: 100%; }
-    .top-actions { width: 100%; display: flex; justify-content: flex-end; align-items: center; min-height: 34px; }
+    .content { position: relative; z-index: 1; width: 100%; height: 100%; display: flex; flex-direction: column; gap: 12px; }
+    
+    .top-actions { width: 100%; display: flex; justify-content: flex-end; align-items: center; margin-bottom: 4px; }
     
     .popout-btn {
-      appearance: none; border: 1px solid rgba(255,255,255,0.12); border-radius: 14px;
-      padding: 9px 11px; background: rgba(255,255,255,0.08); color: #ffffff;
-      font-size: 11px; font-weight: 900; text-transform: uppercase; cursor: pointer; backdrop-filter: blur(4px);
+      appearance: none; border: 1px solid rgba(255,255,255,0.12); border-radius: 12px;
+      padding: 8px 10px; background: rgba(255,255,255,0.08); color: #fff;
+      font-size: 10px; font-weight: 900; text-transform: uppercase; cursor: pointer;
     }
 
     .topbar { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-    .logo-clear { width: 52px; height: auto; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); }
-    .page-title { flex: 1; font-size: 18px; font-weight: 900; color: #dff7f7; text-transform: uppercase; }
+    .logo-clear { width: 48px; height: auto; }
+    .page-title { flex: 1; font-size: 16px; font-weight: 900; color: #dff7f7; text-transform: uppercase; margin: 0; text-align: center;}
     
     .home-link {
-      padding: 10px 12px; border-radius: 16px; background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.12); color: var(--white); text-decoration: none;
-      font-size: 12px; font-weight: 900; text-transform: uppercase;
+      padding: 8px 12px; border-radius: 14px; background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.12); color: #fff; text-decoration: none;
+      font-size: 10px; font-weight: 900; text-transform: uppercase;
     }
 
+    /* Cards */
     .search-card, .results-card {
-      width: 100%; border-radius: 28px; background: var(--panel); border: 1px solid var(--panel-border);
-      backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      width: 100%; border-radius: 24px; background: var(--panel); border: 1px solid var(--panel-border);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     }
 
-    .search-card { padding: 16px 14px; }
-    .results-card { padding: 12px 12px 0 12px; text-align: left; flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+    .search-card { padding: 18px 14px; flex-shrink: 0; }
+    
+    .results-card { 
+      padding: 14px 14px 0 14px; 
+      text-align: left; 
+      flex: 1; 
+      overflow: hidden; 
+      display: flex; 
+      flex-direction: column;
+      margin-bottom: 2px; /* Slight lift from the very bottom edge */
+    }
 
-    .search-title { margin: 0 0 4px 0; font-size: clamp(20px, 6vw, 32px); font-weight: 900; text-transform: uppercase; }
-    .helper-text { margin: 0 0 12px 0; font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; }
+    .search-title { margin: 0 0 2px 0; font-size: 28px; font-weight: 900; text-transform: uppercase; letter-spacing: -0.5px; }
+    .helper-text { margin: 0 0 14px 0; font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; }
 
     .search-input {
-      width: 100%; border: 1px solid rgba(255,255,255,0.16); border-radius: 18px;
-      padding: 14px; font-size: 16px; font-weight: 700; color: #ffffff; background: rgba(0,0,0,0.18); outline: none;
+      width: 100%; border: 1px solid rgba(255,255,255,0.15); border-radius: 16px;
+      padding: 14px; font-size: 16px; font-weight: 700; color: #fff; background: rgba(0,0,0,0.2); outline: none;
     }
 
-    .result-count { margin-bottom: 8px; font-size: 11px; font-weight: 900; color: #dff7f7; text-transform: uppercase; text-align: center; }
+    .result-count { margin-bottom: 10px; font-size: 10px; font-weight: 900; color: #dff7f7; text-transform: uppercase; text-align: center; opacity: 0.8;}
     
     .results-list { 
+      flex: 1; 
+      overflow-y: auto; 
       display: flex; 
       flex-direction: column; 
       gap: 10px; 
-      overflow-y: auto; 
-      padding-right: 2px;
-      padding-bottom: 20px; /* This ensures the last item has space at the bottom */
+      padding-bottom: 16px; /* Spacing at the end of the scroll list */
     }
     
     .result-item {
-      border-radius: 20px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.10);
-      padding: 12px; transition: background 0.2s;
+      border-radius: 18px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+      padding: 14px;
     }
 
-    .result-name { margin: 0 0 2px 0; font-size: 16px; font-weight: 900; color: #ffffff; text-transform: uppercase; }
-    .result-line { margin: 0; font-size: 11px; font-weight: 800; color: #d8f1f1; text-transform: uppercase; opacity: 0.9; }
-    .result-ext { margin-top: 6px; font-size: 15px; font-weight: 900; color: #ffffff; }
+    .result-name { margin: 0 0 2px 0; font-size: 15px; font-weight: 900; color: #fff; text-transform: uppercase; }
+    .result-line { margin: 0; font-size: 10px; font-weight: 700; color: #d8f1f1; text-transform: uppercase; opacity: 0.7; }
+    .result-ext { margin-top: 8px; font-size: 14px; font-weight: 900; color: #fff; }
 
-    .footer-note { margin-top: auto; padding: 8px 0; font-size: 9px; color: #b5d4d4; text-transform: uppercase; font-weight: 700; }
+    .footer-note { 
+      margin-top: auto; 
+      padding: 10px 0 0 0; 
+      font-size: 8px; 
+      color: #b5d4d4; 
+      text-transform: uppercase; 
+      font-weight: 800; 
+      opacity: 0.6;
+      letter-spacing: 1px;
+    }
 
-    @media (max-width: 430px) {
-      .frame { padding: 12px; height: 100dvh; }
-      .app { width: 100%; border-radius: 24px; aspect-ratio: auto; }
+    @media (max-width: 450px) {
+      .app { border-radius: 0; border: none; width: 100%; height: 100dvh; aspect-ratio: auto; }
+      .frame { padding: 0; }
     }
   </style>
 </head>
@@ -131,12 +158,13 @@
           <p class="result-count" id="resultCount">Recommended Contacts</p>
           <div class="results-list" id="resultsList"></div>
         </div>
-        <div class="footer-note">PVHS Staff Directory 2025-2026</div>
+        <center><div class="footer-note">PVHS Staff Directory 2025-2026</div></center>
       </div>
     </div>
   </div>
 
   <script>
+    // [Data and Levenshtein logic remains the same as previous version]
     const extensionSearch = [
       { name: "PVHS Emergency Line", role: "Emergency", extension: "5000", keywords: ["emergency", "urgent"] },
       { name: "PVHS Maintenance", role: "Emergency", extension: "878-8155", keywords: ["maint", "urgent"] },
@@ -192,7 +220,6 @@
 
     const defaultSuggestions = ["PVHS Emergency Line", "PVHS Maintenance", "Eddie Hernandez", "Karine Perez"];
 
-    // Levenshtein Logic for fuzzy searching
     function getLevenshteinDistance(a, b) {
       const matrix = Array.from({ length: a.length + 1 }, (_, i) => [i]);
       for (let j = 1; j <= b.length; j++) matrix[0][j] = j;
@@ -209,36 +236,29 @@
     const resultsList = document.getElementById("resultsList");
     const resultCount = document.getElementById("resultCount");
 
-    function normalizeText(text) {
-      return (text || "").toLowerCase().trim();
-    }
-
     function renderResults(query) {
-      const q = normalizeText(query);
+      const q = query.toLowerCase().trim();
       let results = [];
 
       if (!q) {
         results = extensionSearch.filter(e => defaultSuggestions.includes(e.name));
         resultCount.textContent = "Recommended Contacts";
       } else {
-        // Step 1: Filter by direct inclusion (standard search)
         results = extensionSearch.filter(e => {
           const searchSpace = [e.name, e.role, e.department, e.extension, e.room, ...(e.keywords || [])].join(" ").toLowerCase();
           return searchSpace.includes(q);
         });
 
-        // Step 2: If no direct matches, use fuzzy logic on names
         if (results.length === 0 && q.length > 2) {
           results = extensionSearch
-            .map(e => ({ ...e, dist: getLevenshteinDistance(q, e.name.toLowerCase().split(' ').pop()) })) // check last name
-            .filter(e => e.dist <= 2) // tolerance of 2 typos
+            .map(e => ({ ...e, dist: getLevenshteinDistance(q, e.name.toLowerCase().split(' ').pop()) }))
+            .filter(e => e.dist <= 2)
             .sort((a, b) => a.dist - b.dist);
         }
-        
         resultCount.textContent = results.length > 0 ? `${results.length} found` : "No results found";
       }
 
-      resultsList.innerHTML = results.length ? "" : '<p style="text-align:center; padding:20px; opacity:0.6;">No matches found. Try a department or extension.</p>';
+      resultsList.innerHTML = results.length ? "" : '<p style="text-align:center; padding:20px; opacity:0.6; font-size:12px;">NO MATCHES FOUND</p>';
 
       results.forEach(entry => {
         const div = document.createElement("div");
@@ -255,6 +275,10 @@
 
     searchInput.addEventListener("input", (e) => renderResults(e.target.value));
     renderResults("");
+    
+    document.getElementById("popoutBtn")?.addEventListener("click", () => {
+      window.open(window.location.href, 'popout', 'width=430,height=880');
+    });
   </script>
 </body>
 </html>
