@@ -11,8 +11,8 @@
   <meta name="theme-color" content="#007474">
   
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="apple-touch-icon" href="PV_Logo.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="PV_Logo.png">
+  <link rel="apple-touch-icon" href="PV_AppIcon.png">
+  <link rel="icon" type="image/png" sizes="1024x1024" href="PV_AppIcon.png">
   <title>Countdown Clock</title>
 
   <style>
@@ -98,8 +98,12 @@
     
     /* Dynamic scaling to prevent clipping */
     .timer { 
-      font-size: 22cqw; 
-      line-height: 0.9; font-weight: 900; letter-spacing: -3px; margin: 8px 0; text-shadow: 0 10px 26px rgba(0,0,0,0.30); 
+      width: 100%;
+      padding: 0 10px;
+      font-size: clamp(72px, 20.6cqw, 148px);
+      line-height: 0.98; font-weight: 900; letter-spacing: -2px; margin: 8px 0;
+      text-align: center; text-shadow: 0 10px 26px rgba(0,0,0,0.30);
+      font-variant-numeric: tabular-nums;
     }
     .timer.normal { background: var(--white-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .timer.warning { background: var(--red-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
@@ -109,21 +113,26 @@
     .status-row { font-size: 11px; font-weight: 800; color: #d9f2f2; text-transform: uppercase; margin: 4px 0 0 0; opacity: 0.8; }
 
     .school-label { font-size: 14px; font-weight: 900; color: #ffffff; text-transform: uppercase; margin-bottom: 2px; }
-    .school-number { font-size: 80px; line-height: 0.9; font-weight: 900; letter-spacing: -4px; background: var(--white-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; margin: 4px 0; }
+    .school-number {
+      width: 100%;
+      padding: 0 8px;
+      font-size: clamp(74px, 18.5cqw, 88px);
+      line-height: 0.98; font-weight: 900; letter-spacing: -2px;
+      background: var(--white-gradient); -webkit-background-clip: text; background-clip: text; color: transparent;
+      margin: 4px 0; text-align: center; font-variant-numeric: tabular-nums;
+    }
     .detail-row { font-size: 11px; color: #d9f2f2; margin: 2px 0; font-weight: 800; text-transform: uppercase; text-align: center; }
     .detail-row strong { color: #ffffff; }
 
-    .footer-note { margin-top: auto; padding: 20px 0 4px 0; font-size: 10px; color: #b5d4d4; text-transform: uppercase; font-weight: 800; text-align: center; flex-shrink: 0; }
+    .footer-note { margin-top: auto; padding: 16px 0 4px 0; font-size: 10px; color: #b5d4d4; font-weight: 800; text-align: center; flex-shrink: 0; }
 
-    body.is-standalone {
-      background: radial-gradient(circle at center, rgba(10,34,34,0.94) 0%, rgba(4,20,20,0.98) 46%, rgba(0,116,116,1) 100%);
-    }
+    body.is-standalone { background: #021414; }
 
     body.is-standalone::before {
       content: "";
       position: fixed;
       inset: 0;
-      background: radial-gradient(circle at center, rgba(10,34,34,0.94) 0%, rgba(4,20,20,0.98) 46%, rgba(0,116,116,1) 100%);
+      background: #021414;
       pointer-events: none;
       z-index: 0;
     }
@@ -141,17 +150,20 @@
 
     body.is-standalone .app {
       position: absolute;
-      inset: 0;
-      width: var(--standalone-app-width);
-      height: var(--standalone-app-height);
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: max(30px, calc(env(safe-area-inset-bottom) + 8px));
+      width: auto;
+      height: auto;
       max-width: none;
       max-height: none;
-      border-radius: 0 0 34px 34px;
+      border-radius: 0 0 42px 42px;
       border: none;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.18);
+      box-shadow: 0 24px 46px rgba(0,0,0,0.22);
       padding-top: max(10px, env(safe-area-inset-top));
       padding-right: max(var(--app-spacing), env(safe-area-inset-right));
-      padding-bottom: max(var(--app-spacing), calc(var(--app-spacing) + env(safe-area-inset-bottom)));
+      padding-bottom: 18px;
       padding-left: max(var(--app-spacing), env(safe-area-inset-left));
     }
 
@@ -208,7 +220,7 @@
           <p class="weather-text" id="weatherText">Loading...</p>
         </div>
 
-        <div class="footer-note">CREATED BY: MR. SILVA</div>
+        <div class="footer-note">By: CreativeSilva</div>
       </div>
     </div>
   </div>
@@ -312,7 +324,6 @@
 
     function updateApp() {
       const now = getNow();
-      document.getElementById("daysLeft").textContent = schoolDays.filter(d => d >= now.dateStr).length;
       document.getElementById("todayText").textContent = now.longDate;
 
       let schedType = "REGULAR DAY", blocks = schedules.regular;
@@ -321,31 +332,46 @@
       document.getElementById("scheduleText").textContent = `Schedule: ${schedType}`;
 
       const isSchoolDay = schoolDays.includes(now.dateStr);
-      const firstStart = (8*3600)+(30*60);
-      const lastEnd = parseToSec(blocks[blocks.length-1].e);
+      const firstStart = parseToSec(blocks[0].s);
+      const lastEnd = parseToSec(blocks[blocks.length - 1].e);
+      const isAfterSchool = isSchoolDay && now.totalSec >= lastEnd;
+      const remainingSchoolDays = schoolDays.filter(d => d > now.dateStr || (d === now.dateStr && !isAfterSchool)).length;
+      document.getElementById("daysLeft").textContent = remainingSchoolDays;
 
       if (isSchoolDay && now.totalSec >= firstStart && now.totalSec < lastEnd) {
-        for (let i=0; i<blocks.length; i++) {
+        for (let i = 0; i < blocks.length; i++) {
           const s = parseToSec(blocks[i].s), e = parseToSec(blocks[i].e);
           if (now.totalSec >= s && now.totalSec < e) {
             const rem = e - now.totalSec;
             document.getElementById("blockLabel").textContent = blocks[i].l;
             document.getElementById("timerText").textContent = formatTime(rem);
             document.getElementById("timerText").className = rem <= 300 ? "timer warning" : "timer normal";
-            document.getElementById("subText").textContent = i < blocks.length-1 ? `Next: ${blocks[i+1].l}` : "Almost done for today!";
+            document.getElementById("subText").textContent = i < blocks.length - 1 ? `Next: ${blocks[i + 1].l}` : "Almost done for today!";
             return;
           }
         }
       }
 
-      const nextDay = schoolDays.find(d => d > now.dateStr) || schoolDays[0];
-      const nextDate = new Date(nextDay + "T08:30:00");
-      const diff = Math.floor((nextDate - new Date()) / 1000);
+      const upcomingDay = isSchoolDay && now.totalSec < firstStart
+        ? now.dateStr
+        : (schoolDays.find(d => d > now.dateStr) || schoolDays[schoolDays.length - 1]);
+      const nextDate = new Date(`${upcomingDay}T08:30:00`);
+      const diff = Math.max(0, Math.floor((nextDate - new Date()) / 1000));
+      const isWeekendRecharge = now.weekday === "Saturday" || now.weekday === "Sunday" || (now.weekday === "Friday" && isAfterSchool);
 
-      document.getElementById("blockLabel").textContent = now.weekday === "Friday" || now.weekday === "Saturday" ? "Weekend Recharge" : "Rest Time Remaining";
+      document.getElementById("blockLabel").textContent = isWeekendRecharge ? "Weekend Recharge" : "Rest Time Remaining";
       document.getElementById("timerText").textContent = formatTime(diff, true);
       document.getElementById("timerText").className = "timer rest";
-      document.getElementById("subText").textContent = !isSchoolDay ? "Enjoy your time off!" : "School's out, get some rest!";
+
+      if (isWeekendRecharge) {
+        document.getElementById("subText").textContent = "Enjoy your weekend!";
+      } else if (!isSchoolDay) {
+        document.getElementById("subText").textContent = "Enjoy your time off!";
+      } else if (now.totalSec < firstStart) {
+        document.getElementById("subText").textContent = "School starts at 8:30 AM";
+      } else {
+        document.getElementById("subText").textContent = "School's out, get some rest!";
+      }
     }
 
     function parseToSec(t) { const [h,m] = t.split(":").map(Number); return (h*3600)+(m*60); }
