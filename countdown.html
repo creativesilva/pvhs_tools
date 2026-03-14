@@ -28,7 +28,7 @@
     html, body { width: 100%; height: 100%; background: #021414; overflow: hidden; }
     body { font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; color: var(--white); touch-action: none; user-select: none; }
 
-    /* The Frame ensures the app stays centered with margins on Desktop/Popout */
+    /* The Frame ensures app stays centered with margins on Desktop/Popout */
     .frame { 
       width: 100%; height: 100dvh; display: flex; align-items: center; justify-content: center; 
       padding: 10px;
@@ -60,7 +60,6 @@
       overflow-y: auto; -webkit-overflow-scrolling: touch;
     }
 
-    /* Header in one single line */
     .top-row {
       display: flex; align-items: center; justify-content: space-between;
       width: 100%; gap: 8px; height: 44px; flex-shrink: 0; margin-bottom: 6px;
@@ -83,9 +82,26 @@
     .period-card { padding: 18px 14px; display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; }
     .school-card { padding: 18px 14px; text-align: center; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; }
 
+    /* THE FIX: Specifically shorter padding for weather card */
+    .weather-card { 
+      padding: 10px 14px; /* Shorter padding */
+      text-align: center; 
+      flex-shrink: 0; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center;
+    }
+    .weather-text {
+      font-size: 11px;
+      font-weight: 800;
+      color: #d9f2f2;
+      text-transform: uppercase;
+      margin: 0;
+    }
+
     .block-label { font-size: clamp(20px, 6vw, 26px); line-height: 1; font-weight: 900; text-transform: uppercase; margin: 0; color: #00d1d1; text-align: center; }
     
-    /* Dynamic scaling to prevent clipping */
+    /* DYNAMIC TIMER SCALING - Never clips */
     .timer { 
       font-size: 22cqw; 
       line-height: 0.9; font-weight: 900; letter-spacing: -3px; margin: 8px 0; text-shadow: 0 10px 26px rgba(0,0,0,0.30); 
@@ -144,6 +160,10 @@
           <p class="detail-row"><strong>Last Day:</strong> June 10, 2026</p>
         </div>
 
+        <div class="card weather-card">
+          <p class="weather-text">nano benana</p>
+        </div>
+
         <div class="footer-note">CREATED BY: MR. SILVA</div>
       </div>
     </div>
@@ -157,7 +177,7 @@
     const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
 
     const popoutSection = document.getElementById("popoutSection");
-    const popoutBtn = document.getElementById("popoutBtn"); // ADDED: Definition for listener
+    const popoutBtn = document.getElementById("popoutBtn"); 
     const navLinks = document.querySelectorAll(".nav-link");
 
     // PERSISTENT UI LOGIC
@@ -240,7 +260,6 @@
     function parseToSec(t) { const [h,m] = t.split(":").map(Number); return (h*3600)+(m*60); }
     setInterval(updateApp, 1000); updateApp();
 
-    // ADDED: Optional chaining just in case, but variable is now defined above
     popoutBtn?.addEventListener("click", () => {
       window.open('countdown.html?mode=popout', 'pvPop', 'width=450,height=900,resizable=yes,scrollbars=no');
     });
