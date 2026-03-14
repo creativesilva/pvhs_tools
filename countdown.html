@@ -3,10 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="PVHS Tools">
   <meta name="theme-color" content="#007474">
+  
   <link rel="apple-touch-icon" href="PV_Logo.png">
   <link rel="icon" type="image/png" sizes="192x192" href="PV_Logo.png">
   <title>Countdown Clock</title>
@@ -19,14 +21,16 @@
       --white-gradient: linear-gradient(180deg, #ffffff 0%, #dceaea 100%);
       --red-gradient: linear-gradient(180deg, #ffb8b8 0%, #ff5b5b 58%, #b80000 100%);
       --green-gradient: linear-gradient(180deg, #d2ffcf 0%, #5bff61 58%, #00b806 100%);
+      --card-hover: rgba(255,255,255,0.12);
+      --soft-shadow: 0 12px 24px rgba(0,0,0,0.22);
     }
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background: #021414; }
-    body { font-family: Arial, Helvetica, sans-serif; color: var(--white); touch-action: pan-y; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; background: #021414; overflow: hidden; }
+    body { font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; color: var(--white); touch-action: none; }
 
     .frame { 
-      width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; 
-      padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom)) 12px;
+      width: 100%; height: 100dvh; display: flex; align-items: center; justify-content: center; 
+      padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom) 12px;
     }
 
     .app {
@@ -34,7 +38,7 @@
       aspect-ratio: 430 / 880; border-radius: var(--radius); 
       overflow: hidden; position: relative; box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,0.12);
       background: radial-gradient(circle at center, rgba(10,34,34,0.94) 0%, rgba(4,20,20,0.98) 46%, rgba(0,116,116,1) 100%);
-      display: flex; flex-direction: column; padding: 20px var(--app-spacing) var(--app-spacing) var(--app-spacing);
+      display: flex; flex-direction: column; padding: 10px var(--app-spacing) var(--app-spacing) var(--app-spacing);
       isolation: isolate;
     }
 
@@ -46,11 +50,17 @@
     }
 
     .ghost-logo { position: absolute; top: 56%; left: 50%; width: 182%; opacity: 0.07; transform: translate(-50%, -50%); filter: grayscale(100%) contrast(108%) brightness(114%); pointer-events: none; z-index: 0; }
-    .content { position: relative; z-index: 1; width: 100%; height: 100%; display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
     
+    .content { 
+      position: relative; z-index: 1; width: 100%; height: 100%; 
+      display: flex; flex-direction: column; align-items: center; 
+      overflow-y: auto; -webkit-overflow-scrolling: touch;
+    }
+
+    /* ONE-LINE HEADER */
     .top-row {
       display: flex; align-items: center; justify-content: space-between;
-      width: 100%; gap: 8px; margin-bottom: 4px; flex-shrink: 0;
+      width: 100%; gap: 8px; height: 44px; flex-shrink: 0; margin-bottom: 6px;
     }
 
     .action-pill { 
@@ -60,16 +70,16 @@
     .pill-btn { appearance: none; background: transparent; border: none; color: #fff; font-size: 10px; font-weight: 900; text-transform: uppercase; padding: 8px 10px; cursor: pointer; text-decoration: none; display: flex; align-items: center; }
     .pill-divider { width: 1px; background: var(--panel-border); height: 100%; }
 
-    .logo-clear { width: 44px; height: auto; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); flex-shrink: 0; }
-    .page-title { flex: 1; font-size: 15px; font-weight: 900; color: #dff7f7; text-transform: uppercase; margin: 0; text-align: center; letter-spacing: 0.5px; }
+    .logo-clear { width: 42px; height: auto; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); flex-shrink: 0; }
+    .page-title { flex: 1; font-size: 14px; font-weight: 900; color: #dff7f7; text-transform: uppercase; margin: 0; text-align: center; letter-spacing: 0.5px; }
 
-    .card { width: 100%; border-radius: 28px; background: var(--panel); border: 1px solid var(--panel-border); backdrop-filter: blur(10px); box-shadow: 0 12px 24px rgba(0,0,0,0.22); }
+    .card { width: 100%; border-radius: 28px; background: var(--panel); border: 1px solid var(--panel-border); backdrop-filter: blur(10px); box-shadow: var(--soft-shadow); margin-bottom: 12px; }
     
-    .period-card { padding: 18px 14px; display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; }
+    .period-card { padding: 18px 14px; display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; }
     .school-card { padding: 18px 14px; text-align: center; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; }
 
-    .block-label { font-size: clamp(20px, 6vw, 28px); line-height: 1; font-weight: 900; text-transform: uppercase; margin: 0; color: #00d1d1; text-align: center; }
-    .timer { font-size: clamp(60px, 18vw, 110px); line-height: 0.9; font-weight: 900; letter-spacing: -3px; margin: 8px 0; text-shadow: 0 10px 26px rgba(0,0,0,0.30); }
+    .block-label { font-size: clamp(20px, 6vw, 26px); line-height: 1; font-weight: 900; text-transform: uppercase; margin: 0; color: #00d1d1; text-align: center; }
+    .timer { font-size: clamp(60px, 18vw, 100px); line-height: 0.9; font-weight: 900; letter-spacing: -3px; margin: 8px 0; text-shadow: 0 10px 26px rgba(0,0,0,0.30); }
     .timer.normal { background: var(--white-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .timer.warning { background: var(--red-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .timer.rest { background: var(--green-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
@@ -77,16 +87,16 @@
     .subtext { font-size: 12px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin: 0; text-wrap: balance; text-align: center; }
     .status-row { font-size: 11px; font-weight: 800; color: #d9f2f2; text-transform: uppercase; margin: 4px 0 0 0; opacity: 0.8; }
 
-    .school-label { font-size: 14px; font-weight: 900; color: #ffffff; text-transform: uppercase; margin-bottom: 4px; }
-    .school-number { font-size: 84px; line-height: 0.9; font-weight: 900; letter-spacing: -4px; background: var(--white-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; margin: 4px 0; }
-    .detail-row { font-size: 11px; color: #d9f2f2; margin: 2px 0; font-weight: 800; text-transform: uppercase; }
+    .school-label { font-size: 14px; font-weight: 900; color: #ffffff; text-transform: uppercase; margin-bottom: 2px; }
+    .school-number { font-size: 80px; line-height: 0.9; font-weight: 900; letter-spacing: -4px; background: var(--white-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; margin: 4px 0; }
+    .detail-row { font-size: 11px; color: #d9f2f2; margin: 2px 0; font-weight: 800; text-transform: uppercase; text-align: center; }
     .detail-row strong { color: #ffffff; }
 
-    .footer-note { margin-top: auto; padding: 8px 0; font-size: 10px; color: #b5d4d4; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; text-align: center; flex-shrink: 0; }
+    .footer-note { margin-top: auto; padding: 8px 0 4px 0; font-size: 10px; color: #b5d4d4; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; text-align: center; flex-shrink: 0; }
 
     @media (max-width: 430px) {
       .frame { align-items: flex-start; }
-      .app { width: 100%; aspect-ratio: auto; min-height: calc(100dvh - 24px); border-radius: 28px; }
+      .app { width: 100%; height: calc(100dvh - 24px); aspect-ratio: auto; border-radius: 28px; }
     }
   </style>
 </head>
@@ -101,7 +111,7 @@
           <h1 class="page-title">Countdown</h1>
           <div class="action-pill">
             <a href="index.html" class="pill-btn">Home</a>
-            <div id="popoutSection" style="display: flex;">
+            <div id="popoutSection" style="display: none;">
               <div class="pill-divider"></div>
               <button id="popoutBtn" class="pill-btn" type="button">Pop Out</button>
             </div>
@@ -195,7 +205,12 @@
     function parseToSec(t) { const [h,m] = t.split(":").map(Number); return (h*3600)+(m*60); }
     setInterval(updateApp, 1000); updateApp();
 
-    if (window.name==='popout' || window.location.search.includes('popout=true')) document.getElementById('popoutSection').style.display='none';
+    // Platform Intelligence
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+    const popoutSection = document.getElementById("popoutSection");
+    if (!isMobile && !isStandalone && !window.location.search.includes('popout=true')) popoutSection.style.display = 'flex';
+
     document.getElementById("popoutBtn").addEventListener("click", () => {
       window.open(window.location.href + '?popout=true', 'pvPop', 'width=430,height=880');
     });
