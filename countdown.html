@@ -9,32 +9,44 @@
   <meta name="theme-color" content="#007474">
   <link rel="apple-touch-icon" href="PV_Logo.png">
   <link rel="icon" type="image/png" sizes="192x192" href="PV_Logo.png">
-  <title>Countdown Clock</title>
+  <title>PVHS Tools</title>
 
   <style>
     :root {
-      --teal: #007474; --white: #f7fbfb; --muted: #cfe3e3;
-      --panel: rgba(255,255,255,0.08); --panel-border: rgba(255,255,255,0.12);
-      --shadow: 0 20px 46px rgba(0,0,0,0.30); --app-spacing: 18px; --radius: 34px;
-      --white-gradient: linear-gradient(180deg, #ffffff 0%, #dceaea 100%);
-      --red-gradient: linear-gradient(180deg, #ffb8b8 0%, #ff5b5b 58%, #b80000 100%);
-      --green-gradient: linear-gradient(180deg, #d2ffcf 0%, #5bff61 58%, #00b806 100%);
+      --teal: #007474;
+      --white: #f7fbfb;
+      --muted: #cfe3e3;
+      --panel: rgba(255,255,255,0.08);
+      --panel-border: rgba(255,255,255,0.12);
+      --shadow: 0 20px 46px rgba(0,0,0,0.30);
+      --soft-shadow: 0 12px 24px rgba(0,0,0,0.22);
+      --card-hover: rgba(255,255,255,0.12);
+      --app-spacing: 18px;
     }
+
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background: #021414; }
     body { font-family: Arial, Helvetica, sans-serif; color: var(--white); touch-action: pan-y; }
 
-    .frame { 
-      width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; 
-      padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom)) 12px;
+    .frame {
+      width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+      padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom) 12px;
     }
 
     .app {
-      width: min(100%, 430px); height: 100%; max-height: calc(100dvh - 24px);
-      aspect-ratio: 430 / 880; border-radius: var(--radius); 
-      overflow: hidden; position: relative; box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,0.12);
+      /* FIX: Use dvh (dynamic viewport height) to prevent cutoff */
+      height: 92dvh;
+      width: auto;
+      aspect-ratio: 430 / 880;
+      max-width: min(100%, 430px);
+      border-radius: 34px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,0.12);
       background: radial-gradient(circle at center, rgba(10,34,34,0.94) 0%, rgba(4,20,20,0.98) 46%, rgba(0,116,116,1) 100%);
-      display: flex; flex-direction: column; padding: 20px var(--app-spacing) var(--app-spacing) var(--app-spacing);
+      display: flex; flex-direction: column;
+      padding: 20px var(--app-spacing) var(--app-spacing) var(--app-spacing);
       isolation: isolate;
     }
 
@@ -45,48 +57,58 @@
       z-index: 0;
     }
 
-    .ghost-logo { position: absolute; top: 56%; left: 50%; width: 182%; opacity: 0.07; transform: translate(-50%, -50%); filter: grayscale(100%) contrast(108%) brightness(114%); pointer-events: none; z-index: 0; }
-    .content { position: relative; z-index: 1; width: 100%; height: 100%; display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
-    
-    .top-row {
-      display: flex; align-items: center; justify-content: space-between;
-      width: 100%; gap: 8px; margin-bottom: 4px; flex-shrink: 0;
+    .ghost-logo {
+      position: absolute; top: 56%; left: 50%; width: 182%; opacity: 0.07;
+      transform: translate(-50%, -50%); filter: grayscale(100%) contrast(108%) brightness(114%);
+      pointer-events: none; z-index: 0;
     }
 
-    .action-pill { 
-      display: flex; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--panel-border); 
-      border-radius: 12px; overflow: hidden; backdrop-filter: blur(4px); 
-    }
-    .pill-btn { appearance: none; background: transparent; border: none; color: #fff; font-size: 10px; font-weight: 900; text-transform: uppercase; padding: 8px 10px; cursor: pointer; text-decoration: none; display: flex; align-items: center; }
-    .pill-divider { width: 1px; background: var(--panel-border); height: 100%; }
-
-    .logo-clear { width: 44px; height: auto; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); flex-shrink: 0; }
-    .page-title { flex: 1; font-size: 15px; font-weight: 900; color: #dff7f7; text-transform: uppercase; margin: 0; text-align: center; letter-spacing: 0.5px; }
-
-    .card { width: 100%; border-radius: 28px; background: var(--panel); border: 1px solid var(--panel-border); backdrop-filter: blur(10px); box-shadow: 0 12px 24px rgba(0,0,0,0.22); }
+    .content { position: relative; z-index: 1; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 10px; }
     
-    .period-card { padding: 18px 14px; display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; }
-    .school-card { padding: 18px 14px; text-align: center; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; }
+    .top-actions { width: 100%; display: flex; justify-content: flex-end; flex-shrink: 0; }
+    
+    .popout-pill {
+      appearance: none; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--panel-border);
+      border-radius: 12px; padding: 10px 14px; color: #fff; font-size: 10px;
+      font-weight: 900; text-transform: uppercase; cursor: pointer; backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px); box-shadow: var(--soft-shadow); transition: background 0.2s;
+    }
 
-    .block-label { font-size: clamp(20px, 6vw, 28px); line-height: 1; font-weight: 900; text-transform: uppercase; margin: 0; color: #00d1d1; text-align: center; }
-    .timer { font-size: clamp(60px, 18vw, 110px); line-height: 0.9; font-weight: 900; letter-spacing: -3px; margin: 8px 0; text-shadow: 0 10px 26px rgba(0,0,0,0.30); }
-    .timer.normal { background: var(--white-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .timer.warning { background: var(--red-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .timer.rest { background: var(--green-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .header { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .logo-clear { width: 70px; height: auto; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); }
+    .title { margin: 0; font-size: clamp(30px, 8vh, 42px); line-height: 1; font-weight: 900; text-transform: uppercase; letter-spacing: -1px; text-align: center; }
+    .greeting { margin: 0; font-size: 12px; font-weight: 800; color: #00d1d1; text-transform: uppercase; letter-spacing: 1px; text-align: center; }
+    .subtitle { margin: 0; max-width: 280px; font-size: 12px; line-height: 1.4; font-weight: 700; color: var(--muted); text-wrap: balance; text-align: center; }
 
-    .subtext { font-size: 12px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin: 0; text-wrap: balance; text-align: center; }
-    .status-row { font-size: 11px; font-weight: 800; color: #d9f2f2; text-transform: uppercase; margin: 4px 0 0 0; opacity: 0.8; }
+    .launcher-stack { width: 100%; display: flex; flex-direction: column; gap: 10px; }
 
-    .school-label { font-size: 14px; font-weight: 900; color: #ffffff; text-transform: uppercase; margin-bottom: 4px; }
-    .school-number { font-size: 84px; line-height: 0.9; font-weight: 900; letter-spacing: -4px; background: var(--white-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; margin: 4px 0; }
-    .detail-row { font-size: 11px; color: #d9f2f2; margin: 2px 0; font-weight: 800; text-transform: uppercase; }
-    .detail-row strong { color: #ffffff; }
+    .launch-card {
+      width: 100%; border-radius: 24px; background: var(--panel); border: 1px solid var(--panel-border);
+      box-shadow: var(--soft-shadow); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      text-decoration: none; color: var(--white); padding: 18px 14px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s, transform 0.1s;
+    }
 
-    .footer-note { margin-top: auto; padding: 8px 0; font-size: 10px; color: #b5d4d4; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; text-align: center; flex-shrink: 0; }
+    .launch-card:active { transform: scale(0.98); background: var(--card-hover); }
+    .launch-label { margin: 0; font-size: 16px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
+
+    .quick-links-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
+
+    .quick-link-btn {
+      display: flex; align-items: center; justify-content: center; min-height: 50px;
+      padding: 8px; border-radius: 18px; text-decoration: none; color: #fff;
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      backdrop-filter: blur(4px); text-align: center; transition: background 0.2s;
+    }
+
+    .quick-link-label { margin: 0; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.3px; line-height: 1.2; text-align: center; }
+
+    .footer-note { padding: 4px 0; font-size: 9px; color: #b5d4d4; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; text-align: center; flex-shrink: 0; }
 
     @media (max-width: 430px) {
       .frame { align-items: flex-start; }
-      .app { width: 100%; aspect-ratio: auto; min-height: calc(100dvh - 24px); border-radius: 28px; }
+      .app { height: calc(100dvh - 24px); width: 100%; aspect-ratio: auto; border-radius: 28px; }
     }
   </style>
 </head>
@@ -95,31 +117,27 @@
     <div class="app">
       <img src="PV_Logo.png" alt="" class="ghost-logo">
       <div class="content">
-        
-        <div class="top-row">
+        <div class="top-actions">
+          <button id="popoutBtn" class="popout-pill" type="button">Pop Out</button>
+        </div>
+
+        <div class="header">
           <img src="PV_Logo.png" alt="Logo" class="logo-clear">
-          <h1 class="page-title">Countdown</h1>
-          <div class="action-pill">
-            <a href="index.html" class="pill-btn">Home</a>
-            <div id="popoutSection" style="display: flex;">
-              <div class="pill-divider"></div>
-              <button id="popoutBtn" class="pill-btn" type="button">Pop Out</button>
-            </div>
-          </div>
+          <p class="greeting" id="greetingText">Welcome</p>
+          <h1 class="title">PVHS Tools</h1>
+          <p class="subtitle">Quick access to campus tools and directory.</p>
         </div>
 
-        <div class="card period-card">
-          <div class="block-label" id="blockLabel">Loading</div>
-          <div class="timer normal" id="timerText">--:--</div>
-          <p class="subtext" id="subText">Syncing Calendar...</p>
-          <p class="status-row" id="scheduleText">Schedule: --</p>
+        <div class="launcher-stack">
+          <a class="launch-card" href="countdown.html"><h2 class="launch-label">Classroom Countdown</h2></a>
+          <a class="launch-card" href="extension_search.html"><h2 class="launch-label">Search Directory</h2></a>
         </div>
 
-        <div class="card school-card">
-          <div class="school-label">School Days Left</div>
-          <div class="school-number" id="daysLeft">--</div>
-          <p class="detail-row"><strong id="todayLabel">Today:</strong> <span id="todayText">--</span></p>
-          <p class="detail-row"><strong>Last Day:</strong> June 10, 2026</p>
+        <div class="quick-links-grid">
+          <a class="quick-link-btn" href="https://maintenance.facilitron.com/anonymous/SantaMariaJUHSD/newworkorder" target="_blank"><p class="quick-link-label">Maintenance</p></a>
+          <a class="quick-link-btn" href="https://smjuhsd.incidentiq.com/" target="_blank"><p class="quick-link-label">IT Support</p></a>
+          <a class="quick-link-btn" href="https://login.frontlineeducation.com/login" target="_blank"><p class="quick-link-label">Absences</p></a>
+          <a class="quick-link-btn" href="https://smjuhsd-my.sharepoint.com/:x:/g/personal/etorres_smjuhsd_org/IQBiSObgdkR3R68_dXHYrDwfAbA5RpN-scClTiKQddgcsLU" target="_blank"><p class="quick-link-label">In Lieu</p></a>
         </div>
 
         <div class="footer-note">CREATED BY: MR. SILVA</div>
@@ -128,76 +146,18 @@
   </div>
 
   <script>
-    const timeZone = "America/Los_Angeles";
-    const schoolDays = ["2026-01-15","2026-01-16","2026-01-20","2026-01-21","2026-01-22","2026-01-23","2026-01-26","2026-01-27","2026-01-28","2026-01-29","2026-01-30","2026-02-02","2026-02-03","2026-02-04","2026-02-05","2026-02-06","2026-02-10","2026-02-11","2026-02-12","2026-02-13","2026-02-17","2026-02-18","2026-02-19","2026-02-20","2026-02-23","2026-02-24","2026-02-25","2026-02-26","2026-02-27","2026-03-02","2026-03-03","2026-03-04","2026-03-05","2026-03-06","2026-03-09","2026-03-10","2026-03-11","2026-03-12","2026-03-13","2026-03-16","2026-03-17","2026-03-18","2026-03-19","2026-03-20","2026-03-23","2026-03-24","2026-03-25","2026-03-26","2026-03-27","2026-03-30","2026-03-31","2026-04-01","2026-04-02","2026-04-13","2026-04-14","2026-04-15","2026-04-16","2026-04-17","2026-04-20","2026-04-21","2026-04-22","2026-04-23","2026-04-24","2026-04-27","2026-04-28","2026-04-29","2026-04-30","2026-05-01","2026-05-04","2026-05-05","2026-05-06","2026-05-07","2026-05-08","2026-05-11","2026-05-12","2026-05-13","2026-05-14","2026-05-15","2026-05-18","2026-05-19","2026-05-20","2026-05-21","2026-05-22","2026-05-26","2026-05-27","2026-05-28","2026-05-29","2026-06-01","2026-06-02","2026-06-03","2026-06-04","2026-06-05","2026-06-08","2026-06-09","2026-06-10"];
-    const minimumDays = new Set(["2026-02-27", "2026-04-02", "2026-04-24"]);
+    const hours = new Date().getHours();
+    const greet = hours < 12 ? "Good Morning" : hours < 18 ? "Good Afternoon" : "Good Evening";
+    document.getElementById('greetingText').textContent = greet;
 
-    const schedules = {
-      regular: [ {l:"1ST PERIOD", s:"08:30", e:"09:20"}, {l:"PASSING", s:"09:20", e:"09:30"}, {l:"2ND PERIOD", s:"09:30", e:"10:20"}, {l:"NUTRITION", s:"10:20", e:"10:35"}, {l:"3RD PERIOD", s:"10:35", e:"11:25"}, {l:"PASSING", s:"11:25", e:"11:35"}, {l:"4TH PERIOD", s:"11:35", e:"12:25"}, {l:"LUNCH", s:"12:25", e:"13:05"}, {l:"5TH PERIOD", s:"13:05", e:"13:55"}, {l:"PASSING", s:"13:55", e:"14:05"}, {l:"6TH PERIOD", s:"14:05", e:"14:55"}, {l:"PASSING", s:"14:55", e:"15:05"}, {l:"7TH PERIOD", s:"15:05", e:"15:55"} ],
-      monday: [ {l:"1ST PERIOD", s:"08:30", e:"09:10"}, {l:"PASSING", s:"09:10", e:"09:20"}, {l:"2ND PERIOD", s:"09:20", e:"10:00"}, {l:"NUTRITION", s:"10:00", e:"10:15"}, {l:"3RD PERIOD", s:"10:15", e:"10:55"}, {l:"PASSING", s:"10:55", e:"11:05"}, {l:"4TH PERIOD", s:"11:05", e:"11:45"}, {l:"LUNCH", s:"11:45", e:"12:25"}, {l:"5TH PERIOD", s:"12:25", e:"13:05"}, {l:"PASSING", s:"13:05", e:"13:15"}, {l:"6TH PERIOD", s:"13:15", e:"13:55"}, {l:"PASSING", s:"13:55", e:"14:05"}, {l:"7TH PERIOD", s:"14:05", e:"14:45"} ],
-      minimum: [ {l:"1ST PERIOD", s:"08:30", e:"09:00"}, {l:"PASSING", s:"09:00", e:"09:10"}, {l:"2ND PERIOD", s:"09:10", e:"09:40"}, {l:"NUTRITION", s:"09:40", e:"09:55"}, {l:"3RD PERIOD", s:"09:55", e:"10:25"}, {l:"PASSING", s:"10:25", e:"10:35"}, {l:"4TH PERIOD", s:"10:35", e:"11:05"}, {l:"LUNCH", s:"11:05", e:"11:45"}, {l:"5TH PERIOD", s:"11:45", e:"12:15"}, {l:"PASSING", s:"12:15", e:"12:25"}, {l:"6TH PERIOD", s:"12:25", e:"12:55"}, {l:"PASSING", s:"12:55", e:"13:05"}, {l:"7TH PERIOD", s:"13:05", e:"13:35"} ]
-    };
+    const popoutBtn = document.getElementById("popoutBtn");
+    if (window.location.search.includes('popout=true')) popoutBtn.style.display = 'none';
 
-    function getNow() {
-      const now = new Date();
-      const dateStr = new Intl.DateTimeFormat("en-CA", {timeZone, year:"numeric", month:"2-digit", day:"2-digit"}).format(now);
-      const weekday = new Intl.DateTimeFormat("en-US", {timeZone, weekday:"long"}).format(now);
-      const longDate = new Intl.DateTimeFormat("en-US", {timeZone, weekday:"long", month:"long", day:"numeric", year:"numeric"}).format(now);
-      const parts = new Intl.DateTimeFormat("en-US", {timeZone, hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:false}).formatToParts(now);
-      const h = Number(parts.find(p=>p.type==='hour').value), m = Number(parts.find(p=>p.type==='minute').value), s = Number(parts.find(p=>p.type==='second').value);
-      return { dateStr, weekday, longDate, totalSec: (h*3600)+(m*60)+s };
-    }
-
-    function formatTime(sec, forceHH = false) {
-      const h = Math.floor(sec/3600), m = Math.floor((sec%3600)/60), s = sec%60;
-      if (h > 0 || forceHH) return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-      return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-    }
-
-    function updateApp() {
-      const now = getNow();
-      document.getElementById("daysLeft").textContent = schoolDays.filter(d => d >= now.dateStr).length;
-      document.getElementById("todayText").textContent = now.longDate;
-
-      let schedType = "REGULAR DAY", blocks = schedules.regular;
-      if (minimumDays.has(now.dateStr)) { schedType = "MINIMUM DAY"; blocks = schedules.minimum; }
-      else if (now.weekday === "Monday") { schedType = "COLLABORATION MONDAY"; blocks = schedules.monday; }
-      document.getElementById("scheduleText").textContent = `Schedule: ${schedType}`;
-
-      const isSchoolDay = schoolDays.includes(now.dateStr);
-      const firstStart = (8*3600)+(30*60);
-      const lastEnd = parseToSec(blocks[blocks.length-1].e);
-
-      if (isSchoolDay && now.totalSec >= firstStart && now.totalSec < lastEnd) {
-        for (let i=0; i<blocks.length; i++) {
-          const s = parseToSec(blocks[i].s), e = parseToSec(blocks[i].e);
-          if (now.totalSec >= s && now.totalSec < e) {
-            const rem = e - now.totalSec;
-            document.getElementById("blockLabel").textContent = blocks[i].l;
-            document.getElementById("timerText").textContent = formatTime(rem);
-            document.getElementById("timerText").className = rem <= 300 ? "timer warning" : "timer normal";
-            document.getElementById("subText").textContent = i < blocks.length-1 ? `Next: ${blocks[i+1].l}` : "Almost done for today!";
-            return;
-          }
-        }
-      }
-
-      const nextDay = schoolDays.find(d => d > now.dateStr) || schoolDays[0];
-      const nextDate = new Date(nextDay + "T08:30:00");
-      const diff = Math.floor((nextDate - new Date()) / 1000);
-
-      document.getElementById("blockLabel").textContent = now.weekday === "Friday" || now.weekday === "Saturday" ? "Weekend Recharge" : "Rest Time Remaining";
-      document.getElementById("timerText").textContent = formatTime(diff, true);
-      document.getElementById("timerText").className = "timer rest";
-      document.getElementById("subText").textContent = !isSchoolDay ? "Enjoy your time off!" : "School's out, get some rest!";
-    }
-
-    function parseToSec(t) { const [h,m] = t.split(":").map(Number); return (h*3600)+(m*60); }
-    setInterval(updateApp, 1000); updateApp();
-
-    if (window.name==='popout' || window.location.search.includes('popout=true')) document.getElementById('popoutSection').style.display='none';
-    document.getElementById("popoutBtn").addEventListener("click", () => {
-      window.open(window.location.href + '?popout=true', 'pvPop', 'width=430,height=880');
+    popoutBtn.addEventListener("click", () => {
+      const width = 460; const height = 880;
+      const left = (window.screen.width - width) / 2;
+      const top = (window.screen.height - height) / 2;
+      window.open(window.location.href + '?popout=true', 'pvTools', `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=no`);
     });
   </script>
 </body>
