@@ -21,23 +21,23 @@
       --white-gradient: linear-gradient(180deg, #ffffff 0%, #dceaea 100%);
       --red-gradient: linear-gradient(180deg, #ffb8b8 0%, #ff5b5b 58%, #b80000 100%);
       --green-gradient: linear-gradient(180deg, #d2ffcf 0%, #5bff61 58%, #00b806 100%);
-      --soft-shadow: 0 12px 24px rgba(0,0,0,0.22); --card-hover: rgba(255,255,255,0.12);
+      --soft-shadow: 0 12px 24px rgba(0,0,0,0.22);
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
     html, body { width: 100%; height: 100%; background: #021414; overflow: hidden; }
     body { font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; color: var(--white); touch-action: none; user-select: none; }
 
-    /* The Frame ensures app stays centered with margins on Desktop/Popout */
+    /* The Frame ensures the app stays centered with margins when resized on desktop */
     .frame { 
       width: 100%; height: 100dvh; display: flex; align-items: center; justify-content: center; 
       padding: 10px;
     }
 
-    /* THE PERMANENT IPHONE BUBBLE */
+    /* Locked iPhone Bubble Shape */
     .app {
       width: 430px; height: 880px; max-width: 100%; max-height: 100%;
-      border-radius: var(--radius); 
+      aspect-ratio: 430 / 880; border-radius: var(--radius); 
       overflow: hidden; position: relative; box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,0.12);
       background: radial-gradient(circle at center, rgba(10,34,34,0.94) 0%, rgba(4,20,20,0.98) 46%, rgba(0,116,116,1) 100%);
       display: flex; flex-direction: column; padding: 10px var(--app-spacing) var(--app-spacing) var(--app-spacing);
@@ -60,6 +60,7 @@
       overflow-y: auto; -webkit-overflow-scrolling: touch;
     }
 
+    /* Header in one single line */
     .top-row {
       display: flex; align-items: center; justify-content: space-between;
       width: 100%; gap: 8px; height: 44px; flex-shrink: 0; margin-bottom: 6px;
@@ -67,10 +68,9 @@
 
     .action-pill { 
       display: flex; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--panel-border); 
-      border-radius: 12px; overflow: hidden; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      border-radius: 12px; overflow: hidden; backdrop-filter: blur(4px);
     }
-    .pill-btn { appearance: none; background: transparent; border: none; color: #fff; font-size: 10px; font-weight: 900; text-transform: uppercase; padding: 8px 12px; cursor: pointer; text-decoration: none; display: flex; align-items: center; transition: background 0.2s; }
-    .pill-btn:active { background: var(--card-hover); }
+    .pill-btn { appearance: none; background: transparent; border: none; color: #fff; font-size: 10px; font-weight: 900; text-transform: uppercase; padding: 8px 12px; cursor: pointer; text-decoration: none; display: flex; align-items: center; }
     .pill-divider { width: 1px; background: var(--panel-border); height: 100%; }
 
     .logo-clear { width: 42px; height: auto; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); flex-shrink: 0; }
@@ -81,16 +81,17 @@
     .period-card { padding: 18px 14px; display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; }
     .school-card { padding: 18px 14px; text-align: center; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; }
 
-    /* New Shorter Weather Card */
+    /* NEW WEATHER CARD STYLE */
     .weather-card { 
       padding: 14px 14px; text-align: center; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
     }
     .weather-label { font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin: 0; letter-spacing: 0.5px;}
     .weather-text { font-size: 18px; font-weight: 900; color: #ffffff; text-transform: uppercase; margin: 0; letter-spacing: 0.5px;}
 
+
     .block-label { font-size: clamp(20px, 6vw, 26px); line-height: 1; font-weight: 900; text-transform: uppercase; margin: 0; color: #00d1d1; text-align: center; }
     
-    /* DYNAMIC TIMER SCALING */
+    /* Dynamic scaling to prevent clipping */
     .timer { 
       font-size: 22cqw; 
       line-height: 0.9; font-weight: 900; letter-spacing: -3px; margin: 8px 0; text-shadow: 0 10px 26px rgba(0,0,0,0.30); 
@@ -107,14 +108,13 @@
     .detail-row { font-size: 11px; color: #d9f2f2; margin: 2px 0; font-weight: 800; text-transform: uppercase; text-align: center; }
     .detail-row strong { color: #ffffff; }
 
-    .footer-note { margin-top: auto; padding: 12px 0 4px 0; font-size: 10px; color: #b5d4d4; text-transform: uppercase; font-weight: 800; text-align: center; flex-shrink: 0; }
+    .footer-note { margin-top: auto; padding: 20px 0 4px 0; font-size: 10px; color: #b5d4d4; text-transform: uppercase; font-weight: 800; text-align: center; flex-shrink: 0; }
 
-    /* Phone Override */
+    /* Phone Override: Only used if NOT in popout mode */
     @media (max-width: 430px) {
       body:not(.is-popout) .frame { align-items: flex-start; padding: 0; }
       body:not(.is-popout) .app { width: 100vw; height: 100dvh; max-height: none; border-radius: 0; border: none; }
       .popout-pill { display: none !important; }
-      body { touch-action: pan-y; }
     }
   </style>
 </head>
@@ -167,13 +167,13 @@
     const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
 
     const popoutSection = document.getElementById("popoutSection");
-    const popoutBtn = document.getElementById("popoutBtn");
+    const popoutBtn = document.getElementById("popoutBtn"); 
+    const homeLink = document.getElementById("homeLink");
     const navLinks = document.querySelectorAll(".nav-link");
 
-    // PERSISTENT UI LOGIC
     if (isPopout) {
       document.body.classList.add('is-popout');
-      if (popoutSection) popoutSection.remove(); 
+      if (popoutSection) popoutSection.remove();
       navLinks.forEach(link => {
         const url = new URL(link.href, window.location.origin);
         url.searchParams.set('mode', 'popout');
@@ -250,7 +250,7 @@
     function parseToSec(t) { const [h,m] = t.split(":").map(Number); return (h*3600)+(m*60); }
     setInterval(updateApp, 1000); updateApp();
 
-    // LIVE WEATHER FETCH (Santa Maria, CA)
+    // LIVE WEATHER FETCH SCRIPT
     async function fetchWeather() {
       try {
         const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=34.9530&longitude=-120.4357&current_weather=true&temperature_unit=fahrenheit');
@@ -275,8 +275,10 @@
         document.getElementById('weatherText').textContent = "Weather Unavailable";
       }
     }
-    fetchWeather(); // Fetch immediately on load
-    setInterval(fetchWeather, 900000); // Refresh every 15 minutes
+    
+    // Call immediately, then refresh every 15 mins (900000 ms)
+    fetchWeather(); 
+    setInterval(fetchWeather, 900000);
 
     if (popoutBtn) {
       popoutBtn.addEventListener("click", () => {
