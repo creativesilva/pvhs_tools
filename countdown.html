@@ -381,11 +381,9 @@
           <img src="PV_Logo.png" alt="Logo" class="logo-clear">
           <h1 class="page-title">Countdown</h1>
           <div class="action-pill">
-            <a id="homeLink" href="index.html" class="pill-btn nav-link">Home</a>
-            <div id="popoutSection" style="display: none;">
-              <div class="pill-divider"></div>
-              <button id="popoutBtn" class="pill-btn" type="button">Pop Out</button>
-            </div>
+            <a href="extension_search.html" class="pill-btn nav-link">Directory</a>
+            <div class="pill-divider"></div>
+            <a href="index.html" class="pill-btn nav-link">Home</a>
             <div id="embedSection" class="embed-section">
               <div class="pill-divider"></div>
               <button id="embedBtn" class="pill-btn" type="button">Embed</button>
@@ -446,10 +444,7 @@
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
 
-    const popoutSection = document.getElementById("popoutSection");
     const embedSection = document.getElementById("embedSection");
-    const popoutBtn = document.getElementById("popoutBtn"); 
-    const homeLink = document.getElementById("homeLink");
     const navLinks = document.querySelectorAll(".nav-link");
     const timerTextEl = document.getElementById("timerText");
     const daysLeftEl = document.getElementById("daysLeft");
@@ -533,14 +528,12 @@
     // PERSISTENT UI LOGIC
     if (isPopout) {
       document.body.classList.add('is-popout');
-      if (popoutSection) popoutSection.remove();
       navLinks.forEach(link => {
         const url = new URL(link.href, window.location.origin);
         url.searchParams.set('mode', 'popout');
         link.href = url.toString();
       });
     } else if (!isMobile && !isStandalone && !isEmbed) {
-      if (popoutSection) popoutSection.style.display = 'flex';
       if (embedSection) embedSection.style.display = 'flex';
     }
 
@@ -749,12 +742,6 @@
     // Call immediately, then refresh every 15 mins
     fetchWeather(); 
     setInterval(fetchWeather, 900000);
-
-    if (popoutBtn) {
-      popoutBtn.addEventListener("click", () => {
-        window.open('countdown.html?mode=popout', 'pvPop', 'width=450,height=900,resizable=yes,scrollbars=no');
-      });
-    }
 
     embedBtn?.addEventListener("click", openEmbedModal);
     embedCloseBtn?.addEventListener("click", closeEmbedModal);
