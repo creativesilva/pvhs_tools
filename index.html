@@ -72,14 +72,19 @@
       margin-bottom: 2px;
     }
 
-    /* Flat Style Pop Out Pill */
-    .popout-pill {
-      display: none; appearance: none;
+    .action-pill {
+      display: none;
+      align-items: center;
       background: rgba(255, 255, 255, 0.08); border: 1px solid var(--panel-border);
-      border-radius: 14px; padding: 8px 13px; color: #fff; font-size: 10px; font-weight: 700; 
-      text-transform: uppercase; cursor: pointer; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      border-radius: 14px; overflow: hidden; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
     }
-    .popout-pill:active { background: var(--card-hover); }
+    .pill-btn {
+      appearance: none; background: transparent; border: none; color: #fff; font-size: 10px; font-weight: 700;
+      text-transform: uppercase; padding: 8px 12px; cursor: pointer; text-decoration: none; display: flex; align-items: center;
+      transition: background 0.2s;
+    }
+    .pill-btn:active { background: var(--card-hover); }
+    .pill-divider { width: 1px; background: var(--panel-border); height: 100%; }
 
     .header { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0; margin-top: -2px; }
     .logo-clear { width: 60px; height: auto; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); }
@@ -164,7 +169,7 @@
         border-radius: var(--radius); /* Restores the curved edges */
         border: 1px solid rgba(255,255,255,0.12); /* Maintains the glass border */
       }
-      .popout-pill { display: none !important; }
+      .action-pill { display: none !important; }
       body { touch-action: pan-y; }
     }
   </style>
@@ -175,7 +180,13 @@
       <img src="PV_Logo.png" alt="" class="ghost-logo">
       <div class="content">
         <div class="top-actions">
-          <button id="popoutBtn" class="popout-pill" type="button">Pop Out</button>
+          <div id="desktopHeaderPill" class="action-pill">
+            <a href="countdown.html" class="pill-btn nav-link">Countdown</a>
+            <div class="pill-divider"></div>
+            <a href="extension_search.html" class="pill-btn nav-link">Directory</a>
+            <div id="popoutDivider" class="pill-divider"></div>
+            <button id="popoutBtn" class="pill-btn" type="button">Pop Out</button>
+          </div>
         </div>
         <div class="header">
           <img src="PV_Logo.png" alt="Logo" class="logo-clear">
@@ -209,6 +220,8 @@
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
 
+    const headerPill = document.getElementById("desktopHeaderPill");
+    const popoutDivider = document.getElementById("popoutDivider");
     const popoutBtn = document.getElementById("popoutBtn");
     const navLinks = document.querySelectorAll(".nav-link");
 
@@ -249,14 +262,16 @@
 
     if (isPopout) {
       document.body.classList.add('is-popout');
+      if (headerPill) headerPill.style.display = 'flex';
       if (popoutBtn) popoutBtn.remove();
+      if (popoutDivider) popoutDivider.remove();
       navLinks.forEach(link => {
         const url = new URL(link.href, window.location.origin);
         url.searchParams.set('mode', 'popout');
         link.href = url.toString();
       });
     } else if (!isMobile && !isStandalone) {
-      if (popoutBtn) popoutBtn.style.display = 'block';
+      if (headerPill) headerPill.style.display = 'flex';
     }
 
     // Keep internal navigation inside the installed app.
