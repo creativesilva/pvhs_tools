@@ -126,7 +126,7 @@
     .access-row.warning { display: block; color: #ff8c8c; }
     .status-row { font-size: 10px; font-weight: 600; color: #d9f2f2; text-transform: uppercase; margin: 4px 0 0 0; opacity: 0.78; letter-spacing: 0.08em; }
 
-    .school-label { font-size: 13px; font-weight: 700; color: #ffffff; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.08em; }
+    .school-label { font-size: 13px; font-weight: 700; color: #40dede; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.08em; }
     .school-number {
       width: 100%;
       padding: 0 2px;
@@ -524,8 +524,12 @@
     }
 
     function fitCountdownText() {
-      const timerMax = isEmbed ? 124 : (window.innerWidth <= 430 ? 110 : 128);
-      const timerMin = isEmbed ? 56 : 42;
+      const timerValue = (timerTextEl?.textContent || "").trim();
+      const hasHours = timerValue.split(":").length >= 3;
+      const timerMax = isEmbed
+        ? (hasHours ? 108 : 124)
+        : (window.innerWidth <= 430 ? (hasHours ? 96 : 110) : (hasHours ? 112 : 128));
+      const timerMin = isEmbed ? (hasHours ? 48 : 56) : (hasHours ? 38 : 42);
       const daysMax = isEmbed ? 118 : 92;
       const daysMin = isEmbed ? 72 : 56;
       fitDisplayNumber(timerTextEl, timerMin, timerMax);
@@ -749,7 +753,7 @@
       const diff = Math.max(0, Math.floor((nextDate - new Date()) / 1000));
       const isWeekendRecharge = now.weekday === "Saturday" || now.weekday === "Sunday" || (now.weekday === "Friday" && isAfterSchool);
 
-      document.getElementById("blockLabel").textContent = isWeekendRecharge ? "Weekend Recharge" : "Rest Time Remaining";
+      document.getElementById("blockLabel").textContent = isWeekendRecharge ? "Weekend Recharge" : "Time To Rest";
       document.getElementById("timerText").textContent = formatTime(diff, true);
       document.getElementById("timerText").className = "timer rest";
       updatePeriodAlert("");
