@@ -61,15 +61,15 @@
       padding: 2px var(--app-spacing) 12px var(--app-spacing);
     }
     
-    .top-actions {
-      width: 100%;
-      min-height: 48px;
+    .top-row {
       display: flex;
-      justify-content: flex-end;
       align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      gap: 10px;
+      height: 42px;
       flex-shrink: 0;
-      padding-top: 2px;
-      margin-bottom: 2px;
+      margin-bottom: 6px;
     }
 
     .action-pill {
@@ -86,10 +86,10 @@
     .pill-btn:active { background: var(--card-hover); }
     .pill-divider { width: 1px; background: var(--panel-border); height: 100%; }
 
-    .header { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0; margin-top: -2px; }
-    .logo-clear { width: 60px; height: auto; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); }
-    .title { margin: 0; font-size: clamp(30px, 9vw, 38px); font-weight: 700; text-transform: uppercase; letter-spacing: -0.03em; text-align: center; line-height: 0.96; }
-    .greeting { margin: 4px 0 0 0; font-size: 10px; font-weight: 600; color: #4be1e1; text-transform: uppercase; letter-spacing: 0.22em; }
+    .logo-clear { width: 42px; height: auto; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); flex-shrink: 0; }
+    .page-title { flex: 1; font-size: 15px; font-weight: 700; color: #dff7f7; text-transform: uppercase; margin: 0; text-align: center; letter-spacing: 0.14em; }
+    .header { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0; margin-top: 0; }
+    .greeting { margin: 2px 0 0 0; font-size: 10px; font-weight: 600; color: #4be1e1; text-transform: uppercase; letter-spacing: 0.22em; }
     .subtitle { margin: 6px 0 10px 0; max-width: 296px; font-size: 10.5px; line-height: 1.35; font-weight: 500; color: var(--muted); text-align: center; }
 
     .launcher-stack { width: 100%; display: flex; flex-direction: column; gap: 6px; margin-bottom: 7px; }
@@ -179,7 +179,9 @@
     <div class="app">
       <img src="PV_Logo.png" alt="" class="ghost-logo">
       <div class="content">
-        <div class="top-actions">
+        <div class="top-row">
+          <img src="PV_Logo.png" alt="Logo" class="logo-clear">
+          <h1 class="page-title">PVHS Tools</h1>
           <div id="desktopHeaderPill" class="action-pill">
             <a href="countdown.html" class="pill-btn nav-link">Countdown</a>
             <div class="pill-divider"></div>
@@ -189,9 +191,7 @@
           </div>
         </div>
         <div class="header">
-          <img src="PV_Logo.png" alt="Logo" class="logo-clear">
           <p class="greeting" id="greetingText">Welcome</p>
-          <h1 class="title">PVHS Tools</h1>
           <p class="subtitle">Quick access to staff tools, classroom countdown and directory.</p>
         </div>
         <div class="launcher-stack">
