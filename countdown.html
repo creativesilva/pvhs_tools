@@ -625,7 +625,11 @@
       return /PERIOD/i.test(label);
     }
 
-    function updateRestroomAccess(phase) {
+    function isPassingBlock(label) {
+      return /PASSING/i.test(label);
+    }
+
+    function updatePeriodAlert(phase, message = "No Restroom Access") {
       if (!accessTextEl) return;
       if (!phase) {
         accessTextEl.className = "access-row";
@@ -633,7 +637,7 @@
         return;
       }
       accessTextEl.className = `access-row ${phase}`;
-      accessTextEl.textContent = "No Restroom Access";
+      accessTextEl.textContent = message;
     }
 
     function updateApp() {
@@ -659,19 +663,28 @@
             const rem = e - now.totalSec;
             const elapsed = now.totalSec - s;
             const isClassBlock = isInstructionalPeriod(blocks[i].l);
+            const isPassing = isPassingBlock(blocks[i].l);
             const isFirstTen = isClassBlock && elapsed < 600;
             const isLastTen = isClassBlock && rem <= 600;
             const isLastFive = isClassBlock && rem <= 300;
+            const isLastFivePassing = isPassing && rem <= 300;
             let timerState = "normal";
+            let alertMessage = "";
 
-            if (isLastFive) timerState = "warning";
+            if (isLastFive || isLastFivePassing) timerState = "warning";
             else if (isFirstTen || isLastTen) timerState = "caution";
+
+            if (isLastFivePassing) {
+              alertMessage = "Hurry To Class";
+            } else if (timerState !== "normal") {
+              alertMessage = "No Restroom Access";
+            }
 
             document.getElementById("blockLabel").textContent = blocks[i].l;
             document.getElementById("timerText").textContent = formatTime(rem);
             document.getElementById("timerText").className = `timer ${timerState}`;
             document.getElementById("subText").textContent = i < blocks.length - 1 ? `Next: ${blocks[i + 1].l}` : "Almost done for today!";
-            updateRestroomAccess(timerState === "normal" ? "" : timerState);
+            updatePeriodAlert(timerState === "normal" ? "" : timerState, alertMessage || "No Restroom Access");
             scheduleFitCountdownText();
             return;
           }
@@ -688,7 +701,7 @@
       document.getElementById("blockLabel").textContent = isWeekendRecharge ? "Weekend Recharge" : "Rest Time Remaining";
       document.getElementById("timerText").textContent = formatTime(diff, true);
       document.getElementById("timerText").className = "timer rest";
-      updateRestroomAccess("");
+      updatePeriodAlert("");
 
       if (isWeekendRecharge) {
         document.getElementById("subText").textContent = "Enjoy your weekend!";
