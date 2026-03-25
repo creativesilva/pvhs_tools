@@ -92,26 +92,30 @@
     .greeting { margin: 2px 0 0 0; font-size: 10px; font-weight: 600; color: #4be1e1; text-transform: uppercase; letter-spacing: 0.22em; }
     .subtitle { margin: 6px 0 10px 0; max-width: 296px; font-size: 10.5px; line-height: 1.35; font-weight: 500; color: var(--muted); text-align: center; }
 
-    .launcher-stack { width: 100%; display: flex; flex-direction: column; gap: 6px; margin-bottom: 7px; }
+    .launcher-stack { width: 100%; display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
     .launch-card {
-      width: 100%; min-height: 48px; border-radius: 18px; background: rgba(255,255,255,0.07); border: 1px solid var(--panel-border);
-      text-decoration: none; color: var(--white); padding: 6px 16px;
-      display: flex; align-items: center; justify-content: center;
+      width: 100%; min-height: 50px; border-radius: 18px; background: rgba(255,255,255,0.07); border: 1px solid var(--panel-border);
+      text-decoration: none; color: var(--white); padding: 10px 18px;
+      display: flex; align-items: center; justify-content: space-between;
       transition: background 0.2s, transform 0.1s;
     }
     .launch-card:active { transform: scale(0.98); background: var(--card-hover); }
-    .launch-label { font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; }
+    .launch-icon { font-size: 18px; opacity: 0.75; flex-shrink: 0; }
+    .launch-label { font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; flex: 1; text-align: center; }
+    .launch-chevron { font-size: 20px; font-weight: 300; opacity: 0.38; flex-shrink: 0; line-height: 1; }
 
-    .quick-links-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; width: 100%; }
+    .section-label { width: 100%; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.18em; color: var(--muted); opacity: 0.65; margin-bottom: 5px; padding-left: 3px; }
+    .quick-links-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%; }
     .quick-link-btn {
-      display: flex; align-items: center; justify-content: center; min-height: 46px;
-      padding: 8px; border-radius: 17px; text-decoration: none; color: #fff;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 52px;
+      padding: 8px 6px; border-radius: 17px; text-decoration: none; color: #fff;
       background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
       backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); text-align: center;
-      transition: background 0.2s;
+      gap: 4px; transition: background 0.2s;
     }
     .quick-link-btn:active { background: var(--card-hover); }
-    .quick-link-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; }
+    .quick-link-icon { font-size: 17px; line-height: 1; display: block; }
+    .quick-link-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.10em; line-height: 1; }
 
     .footer-note { margin-top: auto; padding: 9px 0 2px 0; font-size: 9.5px; color: #b5d4d4; font-weight: 600; text-align: center; flex-shrink: 0; }
 
@@ -195,18 +199,27 @@
           <p class="subtitle">Quick access to staff tools, classroom countdown and directory.</p>
         </div>
         <div class="launcher-stack">
-          <a class="nav-link launch-card" href="countdown.html"><h2 class="launch-label">Countdown</h2></a>
-          <a class="nav-link launch-card" href="extension_search.html"><h2 class="launch-label">Directory</h2></a>
+          <a class="nav-link launch-card" href="countdown.html">
+            <span class="launch-icon">⏱</span>
+            <h2 class="launch-label">Countdown</h2>
+            <span class="launch-chevron">›</span>
+          </a>
+          <a class="nav-link launch-card" href="extension_search.html">
+            <span class="launch-icon">🔍</span>
+            <h2 class="launch-label">Directory</h2>
+            <span class="launch-chevron">›</span>
+          </a>
         </div>
+        <p class="section-label">Quick Links</p>
         <div class="quick-links-grid">
-          <a class="quick-link-btn" href="https://www.facilitron.com/accounts/signin/" target="_blank"><p class="quick-link-label">Maintenance</p></a>
-          <a class="quick-link-btn" href="https://smjuhsd.incidentiq.com/" target="_blank"><p class="quick-link-label">IT Support</p></a>
-          <a class="quick-link-btn" href="https://login.frontlineeducation.com/login" target="_blank"><p class="quick-link-label">Absences</p></a>
-          <a class="quick-link-btn" href="https://smjuhsd-my.sharepoint.com/:x:/g/personal/etorres_smjuhsd_org/IQBiSObgdkR3R68_dXHYrDwfAbA5RpN-scClTiKQddgcsLU" target="_blank"><p class="quick-link-label">In Lieu</p></a>
-          <a class="quick-link-btn" href="https://drive.google.com/drive/home" target="_blank"><p class="quick-link-label">Google</p></a>
-          <a class="quick-link-btn" href="https://www.parentsquare.com/signin" target="_blank"><p class="quick-link-label">ParentSquare</p></a>
-          <a class="quick-link-btn" href="https://santamariajuhsd.aeries.net" target="_blank"><p class="quick-link-label">Aeries</p></a>
-          <a class="quick-link-btn" href="https://smjuhsd.instructure.com/login/saml" target="_blank"><p class="quick-link-label">Canvas</p></a>
+          <a class="quick-link-btn" href="https://www.facilitron.com/accounts/signin/" target="_blank"><span class="quick-link-icon">🔧</span><p class="quick-link-label">Maintenance</p></a>
+          <a class="quick-link-btn" href="https://smjuhsd.incidentiq.com/" target="_blank"><span class="quick-link-icon">🖥️</span><p class="quick-link-label">IT Support</p></a>
+          <a class="quick-link-btn" href="https://login.frontlineeducation.com/login" target="_blank"><span class="quick-link-icon">📋</span><p class="quick-link-label">Absences</p></a>
+          <a class="quick-link-btn" href="https://smjuhsd-my.sharepoint.com/:x:/g/personal/etorres_smjuhsd_org/IQBiSObgdkR3R68_dXHYrDwfAbA5RpN-scClTiKQddgcsLU" target="_blank"><span class="quick-link-icon">📝</span><p class="quick-link-label">In Lieu</p></a>
+          <a class="quick-link-btn" href="https://drive.google.com/drive/home" target="_blank"><span class="quick-link-icon">📁</span><p class="quick-link-label">Google</p></a>
+          <a class="quick-link-btn" href="https://www.parentsquare.com/signin" target="_blank"><span class="quick-link-icon">💬</span><p class="quick-link-label">ParentSquare</p></a>
+          <a class="quick-link-btn" href="https://santamariajuhsd.aeries.net" target="_blank"><span class="quick-link-icon">📊</span><p class="quick-link-label">Aeries</p></a>
+          <a class="quick-link-btn" href="https://smjuhsd.instructure.com/login/saml" target="_blank"><span class="quick-link-icon">🎓</span><p class="quick-link-label">Canvas</p></a>
         </div>
         <div class="footer-note">By: CreativeSilva</div>
       </div>

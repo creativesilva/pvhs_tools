@@ -68,13 +68,13 @@
     /* Header in one single line */
     .top-row {
       display: flex; align-items: center; justify-content: space-between;
-      width: 100%; gap: 10px; height: 42px; flex-shrink: 0; margin-bottom: 4px;
+      width: 100%; gap: 10px; height: 42px; flex-shrink: 0; margin-bottom: 6px;
     }
 
     /* Flat Action Pill */
-    .action-pill { 
-      display: flex; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--panel-border); 
-      border-radius: 12px; overflow: hidden; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    .action-pill {
+      display: flex; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--panel-border);
+      border-radius: 14px; overflow: hidden; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
     }
     .pill-btn { appearance: none; background: transparent; border: none; color: #fff; font-size: 9.5px; font-weight: 700; text-transform: uppercase; padding: 8px 12px; cursor: pointer; text-decoration: none; display: flex; align-items: center; transition: background 0.2s; }
     .pill-btn:active { background: var(--card-hover); }
@@ -84,17 +84,18 @@
     .logo-clear { width: 42px; height: auto; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); flex-shrink: 0; }
     .page-title { flex: 1; font-size: 15px; font-weight: 700; color: #dff7f7; text-transform: uppercase; margin: 0; text-align: center; letter-spacing: 0.14em; }
 
-    .card { width: 100%; border-radius: 26px; background: var(--panel); border: 1px solid var(--panel-border); backdrop-filter: blur(10px); box-shadow: var(--soft-shadow); margin-bottom: 10px; }
-    
-    .period-card { padding: 16px 14px 14px; display: flex; flex-direction: column; align-items: center; gap: 0; flex-shrink: 0; }
-    .school-card { padding: 16px 14px 14px; text-align: center; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; }
+    .card { width: 100%; border-radius: 26px; background: var(--panel); border: 1px solid var(--panel-border); backdrop-filter: blur(10px); box-shadow: var(--soft-shadow); margin-bottom: 8px; }
 
-    /* WEATHER CARD STYLE */
-    .weather-card { 
-      padding: 12px 14px; text-align: center; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-    }
-    .weather-label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; margin: 0; letter-spacing: 0.14em;}
-    .weather-text { font-size: 16px; font-weight: 700; color: #ffffff; text-transform: uppercase; margin: 0; letter-spacing: 0.04em;}
+    .period-card { padding: 14px 14px 12px; display: flex; flex-direction: column; align-items: center; gap: 0; flex-shrink: 0; }
+
+    /* INFO STRIP — combines school days + weather side by side */
+    .info-strip { padding: 14px 16px; display: flex; align-items: center; gap: 0; flex-shrink: 0; }
+    .info-cell { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .info-vert-divider { width: 1px; background: rgba(255,255,255,0.12); flex-shrink: 0; margin: 0 8px; align-self: stretch; }
+    .info-label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; margin: 0; }
+    .info-number { font-size: 56px; line-height: 0.95; font-weight: 900; letter-spacing: -0.05em; background: var(--white-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; font-variant-numeric: tabular-nums; white-space: nowrap; margin: 3px 0 2px; width: 100%; text-align: center; padding: 0 2px; }
+    .info-main { font-size: 16px; font-weight: 700; color: #ffffff; text-transform: uppercase; letter-spacing: 0.04em; margin: 3px 0 0; }
+    .info-sub { font-size: 9px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.82; margin: 0; text-align: center; }
 
     .block-label { font-size: clamp(18px, 5vw, 24px); line-height: 1.02; font-weight: 700; text-transform: uppercase; margin: 0 0 4px 0; color: #40dede; text-align: center; letter-spacing: 0.08em; }
     
@@ -126,18 +127,6 @@
     .access-row.warning { display: block; color: #ff8c8c; }
     .status-row { font-size: 10px; font-weight: 600; color: #d9f2f2; text-transform: uppercase; margin: 4px 0 0 0; opacity: 0.78; letter-spacing: 0.08em; }
 
-    .school-label { font-size: 13px; font-weight: 700; color: #40dede; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.08em; }
-    .school-number {
-      width: 100%;
-      padding: 0 2px;
-      font-size: 92px;
-      line-height: 0.92; font-weight: 900; letter-spacing: -0.05em;
-      background: var(--white-gradient); -webkit-background-clip: text; background-clip: text; color: transparent;
-      margin: 2px 0 8px; text-align: center; font-variant-numeric: tabular-nums;
-      white-space: nowrap;
-    }
-    .detail-row { font-size: 10px; color: #d9f2f2; margin: 2px 0; font-weight: 600; text-transform: uppercase; text-align: center; letter-spacing: 0.04em; }
-    .detail-row strong { color: #ffffff; }
 
     .footer-note { margin-top: auto; padding: 10px 0 3px 0; font-size: 9.5px; color: #b5d4d4; font-weight: 600; text-align: center; flex-shrink: 0; }
 
@@ -321,12 +310,13 @@
     body.is-embed .period-card {
       padding: 20px 16px 18px;
     }
-    body.is-embed .school-card {
-      padding: 18px 16px 18px;
+    body.is-embed .info-strip {
+      padding: 20px 16px 18px;
     }
-    body.is-embed .weather-card {
-      padding: 16px 16px 14px;
-    }
+    body.is-embed .info-number { font-size: 80px; }
+    body.is-embed .info-main { font-size: 20px; }
+    body.is-embed .info-label { font-size: 13px; letter-spacing: 0.18em; }
+    body.is-embed .info-sub { font-size: 11px; }
     body.is-embed .block-label {
       font-size: clamp(24px, 8vw, 30px);
       margin-bottom: 6px;
@@ -349,24 +339,6 @@
       margin-top: 8px;
       letter-spacing: 0.08em;
       opacity: 0.9;
-    }
-    body.is-embed .school-label {
-      font-size: 19px;
-      margin-bottom: 8px;
-      letter-spacing: 0.09em;
-    }
-    body.is-embed .detail-row {
-      font-size: 13px;
-      line-height: 1.25;
-      margin: 3px 0;
-    }
-    body.is-embed .weather-label {
-      font-size: 13px;
-      letter-spacing: 0.18em;
-    }
-    body.is-embed .weather-text {
-      font-size: 20px;
-      letter-spacing: 0.03em;
     }
     body.is-embed .footer-note {
       font-size: 11px;
@@ -453,16 +425,18 @@
           <p class="status-row" id="scheduleText">Schedule: --</p>
         </div>
 
-        <div class="card school-card">
-          <div class="school-label">School Days Left</div>
-          <div class="school-number" id="daysLeft">--</div>
-          <p class="detail-row"><strong id="todayLabel">Today:</strong> <span id="todayText">--</span></p>
-          <p class="detail-row"><strong>Last Day:</strong> June 10, 2026</p>
-        </div>
-
-        <div class="card weather-card">
-          <p class="weather-label">Santa Maria, CA</p>
-          <p class="weather-text" id="weatherText">Loading...</p>
+        <div class="card info-strip">
+          <div class="info-cell">
+            <p class="info-label">Days Left</p>
+            <div class="info-number" id="daysLeft">--</div>
+            <p class="info-sub">Last Day: Jun 10</p>
+          </div>
+          <div class="info-vert-divider"></div>
+          <div class="info-cell">
+            <p class="info-label">Santa Maria, CA</p>
+            <p class="info-main" id="weatherText">Loading...</p>
+            <p class="info-sub" id="todayText">--</p>
+          </div>
         </div>
 
         <div class="footer-note">By: CreativeSilva</div>
@@ -530,8 +504,8 @@
         ? (hasHours ? 108 : 124)
         : (window.innerWidth <= 430 ? (hasHours ? 96 : 110) : (hasHours ? 112 : 128));
       const timerMin = isEmbed ? (hasHours ? 48 : 56) : (hasHours ? 38 : 42);
-      const daysMax = isEmbed ? 118 : 92;
-      const daysMin = isEmbed ? 72 : 56;
+      const daysMax = isEmbed ? 96 : 64;
+      const daysMin = isEmbed ? 60 : 40;
       fitDisplayNumber(timerTextEl, timerMin, timerMax);
       fitDisplayNumber(daysLeftEl, daysMin, daysMax);
     }
@@ -656,7 +630,7 @@
 
     const schedules = {
       regular: [ {l:"1ST PERIOD", s:"08:30", e:"09:20"}, {l:"PASSING", s:"09:20", e:"09:30"}, {l:"2ND PERIOD", s:"09:30", e:"10:20"}, {l:"NUTRITION", s:"10:20", e:"10:35"}, {l:"3RD PERIOD", s:"10:35", e:"11:25"}, {l:"PASSING", s:"11:25", e:"11:35"}, {l:"4TH PERIOD", s:"11:35", e:"12:25"}, {l:"LUNCH", s:"12:25", e:"13:05"}, {l:"5TH PERIOD", s:"13:05", e:"13:55"}, {l:"PASSING", s:"13:55", e:"14:05"}, {l:"6TH PERIOD", s:"14:05", e:"14:55"}, {l:"PASSING", s:"14:55", e:"15:05"}, {l:"7TH PERIOD", s:"15:05", e:"15:55"} ],
-      monday: [ {l:"1ST PERIOD", s:"08:30", e:"09:10"}, {l:"PASSING", s:"09:10", e:"09:20"}, {l:"2ND PERIOD", s:"09:20", e:"10:00"}, {l:"NUTRITION", s:"10:00", e:"10:15"}, {l:"3RD PERIOD", s:"10:15", e:"10:55"}, {l:"PASSING", s:"10:55", e:"11:05"}, {l:"4TH PERIOD", s:"11:05", e:"11:45"}, {l:"LUNCH", s:"11:45", e:"12:25"}, {l:"5TH PERIOD", s:"12:25", e:"13:05"}, {l:"PASSING", s:"13:05", e:"13:15"}, {l:"6TH PERIOD", s:"13:15", e:"13:55"}, {l:"PASSING", s:"13:55", e:"14:05"}, {l:"7TH PERIOD", s:"14:05", e:"14:45"} ],
+      monday: [ {l:"1ST PERIOD", s:"08:30", e:"09:10"}, {l:"PASSING", s:"09:10", e:"09:20"}, {l:"2ND PERIOD", s:"09:20", e:"10:00"}, {l:"NUTRITION", s:"10:00", e:"10:15"}, {l:"3RD PERIOD", s:"10:15", e:"10:55"}, {l:"PASSING", s:"10:55", e:"11:05"}, {l:"4TH PERIOD", s:"11:05", e:"11:45"}, {l:"LUNCH", s:"11:45", e:"12:25"}, {l:"5TH PERIOD", s:"12:25", e:"13:05"}, {l:"PASSING", s:"13:05", e:"13:15"}, {l:"6TH PERIOD", s:"13:15", e:"13:55"}, {l:"PASSING", s:"13:55", e:"14:05"}, {l:"7TH PERIOD", s:"14:05", e:"14:45"}, {l:"DEPT. COLLABORATION", s:"14:45", e:"15:55"} ],
       minimum: [ {l:"1ST PERIOD", s:"08:30", e:"09:00"}, {l:"PASSING", s:"09:00", e:"09:10"}, {l:"2ND PERIOD", s:"09:10", e:"09:40"}, {l:"NUTRITION", s:"09:40", e:"09:55"}, {l:"3RD PERIOD", s:"09:55", e:"10:25"}, {l:"PASSING", s:"10:25", e:"10:35"}, {l:"4TH PERIOD", s:"10:35", e:"11:05"}, {l:"LUNCH", s:"11:05", e:"11:45"}, {l:"5TH PERIOD", s:"11:45", e:"12:15"}, {l:"PASSING", s:"12:15", e:"12:25"}, {l:"6TH PERIOD", s:"12:25", e:"12:55"}, {l:"PASSING", s:"12:55", e:"13:05"}, {l:"7TH PERIOD", s:"13:05", e:"13:35"} ]
     };
 
@@ -697,7 +671,7 @@
 
     function updateApp() {
       const now = getNow();
-      document.getElementById("todayText").textContent = now.longDate;
+      document.getElementById("todayText").textContent = new Intl.DateTimeFormat("en-US", {timeZone, weekday:"short", month:"short", day:"numeric"}).format(new Date());
 
       let schedType = "REGULAR DAY", blocks = schedules.regular;
       if (minimumDays.has(now.dateStr)) { schedType = "MINIMUM DAY"; blocks = schedules.minimum; }
@@ -735,10 +709,13 @@
               alertMessage = "No Restroom Access";
             }
 
+            const isCollab = /COLLAB/i.test(blocks[i].l);
             document.getElementById("blockLabel").textContent = blocks[i].l;
             document.getElementById("timerText").textContent = formatTime(rem);
             document.getElementById("timerText").className = `timer ${timerState}`;
-            document.getElementById("subText").textContent = i < blocks.length - 1 ? `Next: ${blocks[i + 1].l}` : "Almost done for today!";
+            document.getElementById("subText").textContent = isCollab
+              ? "Collab ends at 3:55 PM — then rest!"
+              : (i < blocks.length - 1 ? `Next: ${blocks[i + 1].l}` : "Almost done for today!");
             updatePeriodAlert(timerState === "normal" ? "" : timerState, alertMessage || "No Restroom Access");
             scheduleFitCountdownText();
             return;
