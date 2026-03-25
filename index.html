@@ -52,7 +52,7 @@
       z-index: 0;
     }
 
-    .ghost-logo { position: absolute; top: 56%; left: 50%; width: 182%; opacity: 0.07; transform: translate(-50%, -50%); filter: grayscale(100%) contrast(108%) brightness(114%); pointer-events: none; z-index: 0; }
+    .ghost-logo { position: absolute; top: 56%; left: 50%; width: 120%; opacity: 0.07; transform: translate(-50%, -50%); filter: grayscale(100%) contrast(108%) brightness(114%); pointer-events: none; z-index: 0; }
     
     .content { 
       position: relative; z-index: 1; width: 100%; height: 100%; 
@@ -112,7 +112,7 @@
     .logo-clear { width: 42px; height: auto; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); flex-shrink: 0; }
     .page-title { flex: 1; font-size: 15px; font-weight: 700; color: #dff7f7; text-transform: uppercase; margin: 0; text-align: left; letter-spacing: 0.14em; }
     .header { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0; margin-top: 0; }
-    .greeting { margin: 2px 0 0 0; font-size: 15px; font-weight: 700; color: #4be1e1; text-transform: uppercase; letter-spacing: 0.14em; }
+    .greeting { margin: 2px 0 18px 0; font-size: 15px; font-weight: 700; font-style: italic; color: #4be1e1; text-transform: uppercase; letter-spacing: 0.14em; }
     .subtitle { margin: 6px 0 10px 0; max-width: 296px; font-size: 10.5px; line-height: 1.35; font-weight: 500; color: var(--muted); text-align: center; }
 
     .launcher-stack { width: 100%; display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
@@ -280,6 +280,8 @@
         <a href="extension_search.html" class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">🔍</span>Directory</a>
         <div id="popoutMenuSep" class="nav-menu-sep"></div>
         <button id="popoutBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon">🪟</span>Pop Out</button>
+        <div id="installMenuSep" class="nav-menu-sep"></div>
+        <button id="installBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon">📲</span>Add to Home Screen</button>
       </div>
 
       <!-- ADD TO HOME SCREEN PROMPT (mobile only, non-standalone) -->
@@ -429,6 +431,42 @@
         setTimeout(() => { a2hsPrompt.hidden = true; }, 500);
       });
     }
+    // Install / A2HS nav button
+    (function() {
+      const btn = document.getElementById('installBtn');
+      const sep = document.getElementById('installMenuSep');
+      if (!btn) return;
+      // Hide when already installed
+      if (isStandalone) { btn.remove(); sep?.remove(); return; }
+      // Desktop PWA install via beforeinstallprompt
+      let deferredPrompt = null;
+      window.addEventListener('beforeinstallprompt', e => {
+        e.preventDefault();
+        deferredPrompt = e;
+        btn.style.display = 'flex';
+        sep.style.display = 'block';
+      });
+      btn.addEventListener('click', () => {
+        navMenu?.classList.remove('is-open');
+        navMenuBtn?.classList.remove('is-open');
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+        } else {
+          // Mobile: show the existing A2HS slide-up panel
+          const prompt = document.getElementById('a2hsPrompt');
+          if (prompt) {
+            prompt.hidden = false;
+            setTimeout(() => prompt.classList.add('is-visible'), 10);
+          }
+        }
+      });
+      // On mobile without beforeinstallprompt, always show the button
+      if (isMobile && !deferredPrompt) {
+        btn.style.display = 'flex';
+        sep.style.display = 'block';
+      }
+    })();
   </script>
 </body>
 </html>
