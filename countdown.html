@@ -148,6 +148,20 @@
     body.is-embed .prog-label { font-size: 11px; }
     body.is-embed .prog-pct   { font-size: 12px; }
 
+    /* ── NOTIFICATION BELL ─────────────────────────────── */
+    .notif-btn {
+      appearance: none; background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.13); border-radius: 12px;
+      color: #fff; width: 34px; height: 34px; font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .notif-btn:active { background: rgba(255,255,255,0.18); }
+    .notif-btn.is-on   { background: rgba(0,180,180,0.18); border-color: rgba(0,215,215,0.38); }
+    .notif-btn.is-off  { opacity: 0.42; }
+    body.is-embed .notif-btn { display: none; }
+
     .embed-modal[hidden] { display: none; }
     .embed-modal {
       position: absolute;
@@ -424,6 +438,7 @@
         <div class="top-row">
           <img src="PV_Logo.png" alt="Logo" class="logo-clear">
           <h1 class="page-title">Countdown</h1>
+          <button id="notifBtn" class="notif-btn" type="button" title="Alert notifications" aria-label="Toggle period alerts">🔔</button>
           <div class="action-pill">
             <a href="extension_search.html" class="pill-btn nav-link">Directory</a>
             <div class="pill-divider"></div>
@@ -468,7 +483,7 @@
           <div class="prog-sep"></div>
           <div class="prog-row">
             <div class="prog-meta">
-              <span class="prog-label" id="weekProgLabel">This Week</span>
+              <span class="prog-label" id="weekProgLabel">To the Weekend</span>
               <span class="prog-pct"   id="weekPct">—</span>
             </div>
             <div class="prog-track"><div class="prog-bar prog-bar--week" id="weekFill" style="width:0%"></div></div>
@@ -668,8 +683,29 @@
     }
 
     const timeZone = "America/Los_Angeles";
-    const schoolDays = ["2026-01-15","2026-01-16","2026-01-20","2026-01-21","2026-01-22","2026-01-23","2026-01-26","2026-01-27","2026-01-28","2026-01-29","2026-01-30","2026-02-02","2026-02-03","2026-02-04","2026-02-05","2026-02-06","2026-02-10","2026-02-11","2026-02-12","2026-02-13","2026-02-17","2026-02-18","2026-02-19","2026-02-20","2026-02-23","2026-02-24","2026-02-25","2026-02-26","2026-02-27","2026-03-02","2026-03-03","2026-03-04","2026-03-05","2026-03-06","2026-03-09","2026-03-10","2026-03-11","2026-03-12","2026-03-13","2026-03-16","2026-03-17","2026-03-18","2026-03-19","2026-03-20","2026-03-23","2026-03-24","2026-03-25","2026-03-26","2026-03-27","2026-03-30","2026-03-31","2026-04-01","2026-04-02","2026-04-13","2026-04-14","2026-04-15","2026-04-16","2026-04-17","2026-04-20","2026-04-21","2026-04-22","2026-04-23","2026-04-24","2026-04-27","2026-04-28","2026-04-29","2026-04-30","2026-05-01","2026-05-04","2026-05-05","2026-05-06","2026-05-07","2026-05-08","2026-05-11","2026-05-12","2026-05-13","2026-05-14","2026-05-15","2026-05-18","2026-05-19","2026-05-20","2026-05-21","2026-05-22","2026-05-26","2026-05-27","2026-05-28","2026-05-29","2026-06-01","2026-06-02","2026-06-03","2026-06-04","2026-06-05","2026-06-08","2026-06-09","2026-06-10"];
-    const minimumDays = new Set(["2026-02-27", "2026-04-02", "2026-04-24"]);
+    // Full 2025-26 school year: 85 days (Sem 1, Aug 14–Dec 19) + 95 days (Sem 2, Jan 15–Jun 10) = 180 total
+    const schoolDays = [
+      // ── SEMESTER 1 (85 days) ──────────────────────────────────────────
+      // August 2025 (12)
+      "2025-08-14","2025-08-15","2025-08-18","2025-08-19","2025-08-20","2025-08-21","2025-08-22","2025-08-25","2025-08-26","2025-08-27","2025-08-28","2025-08-29",
+      // September 2025 (21)
+      "2025-09-02","2025-09-03","2025-09-04","2025-09-05","2025-09-08","2025-09-09","2025-09-10","2025-09-11","2025-09-12","2025-09-15","2025-09-16","2025-09-17","2025-09-18","2025-09-19","2025-09-22","2025-09-23","2025-09-24","2025-09-25","2025-09-26","2025-09-29","2025-09-30",
+      // October 2025 (23)
+      "2025-10-01","2025-10-02","2025-10-03","2025-10-06","2025-10-07","2025-10-08","2025-10-09","2025-10-10","2025-10-13","2025-10-14","2025-10-15","2025-10-16","2025-10-17","2025-10-20","2025-10-21","2025-10-22","2025-10-23","2025-10-24","2025-10-27","2025-10-28","2025-10-29","2025-10-30","2025-10-31",
+      // November 2025 (14) — Nov 11 Veterans Day, Nov 24-28 Thanksgiving
+      "2025-11-03","2025-11-04","2025-11-05","2025-11-06","2025-11-07","2025-11-10","2025-11-12","2025-11-13","2025-11-14","2025-11-17","2025-11-18","2025-11-19","2025-11-20","2025-11-21",
+      // December 2025 (15) — finals Dec 17-19, winter break Dec 22+
+      "2025-12-01","2025-12-02","2025-12-03","2025-12-04","2025-12-05","2025-12-08","2025-12-09","2025-12-10","2025-12-11","2025-12-12","2025-12-15","2025-12-16","2025-12-17","2025-12-18","2025-12-19",
+      // ── SEMESTER 2 (95 days) ──────────────────────────────────────────
+      "2026-01-15","2026-01-16","2026-01-20","2026-01-21","2026-01-22","2026-01-23","2026-01-26","2026-01-27","2026-01-28","2026-01-29","2026-01-30","2026-02-02","2026-02-03","2026-02-04","2026-02-05","2026-02-06","2026-02-10","2026-02-11","2026-02-12","2026-02-13","2026-02-17","2026-02-18","2026-02-19","2026-02-20","2026-02-23","2026-02-24","2026-02-25","2026-02-26","2026-02-27","2026-03-02","2026-03-03","2026-03-04","2026-03-05","2026-03-06","2026-03-09","2026-03-10","2026-03-11","2026-03-12","2026-03-13","2026-03-16","2026-03-17","2026-03-18","2026-03-19","2026-03-20","2026-03-23","2026-03-24","2026-03-25","2026-03-26","2026-03-27","2026-03-30","2026-03-31","2026-04-01","2026-04-02","2026-04-13","2026-04-14","2026-04-15","2026-04-16","2026-04-17","2026-04-20","2026-04-21","2026-04-22","2026-04-23","2026-04-24","2026-04-27","2026-04-28","2026-04-29","2026-04-30","2026-05-01","2026-05-04","2026-05-05","2026-05-06","2026-05-07","2026-05-08","2026-05-11","2026-05-12","2026-05-13","2026-05-14","2026-05-15","2026-05-18","2026-05-19","2026-05-20","2026-05-21","2026-05-22","2026-05-26","2026-05-27","2026-05-28","2026-05-29","2026-06-01","2026-06-02","2026-06-03","2026-06-04","2026-06-05","2026-06-08","2026-06-09","2026-06-10"
+    ];
+    // Minimum days: shortened schedule (7th period ends 1:35 PM)
+    // Sem 1: Aug 29 (min day), Sep 19 (progress reports), Oct 31 (progress reports), Dec 17-19 (finals)
+    // Sem 2: Feb 27, Apr 2, Apr 24
+    const minimumDays = new Set([
+      "2025-08-29","2025-09-19","2025-10-31","2025-12-17","2025-12-18","2025-12-19",
+      "2026-02-27","2026-04-02","2026-04-24"
+    ]);
 
     const schedules = {
       regular: [ {l:"1ST PERIOD", s:"08:30", e:"09:20"}, {l:"PASSING", s:"09:20", e:"09:30"}, {l:"2ND PERIOD", s:"09:30", e:"10:20"}, {l:"NUTRITION", s:"10:20", e:"10:35"}, {l:"3RD PERIOD", s:"10:35", e:"11:25"}, {l:"PASSING", s:"11:25", e:"11:35"}, {l:"4TH PERIOD", s:"11:35", e:"12:25"}, {l:"LUNCH", s:"12:25", e:"13:05"}, {l:"5TH PERIOD", s:"13:05", e:"13:55"}, {l:"PASSING", s:"13:55", e:"14:05"}, {l:"6TH PERIOD", s:"14:05", e:"14:55"}, {l:"PASSING", s:"14:55", e:"15:05"}, {l:"7TH PERIOD", s:"15:05", e:"15:55"} ],
@@ -793,6 +829,152 @@
 
     function parseToSec(t) { const [h,m] = t.split(":").map(Number); return (h*3600)+(m*60); }
 
+    // ── NOTIFICATION SYSTEM ────────────────────────────────────────────
+    const PRAISES = [
+      "Another day shaping young minds. The ripple of what you taught today will spread further than you'll ever know. Rest well — you've truly earned it. 🌟",
+      "You showed up, you poured yourself in, and you made a difference. That's what extraordinary educators do — every single day. 🍎",
+      "Every question you answered today sparked something in a young person. That spark is a gift only you could give. ✨",
+      "Teaching is the profession that makes all other professions possible. Today, you helped build a better future. 🏆",
+      "You didn't just deliver a lesson — you listened, encouraged, believed, and invested in real human beings. That matters beyond measure. 💛",
+      "The seeds you plant in your classroom bloom in ways you'll never fully see — but they bloom. Trust it. 🌱",
+      "Tired? Good. That means you brought your whole self to what matters most. Recharge tonight — your students need that version of you tomorrow. 💪",
+      "Not all heroes wear capes. Some write lesson plans at midnight, grade on weekends, and still show up with a smile. That's you. 🦸",
+      "You are proof that one person, in one classroom, can change a life's trajectory forever. Thank you for choosing this work. 🚀",
+      "Behind every student who succeeds is a teacher who refused to give up on them. Today, you were that teacher for someone. ❤️"
+    ];
+
+    let _praiseIdx  = Number(localStorage.getItem('pvhs_praise_idx') || '0');
+    let _notifDay   = null;  // date string for which notifications are scheduled
+    let _notifTimers = [];
+
+    function nextPraise() {
+      const msg = PRAISES[_praiseIdx % PRAISES.length];
+      _praiseIdx = (_praiseIdx + 1) % PRAISES.length;
+      localStorage.setItem('pvhs_praise_idx', String(_praiseIdx));
+      return msg;
+    }
+
+    function updateNotifBtn() {
+      const btn = document.getElementById('notifBtn');
+      if (!btn || !('Notification' in window)) { if (btn) btn.style.display = 'none'; return; }
+      const p = Notification.permission;
+      btn.classList.toggle('is-on',  p === 'granted');
+      btn.classList.toggle('is-off', p === 'denied');
+      btn.title       = p === 'granted' ? 'Period alerts ON — tap to info'
+                      : p === 'denied'  ? 'Notifications blocked in browser settings'
+                      : 'Tap to enable period alerts';
+      btn.textContent = p === 'granted' ? '🔔' : p === 'denied' ? '🔕' : '🔔';
+    }
+
+    async function fireNotif(title, body, tag) {
+      if (!('Notification' in window) || Notification.permission !== 'granted') return;
+      try {
+        const reg = await navigator.serviceWorker?.getRegistration?.();
+        if (reg?.showNotification) {
+          await reg.showNotification(title, {
+            body, icon: './PV_AppIcon.png', badge: './PV_AppIcon.png',
+            tag, renotify: true, vibrate: [180, 80, 180], requireInteraction: false
+          });
+        } else {
+          new Notification(title, { body, icon: './PV_AppIcon.png', tag });
+        }
+      } catch (_) {
+        try { new Notification(title, { body, icon: './PV_AppIcon.png', tag }); } catch (_) {}
+      }
+    }
+
+    function clearNotifTimers() {
+      _notifTimers.forEach(clearTimeout);
+      _notifTimers = [];
+    }
+
+    function scheduleNotifications() {
+      clearNotifTimers();
+      if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+      const now = getNow();
+      const { totalSec, dateStr, weekday } = now;
+      if (!schoolDays.includes(dateStr)) return;
+
+      const isMD   = minimumDays.has(dateStr);
+      const blocks = isMD ? schedules.minimum : (weekday === 'Monday' ? schedules.monday : schedules.regular);
+      const lastEnd = parseToSec(blocks[blocks.length - 1].e);
+      if (totalSec >= lastEnd) return;
+
+      _notifDay = dateStr;
+
+      blocks.forEach((block, i) => {
+        const endSec  = parseToSec(block.e);
+        const warnSec = endSec - 300; // 5 min before end
+        if (warnSec <= totalSec) return;
+
+        const ms = (warnSec - totalSec) * 1000;
+        let title, body;
+
+        if      (/PERIOD/i.test(block.l))  { title = `⏱ ${block.l} — 5 Min Left`;  body = `${block.l} ends in 5 minutes.`; }
+        else if (/PASSING/i.test(block.l)) { title = '🏃 Passing — 5 Min Left';     body = 'Get to class — passing ends in 5 minutes!'; }
+        else if (/NUTRITION/i.test(block.l)){ title = '🍎 Nutrition Ending Soon';   body = 'Nutrition break ends in 5 minutes.'; }
+        else if (/LUNCH/i.test(block.l))   { title = '🍽 Lunch Almost Over';        body = 'Lunch ends in 5 minutes — start heading back!'; }
+        else if (/COLLAB/i.test(block.l))  { title = '🤝 Collaboration — 5 Min Left'; body = 'Department collaboration wraps up in 5 minutes!'; }
+        else return;
+
+        _notifTimers.push(setTimeout(() => fireNotif(title, body, `warn-${i}`), ms));
+      });
+
+      // End-of-day celebration
+      const msEOD = (lastEnd - totalSec) * 1000;
+      _notifTimers.push(setTimeout(() => {
+        fireNotif('🎉 School Day Complete!', nextPraise(), 'pvhs-eod');
+      }, msEOD));
+    }
+
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js', { scope: './' })
+        .then(() => {
+          if (Notification.permission === 'granted') scheduleNotifications();
+        })
+        .catch(() => {
+          if (Notification.permission === 'granted') scheduleNotifications();
+        });
+    } else if (Notification.permission === 'granted') {
+      scheduleNotifications();
+    }
+
+    // Bell button handler
+    document.getElementById('notifBtn')?.addEventListener('click', async () => {
+      if (!('Notification' in window)) return;
+      if (Notification.permission === 'denied') {
+        alert('Notifications are blocked. Open your browser/phone Settings → Site Settings (or Notifications) and allow this site, then reload.');
+        return;
+      }
+      if (Notification.permission === 'granted') {
+        // Show a test notification so user knows it's working
+        await fireNotif('🔔 Alerts Active', 'You\'ll get a nudge 5 min before each period, passing, and lunch — plus a celebration at end of day!', 'pvhs-test');
+        updateNotifBtn();
+        return;
+      }
+      const result = await Notification.requestPermission();
+      updateNotifBtn();
+      if (result === 'granted') {
+        scheduleNotifications();
+        await fireNotif('🔔 Alerts Enabled!', 'You\'ll be nudged 5 min before each period, passing, lunch & end of day. 🎉', 'pvhs-welcome');
+      }
+    });
+
+    // Keep scheduler in sync: reschedule if day changes
+    let _schedulerLastDay = null;
+    function checkReschedule() {
+      const today = getNow().dateStr;
+      if (today !== _schedulerLastDay) {
+        _schedulerLastDay = today;
+        if (Notification.permission === 'granted') scheduleNotifications();
+      }
+    }
+    setInterval(checkReschedule, 60000);
+    checkReschedule();
+    updateNotifBtn();
+
     function updateProgressBars() {
       const now = getNow();
       const { totalSec, dateStr, weekday } = now;
@@ -856,7 +1038,7 @@
       setTxt('schoolDayProgLabel', sdLabel);
 
       // ── 2. THIS WEEK ────────────────────────────────────────
-      let wkFrac = 0, wkLabel = 'This Week';
+      let wkFrac = 0, wkLabel = 'To the Weekend';
       const dayOrder = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
       const dow      = dayOrder.indexOf(weekday);
       const offToMon = (dow === 0) ? -6 : (1 - dow);
@@ -873,7 +1055,7 @@
         const wkStart = toMs(fw.off, parseToSec(fwB[0].s));
         const wkEnd   = toMs(lw.off, parseToSec(lwB[lwB.length - 1].e));
         wkFrac  = wkStart < wkEnd ? (nowMs - wkStart) / (wkEnd - wkStart) : 0;
-        wkLabel = wkFrac >= 1 ? 'Week Complete' : 'This Week';
+        wkLabel = wkFrac >= 1 ? 'Weekend! 🎉' : 'To the Weekend';
       } else {
         wkLabel = 'No School';
       }
