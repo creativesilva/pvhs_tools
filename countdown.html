@@ -495,6 +495,58 @@
       display: flex; align-items: center; justify-content: center;
     }
     .a2hs-dismiss:active { background: rgba(255,255,255,0.18); }
+    /* ── FEEDBACK MODAL ─────────────────────────────────── */
+    .feedback-modal[hidden] { display: none; }
+    .feedback-modal {
+      position: absolute; inset: 0; z-index: 20;
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .feedback-modal-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(1,12,12,0.8);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    }
+    .feedback-dialog {
+      position: relative; width: min(100%, 360px);
+      border-radius: 24px; border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(6,26,26,0.97);
+      box-shadow: 0 26px 48px rgba(0,0,0,0.44);
+      padding: 18px; display: flex; flex-direction: column; gap: 12px;
+      max-height: calc(100% - 20px); overflow-y: auto;
+    }
+    .feedback-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .feedback-title { font-size: 13px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 0.12em; margin: 0; }
+    .feedback-close {
+      appearance: none; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.6); border-radius: 99px; width: 28px; height: 28px;
+      font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .feedback-rating { display: flex; justify-content: space-between; gap: 4px; }
+    .feedback-rating-btn {
+      appearance: none; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px; flex: 1; padding: 8px 4px; font-size: 20px; cursor: pointer;
+      transition: background 0.15s, border-color 0.15s; display: flex; align-items: center; justify-content: center;
+    }
+    .feedback-rating-btn.is-selected { background: rgba(0,180,180,0.22); border-color: rgba(0,220,220,0.4); }
+    .feedback-rating-btn:active { background: rgba(255,255,255,0.14); }
+    .feedback-field { display: flex; flex-direction: column; gap: 5px; }
+    .feedback-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted); opacity: 0.8; }
+    .feedback-textarea, .feedback-input {
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px; color: #f0fbfb; font-size: 12px; font-weight: 500;
+      padding: 10px 12px; resize: none; outline: none; font-family: inherit;
+    }
+    .feedback-textarea { min-height: 64px; line-height: 1.45; }
+    .feedback-textarea:focus, .feedback-input:focus { border-color: rgba(0,200,200,0.4); }
+    .feedback-submit {
+      appearance: none; width: 100%;
+      background: linear-gradient(135deg, #007474 0%, #009898 100%);
+      border: none; border-radius: 14px; padding: 13px;
+      color: #fff; font-size: 11px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.12em; cursor: pointer;
+    }
+    .feedback-submit:active { opacity: 0.85; }
+    .feedback-note { font-size: 9px; color: var(--muted); text-align: center; opacity: 0.65; margin: 0; }
   </style>
 </head>
 <body>
@@ -575,6 +627,41 @@
         <div class="footer-note">By: CreativeSilva</div>
       </div>
 
+      <!-- FEEDBACK MODAL -->
+      <div id="feedbackModal" class="feedback-modal" hidden>
+        <div class="feedback-modal-backdrop" id="feedbackBackdrop"></div>
+        <div class="feedback-dialog">
+          <div class="feedback-header">
+            <p class="feedback-title">💬 Share Feedback</p>
+            <button id="feedbackClose" class="feedback-close" type="button">✕</button>
+          </div>
+          <div class="feedback-field">
+            <p class="feedback-label">How's the app working for you?</p>
+            <div class="feedback-rating" id="feedbackRating">
+              <button class="feedback-rating-btn" data-val="1" type="button">😕</button>
+              <button class="feedback-rating-btn" data-val="2" type="button">😐</button>
+              <button class="feedback-rating-btn" data-val="3" type="button">🙂</button>
+              <button class="feedback-rating-btn" data-val="4" type="button">😊</button>
+              <button class="feedback-rating-btn" data-val="5" type="button">🤩</button>
+            </div>
+          </div>
+          <div class="feedback-field">
+            <p class="feedback-label">What's working well?</p>
+            <textarea id="feedbackGood" class="feedback-textarea" placeholder="I love that it shows…"></textarea>
+          </div>
+          <div class="feedback-field">
+            <p class="feedback-label">What would you add or change?</p>
+            <textarea id="feedbackImprove" class="feedback-textarea" placeholder="It would be great if…"></textarea>
+          </div>
+          <div class="feedback-field">
+            <p class="feedback-label">Your name (optional)</p>
+            <input id="feedbackName" class="feedback-input" type="text" placeholder="e.g. Ms. Johnson">
+          </div>
+          <button id="feedbackSubmit" class="feedback-submit" type="button">Send Feedback ✉️</button>
+          <p class="feedback-note">Your feedback goes directly to the developer at csilva@smjuhsd.org</p>
+        </div>
+      </div>
+
       <!-- NAV DROPDOWN (position:fixed, outside content scroll) -->
       <div id="navMenu" class="nav-menu" role="menu">
         <a href="extension_search.html" class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">🔍</span>Directory</a>
@@ -583,6 +670,8 @@
         <button id="embedBtn" class="nav-menu-item" type="button" role="menuitem" style="display:none"><span class="nav-menu-icon">📋</span>Embed</button>
         <div id="installMenuSep" class="nav-menu-sep"></div>
         <button id="installBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon">📲</span>Add to Home Screen</button>
+        <div class="nav-menu-sep"></div>
+        <button id="feedbackBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon">💬</span>Share Feedback</button>
       </div>
 
       <!-- ADD TO HOME SCREEN PROMPT -->
@@ -992,19 +1081,18 @@
 
     async function fireNotif(title, body, tag) {
       if (!('Notification' in window) || Notification.permission !== 'granted') return;
+      const opts = { body, icon: './PV_AppIcon.png', badge: './PV_AppIcon.png', tag, renotify: true, vibrate: [180, 80, 180], requireInteraction: false };
       try {
-        const reg = await navigator.serviceWorker?.getRegistration?.();
+        // Prefer SW notification (works when tab is backgrounded on desktop)
+        const regs = await navigator.serviceWorker?.getRegistrations?.() || [];
+        const reg  = regs.find(r => r.active) || await navigator.serviceWorker?.getRegistration?.();
         if (reg?.showNotification) {
-          await reg.showNotification(title, {
-            body, icon: './PV_AppIcon.png', badge: './PV_AppIcon.png',
-            tag, renotify: true, vibrate: [180, 80, 180], requireInteraction: false
-          });
-        } else {
-          new Notification(title, { body, icon: './PV_AppIcon.png', tag });
+          await reg.showNotification(title, opts);
+          return;
         }
-      } catch (_) {
-        try { new Notification(title, { body, icon: './PV_AppIcon.png', tag }); } catch (_) {}
-      }
+      } catch (_) {}
+      // Fallback: page-level notification
+      try { new Notification(title, { body, icon: './PV_AppIcon.png', tag }); } catch (_) {}
     }
 
     function clearNotifTimers() {
@@ -1096,6 +1184,12 @@
       }
     }
     setInterval(checkReschedule, 60000);
+    // Reschedule notifications when tab becomes visible again (handles background throttling)
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && Notification.permission === 'granted') {
+        scheduleNotifications();
+      }
+    });
     checkReschedule();
     updateNotifBtn();
 
@@ -1183,15 +1277,23 @@
         wkFrac = wkStart < wkEnd ? (nowMs - wkStart) / (wkEnd - wkStart) : 0;
         if (isWeekend || (isAfterSchoolToday && dow === 5)) {
           wkLabel = 'Back to School';
+          const nextSD = schoolDays.find(d => d > dateStr);
+          if (nextSD) {
+            const cal = Math.round((new Date(nextSD + 'T12:00:00') - new Date(dateStr + 'T12:00:00')) / 86400000);
+            wkRight = cal === 1 ? '1 Day' : `${cal} Days`;
+          }
         } else {
           const remSDs = weekSDs.filter(sd => sd.dStr > dateStr || (sd.dStr === dateStr && !isAfterSchoolToday));
-          wkLabel = remSDs.length === 0 ? 'Weekend! 🎉' : 'To the Weekend';
+          const cnt = remSDs.length;
+          wkLabel  = cnt === 0 ? 'Weekend! 🎉' : 'To the Weekend';
+          wkRight  = cnt === 0 ? '🎉' : cnt === 1 ? '1 Day' : `${cnt} Days`;
         }
       } else {
         wkLabel = 'No School';
+        wkRight = '—';
       }
       setFill('weekFill',     wkFrac, 'prog-bar--week');
-      setTxt('weekPct',       pctStr(wkFrac));
+      setTxt('weekPct',       wkRight);
       setTxt('weekProgLabel', wkLabel);
 
       // ── 3. GRADUATION ───────────────────────────────────────
@@ -1237,14 +1339,21 @@
           const totalPRSDs  = schoolDays.filter(d => d >= stretch.from && d <= stretch.to).length;
           const passedPRSDs = schoolDays.filter(d => d >= stretch.from && (d < dateStr || (d === dateStr && isAfterSchoolToday))).length;
           const prFrac = totalPRSDs > 0 ? passedPRSDs / totalPRSDs : 0;
+          const dToPR = schoolDays.filter(d => {
+            if (d > nextPR) return false;
+            if (d > dateStr) return true;
+            if (d === dateStr && !isAfterSchoolToday) return true;
+            return false;
+          }).length;
+          const prRight = dToPR === 0 ? '🎉 Today!' : dToPR === 1 ? '1 Day' : `${dToPR} Days`;
           setFill('prFill', prFrac, 'prog-bar--pr');
-          setTxt('prPct',   pctStr(prFrac));
-          setTxt('prLabel', 'Next Progress Report');
+          setTxt('prPct',   prRight);
+          setTxt('prLabel', 'Progress Report');
         }
       } else {
         setFill('prFill', 1, 'prog-bar--pr');
         setTxt('prLabel', 'Progress Reports Done ✓');
-        setTxt('prPct',   '100%');
+        setTxt('prPct',   '✓');
       }
     }
 
@@ -1376,6 +1485,48 @@
           a2hsPrompt.hidden = false;
           setTimeout(() => a2hsPrompt.classList.add('is-visible'), 10);
         }
+      });
+    })();
+
+    // ── FEEDBACK MODAL ──────────────────────────────────────────
+    (function() {
+      let selectedRating = 0;
+      function openFeedback() {
+        document.getElementById('feedbackModal').hidden = false;
+      }
+      function closeFeedback() {
+        document.getElementById('feedbackModal').hidden = true;
+      }
+      document.getElementById('feedbackBtn')?.addEventListener('click', () => {
+        navMenu?.classList.remove('is-open');
+        navMenuBtn?.classList.remove('is-open');
+        openFeedback();
+      });
+      document.getElementById('feedbackClose')?.addEventListener('click', closeFeedback);
+      document.getElementById('feedbackBackdrop')?.addEventListener('click', closeFeedback);
+      document.querySelectorAll('.feedback-rating-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          selectedRating = Number(btn.dataset.val);
+          document.querySelectorAll('.feedback-rating-btn').forEach(b => b.classList.toggle('is-selected', b === btn));
+        });
+      });
+      document.getElementById('feedbackSubmit')?.addEventListener('click', () => {
+        const ratingLabels = ['','😕 Needs Work','😐 It\'s OK','🙂 Pretty Good','😊 Love It','🤩 Amazing!'];
+        const rating   = selectedRating ? ratingLabels[selectedRating] : 'Not rated';
+        const good     = document.getElementById('feedbackGood')?.value.trim()    || '(none)';
+        const improve  = document.getElementById('feedbackImprove')?.value.trim() || '(none)';
+        const name     = document.getElementById('feedbackName')?.value.trim()    || 'Anonymous';
+        const subject  = encodeURIComponent('PVHS Tools Feedback');
+        const body     = encodeURIComponent(
+          `PVHS Tools Feedback\n` +
+          `━━━━━━━━━━━━━━━━━━━━\n` +
+          `Rating:  ${rating}\n` +
+          `From:    ${name}\n\n` +
+          `What's working well:\n${good}\n\n` +
+          `What to add or change:\n${improve}\n`
+        );
+        window.open(`mailto:csilva@smjuhsd.org?subject=${subject}&body=${body}`);
+        closeFeedback();
       });
     })();
   </script>
