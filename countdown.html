@@ -1253,35 +1253,64 @@
     updateProgressBars();
     scheduleFitCountdownText();
 
-    // LIVE WEATHER FETCH SCRIPT
-    async function fetchWeather() {
-      try {
-        const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=34.9530&longitude=-120.4357&current_weather=true&temperature_unit=fahrenheit');
-        const data = await res.json();
-        const temp = Math.round(data.current_weather.temperature);
-        const code = data.current_weather.weathercode;
-        
-        let desc = "☁️ Weather";
-        if (code === 0) desc = "☀️ Clear";
-        else if (code === 1) desc = "🌤️ Mostly Clear";
-        else if (code === 2) desc = "⛅ Partly Cloudy";
-        else if (code === 3) desc = "☁️ Overcast";
-        else if (code === 45 || code === 48) desc = "🌫️ Fog";
-        else if (code >= 51 && code <= 55) desc = "🌧️ Drizzle";
-        else if (code >= 61 && code <= 65) desc = "🌧️ Rain";
-        else if (code >= 71 && code <= 77) desc = "❄️ Snow";
-        else if (code >= 80 && code <= 82) desc = "🌧️ Showers";
-        else if (code >= 95) desc = "⛈️ Thunderstorm";
+    // LIVE WEATHER — National Weather Service (NWS) API
+    // Santa Maria, CA grid point: LOX/52,27
+    const NWS_OBS_URL = 'https://api.weather.gov/gridpoints/LOX/52,27/forecast/hourly';
+    const NWS_STATION_URL = 'https://api.weather.gov/stations/KSMX/observations/latest';
 
-        document.getElementById('weatherText').textContent = `${desc} | ${temp}°F`;
-      } catch (err) {
-        document.getElementById('weatherText').textContent = "Weather Unavailable";
+    function nwsIcon(shortForecast, isDaytime) {
+      const f = shortForecast.toLowerCase();
+      if (f.includes('thunder')) return '⛈️';
+      if (f.includes('snow') || f.includes('blizzard')) return '❄️';
+      if (f.includes('sleet') || f.includes('freezing')) return '🌨️';
+      if (f.includes('rain') || f.includes('shower') || f.includes('drizzle')) return '🌧️';
+      if (f.includes('fog') || f.includes('haze') || f.includes('mist')) return '🌫️';
+      if (f.includes('wind')) return isDaytime ? '🌬️' : '🌬️';
+      if (f.includes('overcast') || f.includes('cloudy')) return '☁️';
+      if (f.includes('mostly cloudy') || f.includes('partly sunny')) return '⛅';
+      if (f.includes('partly cloudy') || f.includes('mostly sunny')) return '🌤️';
+      if (f.includes('sunny') || f.includes('clear')) return isDaytime ? '☀️' : '🌙';
+      return '🌡️';
+    }
+
+    async function fetchWeather() {
+      const el = document.getElementById('weatherText');
+      if (!el) return;
+      try {
+        // Try live station observation first (most current — updates ~5 min)
+        const obsRes = await fetch(NWS_STATION_URL, { headers: { 'User-Agent': 'pvhs-tools/1.0' } });
+        if (obsRes.ok) {
+          const obs = await obsRes.json();
+          const props = obs.properties;
+          const tempC = props.temperature?.value;
+          const desc  = props.textDescription || '';
+          if (tempC !== null && tempC !== undefined) {
+            const tempF = Math.round(tempC * 9 / 5 + 32);
+            const icon  = nwsIcon(desc, true);
+            const label = desc.length > 18 ? desc.slice(0, 18).trim() + '…' : desc;
+            el.textContent = `${icon} ${label || 'Santa Maria'} | ${tempF}°F`;
+            return;
+          }
+        }
+        // Fallback: hourly forecast for current period
+        const fcRes = await fetch(NWS_OBS_URL, { headers: { 'User-Agent': 'pvhs-tools/1.0' } });
+        if (fcRes.ok) {
+          const fc = await fcRes.json();
+          const period = fc.properties.periods[0];
+          const icon = nwsIcon(period.shortForecast, period.isDaytime);
+          const label = period.shortForecast.length > 18 ? period.shortForecast.slice(0, 18).trim() + '…' : period.shortForecast;
+          el.textContent = `${icon} ${label} | ${period.temperature}°F`;
+          return;
+        }
+        el.textContent = '🌡️ Weather Unavailable';
+      } catch (_) {
+        el.textContent = '🌡️ Weather Unavailable';
       }
     }
-    
-    // Call immediately, then refresh every 15 mins
-    fetchWeather(); 
-    setInterval(fetchWeather, 900000);
+
+    // Fetch immediately, then every 10 minutes
+    fetchWeather();
+    setInterval(fetchWeather, 600000);
 
     // embedBtn wired above in nav menu setup
     embedCloseBtn?.addEventListener("click", closeEmbedModal);
