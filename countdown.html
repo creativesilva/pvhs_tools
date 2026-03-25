@@ -119,6 +119,7 @@
     /* INFO STRIP — combines school days + weather side by side */
     .info-strip { padding: 14px 16px; display: flex; align-items: center; gap: 0; flex-shrink: 0; }
     .info-cell { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .info-cell:first-child { flex: 0 0 110px; }
     .info-vert-divider { width: 1px; background: rgba(255,255,255,0.12); flex-shrink: 0; margin: 0 8px; align-self: stretch; }
     .info-label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; margin: 0; }
     .info-number { font-size: 56px; line-height: 0.95; font-weight: 900; letter-spacing: -0.05em; background: var(--white-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; font-variant-numeric: tabular-nums; white-space: nowrap; margin: 3px 0 2px; width: 100%; text-align: center; padding: 0 2px; }
@@ -171,6 +172,7 @@
     .prog-bar--rest { background: linear-gradient(90deg, #60d4d4 0%, #2a8a8a 100%); opacity: 0.75; }
     .prog-bar--week { background: linear-gradient(90deg, #6fdf6f 0%, #2a802a 100%); }
     .prog-bar--grad { background: linear-gradient(90deg, #ffd44a 0%, #e07000 100%); }
+    .prog-bar--vac  { background: linear-gradient(90deg, #ff9a5c 0%, #d94f00 100%); }
     body.is-embed .progress-card { padding: 14px 16px; }
     body.is-embed .prog-track { height: 7px; }
     body.is-embed .prog-label { font-size: 11px; }
@@ -515,6 +517,14 @@
               <span class="prog-pct" id="gradPct">—</span>
             </div>
             <div class="prog-track"><div class="prog-bar prog-bar--grad" id="gradFill" style="width:0%"></div></div>
+          </div>
+          <div class="prog-sep"></div>
+          <div class="prog-row">
+            <div class="prog-meta">
+              <span class="prog-label" id="vacLabel">Till Spring Break</span>
+              <span class="prog-pct" id="vacPct">—</span>
+            </div>
+            <div class="prog-track"><div class="prog-bar prog-bar--vac" id="vacFill" style="width:0%"></div></div>
           </div>
         </div>
         <div class="footer-note">By: CreativeSilva</div>
@@ -1040,6 +1050,7 @@
       const firstStart = parseToSec(blks[0].s);
       const lastEnd    = parseToSec(blks[blks.length - 1].e);
       const isSD       = schoolDays.includes(dateStr);
+      const isAfterSchoolToday = isSD && totalSec >= lastEnd;
 
       function toMs(dayOff, sec) { return todayMidnightMs + dayOff * 86400000 + sec * 1000; }
       function clamp01(v) { return Math.max(0, Math.min(1, v)); }
@@ -1093,9 +1104,10 @@
       setTxt('schoolDayProgLabel', sdLabel);
 
       // ── 2. THIS WEEK ────────────────────────────────────────
-      let wkFrac = 0, wkLabel = 'To the Weekend';
+      let wkFrac = 0, wkLabel = 'To the Weekend', wkRight = '—';
       const dayOrder = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
       const dow      = dayOrder.indexOf(weekday);
+      const isWeekend = dow === 0 || dow === 6;
       const offToMon = (dow === 0) ? -6 : (1 - dow);
       const weekSDs  = [];
       for (let i = 0; i <= 4; i++) {
@@ -1109,14 +1121,29 @@
         const fwB = getSchBlocks(fw.dStr), lwB = getSchBlocks(lw.dStr);
         const wkStart = toMs(fw.off, parseToSec(fwB[0].s));
         const wkEnd   = toMs(lw.off, parseToSec(lwB[lwB.length - 1].e));
-        wkFrac  = wkStart < wkEnd ? (nowMs - wkStart) / (wkEnd - wkStart) : 0;
-        wkLabel = wkFrac >= 1 ? 'Weekend! 🎉' : 'To the Weekend';
+        wkFrac = wkStart < wkEnd ? (nowMs - wkStart) / (wkEnd - wkStart) : 0;
+        if (isWeekend || (isAfterSchoolToday && dow === 5)) {
+          // Weekend: show calendar days until next school day
+          wkLabel = 'Back to School';
+          const nextSD = schoolDays.find(d => d > dateStr);
+          if (nextSD) {
+            const daysUntil = Math.round((new Date(nextSD + 'T12:00:00') - new Date(dateStr + 'T12:00:00')) / 86400000);
+            wkRight = daysUntil === 1 ? '1 day' : `${daysUntil} days`;
+          }
+        } else {
+          // Weekday: show school days remaining this week (including today if school not over)
+          const remSDs = weekSDs.filter(sd => sd.dStr > dateStr || (sd.dStr === dateStr && !isAfterSchoolToday));
+          const count  = remSDs.length;
+          wkLabel = count === 0 ? 'Weekend! 🎉' : 'To the Weekend';
+          wkRight = count === 0 ? '🎉' : count === 1 ? '1 day' : `${count} days`;
+        }
       } else {
         wkLabel = 'No School';
+        wkRight = '—';
       }
-      setFill('weekFill',      wkFrac, 'prog-bar--week');
-      setTxt('weekPct',        pctStr(wkFrac));
-      setTxt('weekProgLabel',  wkLabel);
+      setFill('weekFill',     wkFrac, 'prog-bar--week');
+      setTxt('weekPct',       wkRight);
+      setTxt('weekProgLabel', wkLabel);
 
       // ── 3. GRADUATION ───────────────────────────────────────
       const total   = schoolDays.length;
@@ -1125,6 +1152,33 @@
       const grFrac  = total > 0 ? passed / total : 0;
       setFill('gradFill', grFrac, 'prog-bar--grad');
       setTxt('gradPct',   pctStr(grFrac));
+
+      // ── 4. NEXT VACATION ────────────────────────────────────
+      const vacations = [
+        { name: "Spring Break", start: "2026-04-03", stretchFrom: "2026-01-15" },
+        { name: "Summer Break", start: "2026-06-11", stretchFrom: "2026-04-13" }
+      ];
+      const nextVac = vacations.find(v => dateStr <= v.start);
+      if (nextVac) {
+        const { name: vacName, start: vacStart, stretchFrom } = nextVac;
+        const totalVacSDs  = schoolDays.filter(d => d >= stretchFrom && d < vacStart).length;
+        const passedVacSDs = schoolDays.filter(d => d >= stretchFrom && (d < dateStr || (d === dateStr && isAfterSchoolToday))).length;
+        const vacFrac = totalVacSDs > 0 ? passedVacSDs / totalVacSDs : 0;
+        const dToVac  = schoolDays.filter(d => {
+          if (d >= vacStart) return false;
+          if (d > dateStr) return true;
+          if (d === dateStr && !isAfterSchoolToday) return true;
+          return false;
+        }).length;
+        const vacRight = dToVac === 0 ? '🎉 Break!' : dToVac === 1 ? '1 day' : `${dToVac} days`;
+        setFill('vacFill', vacFrac, 'prog-bar--vac');
+        setTxt('vacLabel', `Till ${vacName}`);
+        setTxt('vacPct', vacRight);
+      } else {
+        setFill('vacFill', 1, 'prog-bar--vac');
+        setTxt('vacLabel', 'Summer Break! 🌴');
+        setTxt('vacPct', '🎉');
+      }
     }
 
     setInterval(() => { updateApp(); updateProgressBars(); }, 1000);
