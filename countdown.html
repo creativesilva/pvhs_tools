@@ -513,18 +513,18 @@
           <div class="prog-sep"></div>
           <div class="prog-row">
             <div class="prog-meta">
-              <span class="prog-label">Graduation &middot; Jun 11</span>
-              <span class="prog-pct" id="gradPct">—</span>
-            </div>
-            <div class="prog-track"><div class="prog-bar prog-bar--grad" id="gradFill" style="width:0%"></div></div>
-          </div>
-          <div class="prog-sep"></div>
-          <div class="prog-row">
-            <div class="prog-meta">
               <span class="prog-label" id="vacLabel">Till Spring Break</span>
               <span class="prog-pct" id="vacPct">—</span>
             </div>
             <div class="prog-track"><div class="prog-bar prog-bar--vac" id="vacFill" style="width:0%"></div></div>
+          </div>
+          <div class="prog-sep"></div>
+          <div class="prog-row">
+            <div class="prog-meta">
+              <span class="prog-label">Graduation &middot; Jun 11</span>
+              <span class="prog-pct" id="gradPct">—</span>
+            </div>
+            <div class="prog-track"><div class="prog-bar prog-bar--grad" id="gradFill" style="width:0%"></div></div>
           </div>
         </div>
         <div class="footer-note">By: CreativeSilva</div>
@@ -1123,26 +1123,16 @@
         const wkEnd   = toMs(lw.off, parseToSec(lwB[lwB.length - 1].e));
         wkFrac = wkStart < wkEnd ? (nowMs - wkStart) / (wkEnd - wkStart) : 0;
         if (isWeekend || (isAfterSchoolToday && dow === 5)) {
-          // Weekend: show calendar days until next school day
           wkLabel = 'Back to School';
-          const nextSD = schoolDays.find(d => d > dateStr);
-          if (nextSD) {
-            const daysUntil = Math.round((new Date(nextSD + 'T12:00:00') - new Date(dateStr + 'T12:00:00')) / 86400000);
-            wkRight = daysUntil === 1 ? '1 day' : `${daysUntil} days`;
-          }
         } else {
-          // Weekday: show school days remaining this week (including today if school not over)
           const remSDs = weekSDs.filter(sd => sd.dStr > dateStr || (sd.dStr === dateStr && !isAfterSchoolToday));
-          const count  = remSDs.length;
-          wkLabel = count === 0 ? 'Weekend! 🎉' : 'To the Weekend';
-          wkRight = count === 0 ? '🎉' : count === 1 ? '1 day' : `${count} days`;
+          wkLabel = remSDs.length === 0 ? 'Weekend! 🎉' : 'To the Weekend';
         }
       } else {
         wkLabel = 'No School';
-        wkRight = '—';
       }
       setFill('weekFill',     wkFrac, 'prog-bar--week');
-      setTxt('weekPct',       wkRight);
+      setTxt('weekPct',       pctStr(wkFrac));
       setTxt('weekProgLabel', wkLabel);
 
       // ── 3. GRADUATION ───────────────────────────────────────
@@ -1164,20 +1154,13 @@
         const totalVacSDs  = schoolDays.filter(d => d >= stretchFrom && d < vacStart).length;
         const passedVacSDs = schoolDays.filter(d => d >= stretchFrom && (d < dateStr || (d === dateStr && isAfterSchoolToday))).length;
         const vacFrac = totalVacSDs > 0 ? passedVacSDs / totalVacSDs : 0;
-        const dToVac  = schoolDays.filter(d => {
-          if (d >= vacStart) return false;
-          if (d > dateStr) return true;
-          if (d === dateStr && !isAfterSchoolToday) return true;
-          return false;
-        }).length;
-        const vacRight = dToVac === 0 ? '🎉 Break!' : dToVac === 1 ? '1 day' : `${dToVac} days`;
         setFill('vacFill', vacFrac, 'prog-bar--vac');
         setTxt('vacLabel', `Till ${vacName}`);
-        setTxt('vacPct', vacRight);
+        setTxt('vacPct', pctStr(vacFrac));
       } else {
         setFill('vacFill', 1, 'prog-bar--vac');
         setTxt('vacLabel', 'Summer Break! 🌴');
-        setTxt('vacPct', '🎉');
+        setTxt('vacPct', '100%');
       }
     }
 
