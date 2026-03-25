@@ -468,7 +468,7 @@
           <div class="prog-sep"></div>
           <div class="prog-row">
             <div class="prog-meta">
-              <span class="prog-label" id="weekProgLabel">This Week</span>
+              <span class="prog-label" id="weekProgLabel">To the Weekend</span>
               <span class="prog-pct"   id="weekPct">—</span>
             </div>
             <div class="prog-track"><div class="prog-bar prog-bar--week" id="weekFill" style="width:0%"></div></div>
@@ -877,7 +877,7 @@
       setTxt('schoolDayProgLabel', sdLabel);
 
       // ── 2. THIS WEEK ────────────────────────────────────────
-      let wkFrac = 0, wkLabel = 'This Week';
+      let wkFrac = 0, wkLabel = 'To the Weekend';
       const dayOrder = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
       const dow      = dayOrder.indexOf(weekday);
       const offToMon = (dow === 0) ? -6 : (1 - dow);
@@ -894,7 +894,7 @@
         const wkStart = toMs(fw.off, parseToSec(fwB[0].s));
         const wkEnd   = toMs(lw.off, parseToSec(lwB[lwB.length - 1].e));
         wkFrac  = wkStart < wkEnd ? (nowMs - wkStart) / (wkEnd - wkStart) : 0;
-        wkLabel = wkFrac >= 1 ? 'Week Complete' : 'This Week';
+        wkLabel = wkFrac >= 1 ? 'Weekend! 🎉' : 'To the Weekend';
       } else {
         wkLabel = 'No School';
       }
