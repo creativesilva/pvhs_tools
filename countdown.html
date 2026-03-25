@@ -82,7 +82,7 @@
     .embed-section { display: none; }
 
     .logo-clear { width: 42px; height: auto; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); flex-shrink: 0; }
-    .page-title { flex: 1; font-size: 15px; font-weight: 700; color: #dff7f7; text-transform: uppercase; margin: 0; text-align: center; letter-spacing: 0.14em; }
+    .page-title { flex: 1; font-size: 15px; font-weight: 700; color: #dff7f7; text-transform: uppercase; margin: 0; text-align: left; letter-spacing: 0.14em; }
 
     .card { width: 100%; border-radius: 26px; background: var(--panel); border: 1px solid var(--panel-border); backdrop-filter: blur(10px); box-shadow: var(--soft-shadow); margin-bottom: 8px; }
 
@@ -129,6 +129,24 @@
 
 
     .footer-note { margin-top: auto; padding: 10px 0 3px 0; font-size: 9.5px; color: #b5d4d4; font-weight: 600; text-align: center; flex-shrink: 0; }
+
+    /* ── PROGRESS BARS ─────────────────────────────────── */
+    .progress-card { padding: 10px 14px 11px; flex-shrink: 0; }
+    .prog-row  { display: flex; flex-direction: column; gap: 4px; }
+    .prog-sep  { height: 1px; background: rgba(255,255,255,0.07); margin: 7px 0; }
+    .prog-meta { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
+    .prog-label { font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em; color: var(--muted); opacity: 0.88; }
+    .prog-pct   { font-size: 9px; font-weight: 800; letter-spacing: 0.04em; color: #d4f4f4; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .prog-track { width: 100%; height: 5px; border-radius: 99px; background: rgba(255,255,255,0.09); overflow: hidden; }
+    .prog-bar   { height: 100%; border-radius: 99px; transition: width 1.1s cubic-bezier(.4,0,.2,1); }
+    .prog-bar--day  { background: linear-gradient(90deg, #00d4d4 0%, #007474 100%); }
+    .prog-bar--rest { background: linear-gradient(90deg, #60d4d4 0%, #2a8a8a 100%); opacity: 0.75; }
+    .prog-bar--week { background: linear-gradient(90deg, #6fdf6f 0%, #2a802a 100%); }
+    .prog-bar--grad { background: linear-gradient(90deg, #ffd44a 0%, #e07000 100%); }
+    body.is-embed .progress-card { padding: 14px 16px; }
+    body.is-embed .prog-track { height: 7px; }
+    body.is-embed .prog-label { font-size: 11px; }
+    body.is-embed .prog-pct   { font-size: 12px; }
 
     .embed-modal[hidden] { display: none; }
     .embed-modal {
@@ -439,6 +457,31 @@
           </div>
         </div>
 
+        <div class="card progress-card">
+          <div class="prog-row">
+            <div class="prog-meta">
+              <span class="prog-label" id="schoolDayProgLabel">School Day</span>
+              <span class="prog-pct"   id="schoolDayPct">—</span>
+            </div>
+            <div class="prog-track"><div class="prog-bar prog-bar--day" id="schoolDayFill" style="width:0%"></div></div>
+          </div>
+          <div class="prog-sep"></div>
+          <div class="prog-row">
+            <div class="prog-meta">
+              <span class="prog-label" id="weekProgLabel">This Week</span>
+              <span class="prog-pct"   id="weekPct">—</span>
+            </div>
+            <div class="prog-track"><div class="prog-bar prog-bar--week" id="weekFill" style="width:0%"></div></div>
+          </div>
+          <div class="prog-sep"></div>
+          <div class="prog-row">
+            <div class="prog-meta">
+              <span class="prog-label">Graduation &middot; Jun 11</span>
+              <span class="prog-pct" id="gradPct">—</span>
+            </div>
+            <div class="prog-track"><div class="prog-bar prog-bar--grad" id="gradFill" style="width:0%"></div></div>
+          </div>
+        </div>
         <div class="footer-note">By: CreativeSilva</div>
       </div>
 
@@ -749,7 +792,107 @@
     }
 
     function parseToSec(t) { const [h,m] = t.split(":").map(Number); return (h*3600)+(m*60); }
-    setInterval(updateApp, 1000); updateApp();
+
+    function updateProgressBars() {
+      const now = getNow();
+      const { totalSec, dateStr, weekday } = now;
+      const nowMs = Date.now();
+      const todayMidnightMs = nowMs - totalSec * 1000;
+      const isMD = minimumDays.has(dateStr);
+      const blks = isMD ? schedules.minimum : (weekday === "Monday" ? schedules.monday : schedules.regular);
+      const firstStart = parseToSec(blks[0].s);
+      const lastEnd    = parseToSec(blks[blks.length - 1].e);
+      const isSD       = schoolDays.includes(dateStr);
+
+      function toMs(dayOff, sec) { return todayMidnightMs + dayOff * 86400000 + sec * 1000; }
+      function clamp01(v) { return Math.max(0, Math.min(1, v)); }
+      function pctStr(v)  { return `${Math.round(clamp01(v) * 100)}%`; }
+      function setFill(id, frac, cls) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.style.width = `${(clamp01(frac) * 100).toFixed(1)}%`;
+        if (cls) el.className = 'prog-bar ' + cls;
+      }
+      function setTxt(id, t) { const el = document.getElementById(id); if (el) el.textContent = t; }
+      function getSchBlocks(dStr) {
+        const md = minimumDays.has(dStr);
+        const wd = new Intl.DateTimeFormat('en-US', {timeZone, weekday:'long'}).format(new Date(dStr + 'T12:00:00'));
+        return md ? schedules.minimum : (wd === 'Monday' ? schedules.monday : schedules.regular);
+      }
+
+      // ── 1. SCHOOL DAY / RESTING ─────────────────────────────
+      let sdFrac = 0, sdLabel = 'School Day', sdCls = 'prog-bar--day';
+      if (isSD && totalSec >= firstStart && totalSec < lastEnd) {
+        sdFrac = (totalSec - firstStart) / (lastEnd - firstStart);
+      } else {
+        sdLabel = 'Resting'; sdCls = 'prog-bar--rest';
+        const nextSD = (isSD && totalSec < firstStart)
+          ? dateStr
+          : (schoolDays.find(d => d > dateStr) || null);
+        if (nextSD) {
+          const nextOff = Math.round((new Date(nextSD + 'T12:00:00') - new Date(dateStr + 'T12:00:00')) / 86400000);
+          const restEndMs = toMs(nextOff, parseToSec(getSchBlocks(nextSD)[0].s));
+          let restStartMs;
+          if (isSD && totalSec >= lastEnd) {
+            restStartMs = toMs(0, lastEnd);
+          } else {
+            const prevSD = [...schoolDays].reverse().find(d => d < dateStr);
+            if (prevSD) {
+              const prevOff  = Math.round((new Date(prevSD + 'T12:00:00') - new Date(dateStr + 'T12:00:00')) / 86400000);
+              const prevBlks = getSchBlocks(prevSD);
+              restStartMs = toMs(prevOff, parseToSec(prevBlks[prevBlks.length - 1].e));
+            } else {
+              restStartMs = restEndMs - 86400000;
+            }
+          }
+          const restTotal = restEndMs - restStartMs;
+          sdFrac = restTotal > 0 ? (nowMs - restStartMs) / restTotal : 0;
+        } else {
+          sdFrac = 1; sdLabel = 'Graduated! 🎓'; sdCls = 'prog-bar--grad';
+        }
+      }
+      setFill('schoolDayFill', sdFrac, sdCls);
+      setTxt('schoolDayPct',       pctStr(sdFrac));
+      setTxt('schoolDayProgLabel', sdLabel);
+
+      // ── 2. THIS WEEK ────────────────────────────────────────
+      let wkFrac = 0, wkLabel = 'This Week';
+      const dayOrder = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      const dow      = dayOrder.indexOf(weekday);
+      const offToMon = (dow === 0) ? -6 : (1 - dow);
+      const weekSDs  = [];
+      for (let i = 0; i <= 4; i++) {
+        const off = offToMon + i;
+        const d   = new Date(new Date(dateStr + 'T12:00:00').getTime() + off * 86400000);
+        const dStr = new Intl.DateTimeFormat('en-CA', {timeZone, year:'numeric', month:'2-digit', day:'2-digit'}).format(d);
+        if (schoolDays.includes(dStr)) weekSDs.push({ dStr, off });
+      }
+      if (weekSDs.length > 0) {
+        const fw = weekSDs[0], lw = weekSDs[weekSDs.length - 1];
+        const fwB = getSchBlocks(fw.dStr), lwB = getSchBlocks(lw.dStr);
+        const wkStart = toMs(fw.off, parseToSec(fwB[0].s));
+        const wkEnd   = toMs(lw.off, parseToSec(lwB[lwB.length - 1].e));
+        wkFrac  = wkStart < wkEnd ? (nowMs - wkStart) / (wkEnd - wkStart) : 0;
+        wkLabel = wkFrac >= 1 ? 'Week Complete' : 'This Week';
+      } else {
+        wkLabel = 'No School';
+      }
+      setFill('weekFill',      wkFrac, 'prog-bar--week');
+      setTxt('weekPct',        pctStr(wkFrac));
+      setTxt('weekProgLabel',  wkLabel);
+
+      // ── 3. GRADUATION ───────────────────────────────────────
+      const total   = schoolDays.length;
+      const afterToday = isSD && totalSec >= lastEnd;
+      const passed  = schoolDays.filter(d => d < dateStr).length + (afterToday ? 1 : 0);
+      const grFrac  = total > 0 ? passed / total : 0;
+      setFill('gradFill', grFrac, 'prog-bar--grad');
+      setTxt('gradPct',   pctStr(grFrac));
+    }
+
+    setInterval(() => { updateApp(); updateProgressBars(); }, 1000);
+    updateApp();
+    updateProgressBars();
     scheduleFitCountdownText();
 
     // LIVE WEATHER FETCH SCRIPT
