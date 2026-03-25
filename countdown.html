@@ -57,7 +57,7 @@
       z-index: 0;
     }
 
-    .ghost-logo { position: absolute; top: 56%; left: 50%; width: 182%; opacity: 0.07; transform: translate(-50%, -50%); filter: grayscale(100%) contrast(108%) brightness(114%); pointer-events: none; z-index: 0; }
+    .ghost-logo { position: absolute; top: 56%; left: 50%; width: 120%; opacity: 0.07; transform: translate(-50%, -50%); filter: grayscale(100%) contrast(108%) brightness(114%); pointer-events: none; z-index: 0; }
     
     .content { 
       position: relative; z-index: 1; width: 100%; height: 100%; 
@@ -594,7 +594,7 @@
           <div class="prog-sep"></div>
           <div class="prog-row">
             <div class="prog-meta">
-              <span class="prog-label" id="weekProgLabel">To the Weekend</span>
+              <span class="prog-label" id="weekProgLabel">Till the Weekend</span>
               <span class="prog-pct"   id="weekPct">—</span>
             </div>
             <div class="prog-track"><div class="prog-bar prog-bar--week" id="weekFill" style="width:0%"></div></div>
@@ -610,7 +610,7 @@
           <div class="prog-sep"></div>
           <div class="prog-row">
             <div class="prog-meta">
-              <span class="prog-label" id="prLabel">Next Progress Report</span>
+              <span class="prog-label" id="prLabel">Till Progress Report</span>
               <span class="prog-pct" id="prPct">—</span>
             </div>
             <div class="prog-track"><div class="prog-bar prog-bar--pr" id="prFill" style="width:0%"></div></div>
@@ -1285,7 +1285,7 @@
         } else {
           const remSDs = weekSDs.filter(sd => sd.dStr > dateStr || (sd.dStr === dateStr && !isAfterSchoolToday));
           const cnt = remSDs.length;
-          wkLabel  = cnt === 0 ? 'Weekend! 🎉' : 'To the Weekend';
+          wkLabel  = cnt === 0 ? 'Weekend! 🎉' : 'Till the Weekend';
           wkRight  = cnt === 0 ? '🎉' : cnt === 1 ? '1 Day' : `${cnt} Days`;
         }
       } else {
@@ -1348,7 +1348,7 @@
           const prRight = dToPR === 0 ? '🎉 Today!' : dToPR === 1 ? '1 Day' : `${dToPR} Days`;
           setFill('prFill', prFrac, 'prog-bar--pr');
           setTxt('prPct',   prRight);
-          setTxt('prLabel', 'Progress Report');
+          setTxt('prLabel', 'Till Progress Report');
         }
       } else {
         setFill('prFill', 1, 'prog-bar--pr');
