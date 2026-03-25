@@ -167,19 +167,55 @@
 
     /* NATIVE APP OVERRIDE (Option B) */
     @media (max-width: 430px) {
-      body:not(.is-popout):not(.is-standalone) .frame { 
-        padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom) 12px; 
+      body:not(.is-popout):not(.is-standalone) .frame {
+        padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom) 12px;
       }
-      body:not(.is-popout):not(.is-standalone) .app { 
-        width: 100vw; 
-        height: 100%; 
-        max-height: 100%; 
-        border-radius: var(--radius); 
+      body:not(.is-popout):not(.is-standalone) .app {
+        width: 100vw;
+        height: 100%;
+        max-height: 100%;
+        border-radius: var(--radius);
         border: 1px solid rgba(255,255,255,0.12);
       }
       /* nav menu always visible */
       body { touch-action: pan-y; }
     }
+
+    /* ── ADD TO HOME SCREEN PROMPT ─────────────────────── */
+    .a2hs-prompt {
+      position: absolute; bottom: 0; left: 0; right: 0; z-index: 10;
+      padding: 0 14px 16px;
+      transform: translateY(110%);
+      transition: transform 0.48s cubic-bezier(0.34, 1.36, 0.64, 1);
+      pointer-events: none;
+    }
+    .a2hs-prompt.is-visible { transform: translateY(0); pointer-events: auto; }
+    .a2hs-inner {
+      display: flex; align-items: center; gap: 11px;
+      background: rgba(2, 22, 22, 0.93);
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 20px; padding: 12px 14px;
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 -6px 28px rgba(0,0,0,0.34);
+    }
+    .a2hs-icon { width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0; }
+    .a2hs-text { flex: 1; }
+    .a2hs-title { font-size: 11.5px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 0.11em; margin: 0 0 3px; }
+    .a2hs-desc  { font-size: 10px; font-weight: 500; color: var(--muted); line-height: 1.45; margin: 0; }
+    .a2hs-share {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: rgba(0,130,255,0.85); color: #fff;
+      border-radius: 5px; padding: 1px 4px; font-size: 10px; font-weight: 700;
+      vertical-align: middle; margin: 0 1px;
+    }
+    .a2hs-dismiss {
+      appearance: none; background: rgba(255,255,255,0.09);
+      border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.7);
+      border-radius: 99px; width: 26px; height: 26px; font-size: 12px;
+      cursor: pointer; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .a2hs-dismiss:active { background: rgba(255,255,255,0.18); }
   </style>
 </head>
 <body>
@@ -208,10 +244,24 @@
         <div class="footer-note">By: CreativeSilva</div>
       </div>
 
+      <!-- ADD TO HOME SCREEN PROMPT -->
+      <div id="a2hsPrompt" class="a2hs-prompt" hidden>
+        <div class="a2hs-inner">
+          <img src="PV_AppIcon.png" alt="PVHS Tools" class="a2hs-icon">
+          <div class="a2hs-text">
+            <p class="a2hs-title">Install as App</p>
+            <p class="a2hs-desc" id="a2hsDesc">Tap <span class="a2hs-share">⬆ Share</span> then <strong style="color:#fff">"Add to Home Screen"</strong> for the full experience.</p>
+          </div>
+          <button id="a2hsDismiss" class="a2hs-dismiss" type="button" aria-label="Dismiss">✕</button>
+        </div>
+      </div>
+
       <!-- NAV DROPDOWN -->
       <div id="navMenu" class="nav-menu" role="menu">
         <a href="countdown.html" class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">⏱</span>Countdown</a>
         <a href="index.html"     class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">🏠</span>Home</a>
+        <div id="installMenuSep" class="nav-menu-sep"></div>
+        <button id="installBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon">📲</span>Add to Home Screen</button>
       </div>
     </div>
   </div>
@@ -358,6 +408,51 @@
 
     searchInput.addEventListener("input", (e) => renderResults(e.target.value));
     renderResults("");
+
+    // ── A2HS / INSTALL PROMPT ───────────────────────────────────
+    const a2hsPrompt  = document.getElementById('a2hsPrompt');
+    const a2hsDismiss = document.getElementById('a2hsDismiss');
+    const a2hsDesc    = document.getElementById('a2hsDesc');
+    const isIOS       = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isAndroid   = /Android/i.test(navigator.userAgent);
+    const a2hsSeen    = localStorage.getItem('pvhs_a2hs_seen');
+
+    if (isMobile && !isStandalone && !false && !a2hsSeen && a2hsPrompt) {
+      if (isAndroid && a2hsDesc) {
+        a2hsDesc.innerHTML = 'Tap <strong style="color:#fff">⋮ Menu</strong> in your browser then <strong style="color:#fff">"Add to Home Screen"</strong> for the full app experience.';
+      }
+      a2hsPrompt.hidden = false;
+      setTimeout(() => a2hsPrompt.classList.add('is-visible'), 1800);
+      a2hsDismiss?.addEventListener('click', () => {
+        a2hsPrompt.classList.remove('is-visible');
+        localStorage.setItem('pvhs_a2hs_seen', '1');
+        setTimeout(() => { a2hsPrompt.hidden = true; }, 500);
+      });
+    }
+
+    // Install nav button
+    (function() {
+      const btn = document.getElementById('installBtn');
+      const sep = document.getElementById('installMenuSep');
+      if (!btn) return;
+      if (isStandalone || false) { btn.remove(); sep?.remove(); return; }
+      let deferredPrompt = null;
+      window.addEventListener('beforeinstallprompt', e => {
+        e.preventDefault();
+        deferredPrompt = e;
+      });
+      btn.addEventListener('click', () => {
+        navMenu?.classList.remove('is-open');
+        navMenuBtn?.classList.remove('is-open');
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+        } else if (a2hsPrompt) {
+          a2hsPrompt.hidden = false;
+          setTimeout(() => a2hsPrompt.classList.add('is-visible'), 10);
+        }
+      });
+    })();
   </script>
 </body>
 </html>
