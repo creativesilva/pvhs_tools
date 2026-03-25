@@ -148,6 +148,20 @@
     body.is-embed .prog-label { font-size: 11px; }
     body.is-embed .prog-pct   { font-size: 12px; }
 
+    /* ── NOTIFICATION BELL ─────────────────────────────── */
+    .notif-btn {
+      appearance: none; background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.13); border-radius: 12px;
+      color: #fff; width: 34px; height: 34px; font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .notif-btn:active { background: rgba(255,255,255,0.18); }
+    .notif-btn.is-on   { background: rgba(0,180,180,0.18); border-color: rgba(0,215,215,0.38); }
+    .notif-btn.is-off  { opacity: 0.42; }
+    body.is-embed .notif-btn { display: none; }
+
     .embed-modal[hidden] { display: none; }
     .embed-modal {
       position: absolute;
@@ -424,6 +438,7 @@
         <div class="top-row">
           <img src="PV_Logo.png" alt="Logo" class="logo-clear">
           <h1 class="page-title">Countdown</h1>
+          <button id="notifBtn" class="notif-btn" type="button" title="Alert notifications" aria-label="Toggle period alerts">🔔</button>
           <div class="action-pill">
             <a href="extension_search.html" class="pill-btn nav-link">Directory</a>
             <div class="pill-divider"></div>
@@ -813,6 +828,152 @@
     }
 
     function parseToSec(t) { const [h,m] = t.split(":").map(Number); return (h*3600)+(m*60); }
+
+    // ── NOTIFICATION SYSTEM ────────────────────────────────────────────
+    const PRAISES = [
+      "Another day shaping young minds. The ripple of what you taught today will spread further than you'll ever know. Rest well — you've truly earned it. 🌟",
+      "You showed up, you poured yourself in, and you made a difference. That's what extraordinary educators do — every single day. 🍎",
+      "Every question you answered today sparked something in a young person. That spark is a gift only you could give. ✨",
+      "Teaching is the profession that makes all other professions possible. Today, you helped build a better future. 🏆",
+      "You didn't just deliver a lesson — you listened, encouraged, believed, and invested in real human beings. That matters beyond measure. 💛",
+      "The seeds you plant in your classroom bloom in ways you'll never fully see — but they bloom. Trust it. 🌱",
+      "Tired? Good. That means you brought your whole self to what matters most. Recharge tonight — your students need that version of you tomorrow. 💪",
+      "Not all heroes wear capes. Some write lesson plans at midnight, grade on weekends, and still show up with a smile. That's you. 🦸",
+      "You are proof that one person, in one classroom, can change a life's trajectory forever. Thank you for choosing this work. 🚀",
+      "Behind every student who succeeds is a teacher who refused to give up on them. Today, you were that teacher for someone. ❤️"
+    ];
+
+    let _praiseIdx  = Number(localStorage.getItem('pvhs_praise_idx') || '0');
+    let _notifDay   = null;  // date string for which notifications are scheduled
+    let _notifTimers = [];
+
+    function nextPraise() {
+      const msg = PRAISES[_praiseIdx % PRAISES.length];
+      _praiseIdx = (_praiseIdx + 1) % PRAISES.length;
+      localStorage.setItem('pvhs_praise_idx', String(_praiseIdx));
+      return msg;
+    }
+
+    function updateNotifBtn() {
+      const btn = document.getElementById('notifBtn');
+      if (!btn || !('Notification' in window)) { if (btn) btn.style.display = 'none'; return; }
+      const p = Notification.permission;
+      btn.classList.toggle('is-on',  p === 'granted');
+      btn.classList.toggle('is-off', p === 'denied');
+      btn.title       = p === 'granted' ? 'Period alerts ON — tap to info'
+                      : p === 'denied'  ? 'Notifications blocked in browser settings'
+                      : 'Tap to enable period alerts';
+      btn.textContent = p === 'granted' ? '🔔' : p === 'denied' ? '🔕' : '🔔';
+    }
+
+    async function fireNotif(title, body, tag) {
+      if (!('Notification' in window) || Notification.permission !== 'granted') return;
+      try {
+        const reg = await navigator.serviceWorker?.getRegistration?.();
+        if (reg?.showNotification) {
+          await reg.showNotification(title, {
+            body, icon: './PV_AppIcon.png', badge: './PV_AppIcon.png',
+            tag, renotify: true, vibrate: [180, 80, 180], requireInteraction: false
+          });
+        } else {
+          new Notification(title, { body, icon: './PV_AppIcon.png', tag });
+        }
+      } catch (_) {
+        try { new Notification(title, { body, icon: './PV_AppIcon.png', tag }); } catch (_) {}
+      }
+    }
+
+    function clearNotifTimers() {
+      _notifTimers.forEach(clearTimeout);
+      _notifTimers = [];
+    }
+
+    function scheduleNotifications() {
+      clearNotifTimers();
+      if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+      const now = getNow();
+      const { totalSec, dateStr, weekday } = now;
+      if (!schoolDays.includes(dateStr)) return;
+
+      const isMD   = minimumDays.has(dateStr);
+      const blocks = isMD ? schedules.minimum : (weekday === 'Monday' ? schedules.monday : schedules.regular);
+      const lastEnd = parseToSec(blocks[blocks.length - 1].e);
+      if (totalSec >= lastEnd) return;
+
+      _notifDay = dateStr;
+
+      blocks.forEach((block, i) => {
+        const endSec  = parseToSec(block.e);
+        const warnSec = endSec - 300; // 5 min before end
+        if (warnSec <= totalSec) return;
+
+        const ms = (warnSec - totalSec) * 1000;
+        let title, body;
+
+        if      (/PERIOD/i.test(block.l))  { title = `⏱ ${block.l} — 5 Min Left`;  body = `${block.l} ends in 5 minutes.`; }
+        else if (/PASSING/i.test(block.l)) { title = '🏃 Passing — 5 Min Left';     body = 'Get to class — passing ends in 5 minutes!'; }
+        else if (/NUTRITION/i.test(block.l)){ title = '🍎 Nutrition Ending Soon';   body = 'Nutrition break ends in 5 minutes.'; }
+        else if (/LUNCH/i.test(block.l))   { title = '🍽 Lunch Almost Over';        body = 'Lunch ends in 5 minutes — start heading back!'; }
+        else if (/COLLAB/i.test(block.l))  { title = '🤝 Collaboration — 5 Min Left'; body = 'Department collaboration wraps up in 5 minutes!'; }
+        else return;
+
+        _notifTimers.push(setTimeout(() => fireNotif(title, body, `warn-${i}`), ms));
+      });
+
+      // End-of-day celebration
+      const msEOD = (lastEnd - totalSec) * 1000;
+      _notifTimers.push(setTimeout(() => {
+        fireNotif('🎉 School Day Complete!', nextPraise(), 'pvhs-eod');
+      }, msEOD));
+    }
+
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js', { scope: './' })
+        .then(() => {
+          if (Notification.permission === 'granted') scheduleNotifications();
+        })
+        .catch(() => {
+          if (Notification.permission === 'granted') scheduleNotifications();
+        });
+    } else if (Notification.permission === 'granted') {
+      scheduleNotifications();
+    }
+
+    // Bell button handler
+    document.getElementById('notifBtn')?.addEventListener('click', async () => {
+      if (!('Notification' in window)) return;
+      if (Notification.permission === 'denied') {
+        alert('Notifications are blocked. Open your browser/phone Settings → Site Settings (or Notifications) and allow this site, then reload.');
+        return;
+      }
+      if (Notification.permission === 'granted') {
+        // Show a test notification so user knows it's working
+        await fireNotif('🔔 Alerts Active', 'You\'ll get a nudge 5 min before each period, passing, and lunch — plus a celebration at end of day!', 'pvhs-test');
+        updateNotifBtn();
+        return;
+      }
+      const result = await Notification.requestPermission();
+      updateNotifBtn();
+      if (result === 'granted') {
+        scheduleNotifications();
+        await fireNotif('🔔 Alerts Enabled!', 'You\'ll be nudged 5 min before each period, passing, lunch & end of day. 🎉', 'pvhs-welcome');
+      }
+    });
+
+    // Keep scheduler in sync: reschedule if day changes
+    let _schedulerLastDay = null;
+    function checkReschedule() {
+      const today = getNow().dateStr;
+      if (today !== _schedulerLastDay) {
+        _schedulerLastDay = today;
+        if (Notification.permission === 'granted') scheduleNotifications();
+      }
+    }
+    setInterval(checkReschedule, 60000);
+    checkReschedule();
+    updateNotifBtn();
 
     function updateProgressBars() {
       const now = getNow();
