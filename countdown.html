@@ -709,6 +709,14 @@
   </div>
 
   <script>
+    window.onerror = function(msg, src, line, col, err) {
+      var el = document.getElementById('blockLabel');
+      if (el) el.textContent = 'ERR L' + line;
+      var el2 = document.getElementById('timerText');
+      if (el2) { el2.textContent = msg; el2.style.fontSize = '12px'; }
+      var el3 = document.getElementById('subText');
+      if (el3) el3.textContent = (src||'') + ':' + line + ':' + col;
+    };
     const urlParams = new URLSearchParams(window.location.search);
     const mode = urlParams.get('mode');
     const isPopout = mode === 'popout';
@@ -1357,10 +1365,19 @@
       }
     }
 
-    setInterval(() => { updateApp(); updateProgressBars(); }, 1000);
-    updateApp();
-    updateProgressBars();
-    scheduleFitCountdownText();
+    try {
+      updateApp();
+      updateProgressBars();
+      scheduleFitCountdownText();
+      setInterval(() => { try { updateApp(); updateProgressBars(); } catch(e) { document.getElementById('blockLabel').textContent = 'ERR: ' + e.message; } }, 1000);
+    } catch(e) {
+      // Show error visibly so we can debug on mobile
+      document.getElementById('blockLabel').textContent = 'JS Error';
+      document.getElementById('timerText').textContent = e.message;
+      document.getElementById('timerText').style.fontSize = '14px';
+      document.getElementById('subText').textContent = e.stack ? e.stack.split('\n').slice(0,3).join(' | ') : 'no stack';
+      console.error('PVHS init error:', e);
+    }
 
     // LIVE WEATHER — National Weather Service (NWS) API
     // Santa Maria, CA grid point: LOX/52,27
