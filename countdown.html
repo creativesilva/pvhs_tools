@@ -71,15 +71,43 @@
       width: 100%; gap: 10px; height: 42px; flex-shrink: 0; margin-bottom: 6px;
     }
 
-    /* Flat Action Pill */
-    .action-pill {
-      display: flex; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--panel-border);
-      border-radius: 14px; overflow: hidden; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    /* ── NAV DROPDOWN MENU ─────────────────────────────── */
+    .nav-menu-btn {
+      appearance: none; background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.13); border-radius: 12px;
+      color: rgba(255,255,255,0.92); width: 34px; height: 34px;
+      font-size: 14px; font-weight: 900; letter-spacing: 0.08em;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0;
+      transition: background 0.16s, border-color 0.16s;
     }
-    .pill-btn { appearance: none; background: transparent; border: none; color: #fff; font-size: 9.5px; font-weight: 700; text-transform: uppercase; padding: 8px 12px; cursor: pointer; text-decoration: none; display: flex; align-items: center; transition: background 0.2s; }
-    .pill-btn:active { background: var(--card-hover); }
-    .pill-divider { width: 1px; background: var(--panel-border); height: 100%; }
-    .embed-section { display: none; }
+    .nav-menu-btn.is-open,
+    .nav-menu-btn:active { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.26); }
+    .nav-menu {
+      position: fixed; z-index: 9999; min-width: 172px;
+      background: rgba(3, 20, 20, 0.97);
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 16px; padding: 5px;
+      box-shadow: 0 14px 44px rgba(0,0,0,0.52);
+      backdrop-filter: blur(26px); -webkit-backdrop-filter: blur(26px);
+      transform-origin: top right;
+      transform: scale(0.88) translateY(-8px);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.17s ease, transform 0.19s cubic-bezier(0.34,1.4,0.64,1);
+    }
+    .nav-menu.is-open { opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; }
+    .nav-menu-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 11px;
+      text-decoration: none; color: #eaf8f8; background: transparent;
+      font-size: 11.5px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.12em; border: none; cursor: pointer; width: 100%;
+      transition: background 0.13s;
+    }
+    .nav-menu-item:active { background: rgba(255,255,255,0.1); }
+    .nav-menu-icon { font-size: 14px; flex-shrink: 0; }
+    .nav-menu-sep { height: 1px; background: rgba(255,255,255,0.09); margin: 3px 6px; }
+    body.is-embed .nav-menu-btn { display: none; }
 
     .logo-clear { width: 42px; height: auto; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); flex-shrink: 0; }
     .page-title { flex: 1; font-size: 15px; font-weight: 700; color: #dff7f7; text-transform: uppercase; margin: 0; text-align: left; letter-spacing: 0.14em; }
@@ -91,6 +119,7 @@
     /* INFO STRIP — combines school days + weather side by side */
     .info-strip { padding: 14px 16px; display: flex; align-items: center; gap: 0; flex-shrink: 0; }
     .info-cell { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .info-cell:first-child { flex: 0 0 110px; }
     .info-vert-divider { width: 1px; background: rgba(255,255,255,0.12); flex-shrink: 0; margin: 0 8px; align-self: stretch; }
     .info-label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; margin: 0; }
     .info-number { font-size: 56px; line-height: 0.95; font-weight: 900; letter-spacing: -0.05em; background: var(--white-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; font-variant-numeric: tabular-nums; white-space: nowrap; margin: 3px 0 2px; width: 100%; text-align: center; padding: 0 2px; }
@@ -143,6 +172,7 @@
     .prog-bar--rest { background: linear-gradient(90deg, #60d4d4 0%, #2a8a8a 100%); opacity: 0.75; }
     .prog-bar--week { background: linear-gradient(90deg, #6fdf6f 0%, #2a802a 100%); }
     .prog-bar--grad { background: linear-gradient(90deg, #ffd44a 0%, #e07000 100%); }
+    .prog-bar--vac  { background: linear-gradient(90deg, #ff9a5c 0%, #d94f00 100%); }
     body.is-embed .progress-card { padding: 14px 16px; }
     body.is-embed .prog-track { height: 7px; }
     body.is-embed .prog-label { font-size: 11px; }
@@ -425,7 +455,7 @@
         border-radius: var(--radius); 
         border: 1px solid rgba(255,255,255,0.12);
       }
-      .popout-pill { display: none !important; }
+      .nav-menu-btn-hide { display: none; }
       body { touch-action: pan-y; }
     }
   </style>
@@ -439,15 +469,7 @@
           <img src="PV_Logo.png" alt="Logo" class="logo-clear">
           <h1 class="page-title">Countdown</h1>
           <button id="notifBtn" class="notif-btn" type="button" title="Alert notifications" aria-label="Toggle period alerts">🔔</button>
-          <div class="action-pill">
-            <a href="extension_search.html" class="pill-btn nav-link">Directory</a>
-            <div class="pill-divider"></div>
-            <a href="index.html" class="pill-btn nav-link">Home</a>
-            <div id="embedSection" class="embed-section">
-              <div class="pill-divider"></div>
-              <button id="embedBtn" class="pill-btn" type="button">Embed</button>
-            </div>
-          </div>
+          <button id="navMenuBtn" class="nav-menu-btn" type="button" aria-label="Menu" aria-expanded="false">···</button>
         </div>
 
         <div class="card period-card">
@@ -496,8 +518,24 @@
             </div>
             <div class="prog-track"><div class="prog-bar prog-bar--grad" id="gradFill" style="width:0%"></div></div>
           </div>
+          <div class="prog-sep"></div>
+          <div class="prog-row">
+            <div class="prog-meta">
+              <span class="prog-label" id="vacLabel">Till Spring Break</span>
+              <span class="prog-pct" id="vacPct">—</span>
+            </div>
+            <div class="prog-track"><div class="prog-bar prog-bar--vac" id="vacFill" style="width:0%"></div></div>
+          </div>
         </div>
         <div class="footer-note">By: CreativeSilva</div>
+      </div>
+
+      <!-- NAV DROPDOWN (position:fixed, outside content scroll) -->
+      <div id="navMenu" class="nav-menu" role="menu">
+        <a href="extension_search.html" class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">🔍</span>Directory</a>
+        <a href="index.html" class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">🏠</span>Home</a>
+        <div id="embedMenuSep" class="nav-menu-sep" style="display:none"></div>
+        <button id="embedBtn" class="nav-menu-item" type="button" role="menuitem" style="display:none"><span class="nav-menu-icon">📋</span>Embed</button>
       </div>
 
       <div id="embedModal" class="embed-modal" hidden>
@@ -530,12 +568,10 @@
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
 
-    const embedSection = document.getElementById("embedSection");
     const navLinks = document.querySelectorAll(".nav-link");
     const timerTextEl = document.getElementById("timerText");
     const daysLeftEl = document.getElementById("daysLeft");
     const accessTextEl = document.getElementById("accessText");
-    const embedBtn = document.getElementById("embedBtn");
     const embedModal = document.getElementById("embedModal");
     const embedBackdrop = document.getElementById("embedBackdrop");
     const embedCloseBtn = document.getElementById("embedCloseBtn");
@@ -627,9 +663,38 @@
         url.searchParams.set('mode', 'popout');
         link.href = url.toString();
       });
-    } else if (!isMobile && !isStandalone && !isEmbed) {
-      if (embedSection) embedSection.style.display = 'flex';
     }
+
+    // NAV MENU
+    const navMenuBtn  = document.getElementById('navMenuBtn');
+    const navMenu     = document.getElementById('navMenu');
+    const embedMenuSep = document.getElementById('embedMenuSep');
+
+    // Show embed item on desktop non-embed
+    if (!isMobile && !isStandalone && !isEmbed) {
+      const embedBtn = document.getElementById('embedBtn');
+      if (embedMenuSep) embedMenuSep.style.display = 'block';
+      if (embedBtn)     { embedBtn.style.display = 'flex'; embedBtn.addEventListener('click', () => { navMenu?.classList.remove('is-open'); navMenuBtn?.classList.remove('is-open'); openEmbedModal(); }); }
+    }
+
+    function positionNavMenu() {
+      if (!navMenuBtn || !navMenu) return;
+      const r = navMenuBtn.getBoundingClientRect();
+      navMenu.style.top   = `${r.bottom + 6}px`;
+      navMenu.style.right = `${window.innerWidth - r.right}px`;
+    }
+    navMenuBtn?.addEventListener('click', e => {
+      e.stopPropagation();
+      positionNavMenu();
+      const open = navMenu.classList.toggle('is-open');
+      navMenuBtn.classList.toggle('is-open', open);
+      navMenuBtn.setAttribute('aria-expanded', String(open));
+    });
+    document.addEventListener('click', () => {
+      navMenu?.classList.remove('is-open');
+      navMenuBtn?.classList.remove('is-open');
+    });
+    navMenu?.addEventListener('click', e => e.stopPropagation());
 
     // Keep internal navigation inside the installed app.
     if (isStandalone) {
@@ -985,6 +1050,7 @@
       const firstStart = parseToSec(blks[0].s);
       const lastEnd    = parseToSec(blks[blks.length - 1].e);
       const isSD       = schoolDays.includes(dateStr);
+      const isAfterSchoolToday = isSD && totalSec >= lastEnd;
 
       function toMs(dayOff, sec) { return todayMidnightMs + dayOff * 86400000 + sec * 1000; }
       function clamp01(v) { return Math.max(0, Math.min(1, v)); }
@@ -1038,9 +1104,10 @@
       setTxt('schoolDayProgLabel', sdLabel);
 
       // ── 2. THIS WEEK ────────────────────────────────────────
-      let wkFrac = 0, wkLabel = 'To the Weekend';
+      let wkFrac = 0, wkLabel = 'To the Weekend', wkRight = '—';
       const dayOrder = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
       const dow      = dayOrder.indexOf(weekday);
+      const isWeekend = dow === 0 || dow === 6;
       const offToMon = (dow === 0) ? -6 : (1 - dow);
       const weekSDs  = [];
       for (let i = 0; i <= 4; i++) {
@@ -1054,14 +1121,29 @@
         const fwB = getSchBlocks(fw.dStr), lwB = getSchBlocks(lw.dStr);
         const wkStart = toMs(fw.off, parseToSec(fwB[0].s));
         const wkEnd   = toMs(lw.off, parseToSec(lwB[lwB.length - 1].e));
-        wkFrac  = wkStart < wkEnd ? (nowMs - wkStart) / (wkEnd - wkStart) : 0;
-        wkLabel = wkFrac >= 1 ? 'Weekend! 🎉' : 'To the Weekend';
+        wkFrac = wkStart < wkEnd ? (nowMs - wkStart) / (wkEnd - wkStart) : 0;
+        if (isWeekend || (isAfterSchoolToday && dow === 5)) {
+          // Weekend: show calendar days until next school day
+          wkLabel = 'Back to School';
+          const nextSD = schoolDays.find(d => d > dateStr);
+          if (nextSD) {
+            const daysUntil = Math.round((new Date(nextSD + 'T12:00:00') - new Date(dateStr + 'T12:00:00')) / 86400000);
+            wkRight = daysUntil === 1 ? '1 day' : `${daysUntil} days`;
+          }
+        } else {
+          // Weekday: show school days remaining this week (including today if school not over)
+          const remSDs = weekSDs.filter(sd => sd.dStr > dateStr || (sd.dStr === dateStr && !isAfterSchoolToday));
+          const count  = remSDs.length;
+          wkLabel = count === 0 ? 'Weekend! 🎉' : 'To the Weekend';
+          wkRight = count === 0 ? '🎉' : count === 1 ? '1 day' : `${count} days`;
+        }
       } else {
         wkLabel = 'No School';
+        wkRight = '—';
       }
-      setFill('weekFill',      wkFrac, 'prog-bar--week');
-      setTxt('weekPct',        pctStr(wkFrac));
-      setTxt('weekProgLabel',  wkLabel);
+      setFill('weekFill',     wkFrac, 'prog-bar--week');
+      setTxt('weekPct',       wkRight);
+      setTxt('weekProgLabel', wkLabel);
 
       // ── 3. GRADUATION ───────────────────────────────────────
       const total   = schoolDays.length;
@@ -1070,6 +1152,33 @@
       const grFrac  = total > 0 ? passed / total : 0;
       setFill('gradFill', grFrac, 'prog-bar--grad');
       setTxt('gradPct',   pctStr(grFrac));
+
+      // ── 4. NEXT VACATION ────────────────────────────────────
+      const vacations = [
+        { name: "Spring Break", start: "2026-04-03", stretchFrom: "2026-01-15" },
+        { name: "Summer Break", start: "2026-06-11", stretchFrom: "2026-04-13" }
+      ];
+      const nextVac = vacations.find(v => dateStr <= v.start);
+      if (nextVac) {
+        const { name: vacName, start: vacStart, stretchFrom } = nextVac;
+        const totalVacSDs  = schoolDays.filter(d => d >= stretchFrom && d < vacStart).length;
+        const passedVacSDs = schoolDays.filter(d => d >= stretchFrom && (d < dateStr || (d === dateStr && isAfterSchoolToday))).length;
+        const vacFrac = totalVacSDs > 0 ? passedVacSDs / totalVacSDs : 0;
+        const dToVac  = schoolDays.filter(d => {
+          if (d >= vacStart) return false;
+          if (d > dateStr) return true;
+          if (d === dateStr && !isAfterSchoolToday) return true;
+          return false;
+        }).length;
+        const vacRight = dToVac === 0 ? '🎉 Break!' : dToVac === 1 ? '1 day' : `${dToVac} days`;
+        setFill('vacFill', vacFrac, 'prog-bar--vac');
+        setTxt('vacLabel', `Till ${vacName}`);
+        setTxt('vacPct', vacRight);
+      } else {
+        setFill('vacFill', 1, 'prog-bar--vac');
+        setTxt('vacLabel', 'Summer Break! 🌴');
+        setTxt('vacPct', '🎉');
+      }
     }
 
     setInterval(() => { updateApp(); updateProgressBars(); }, 1000);
@@ -1107,7 +1216,7 @@
     fetchWeather(); 
     setInterval(fetchWeather, 900000);
 
-    embedBtn?.addEventListener("click", openEmbedModal);
+    // embedBtn wired above in nav menu setup
     embedCloseBtn?.addEventListener("click", closeEmbedModal);
     embedBackdrop?.addEventListener("click", closeEmbedModal);
     copyEmbedBtn?.addEventListener("click", async () => {
