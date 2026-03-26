@@ -494,6 +494,94 @@
       display: flex; align-items: center; justify-content: center;
     }
     .a2hs-dismiss:active { background: rgba(255,255,255,0.18); }
+
+    /* ── DESKTOP INSTALL BANNER ─────────────────────── */
+    .install-banner {
+      position: absolute; top: 0; left: 0; right: 0; z-index: 10;
+      padding: 12px 14px 0;
+      transform: translateY(-110%);
+      transition: transform 0.44s cubic-bezier(0.34, 1.3, 0.64, 1);
+      pointer-events: none;
+    }
+    .install-banner.is-visible { transform: translateY(0); pointer-events: auto; }
+    .install-banner-inner {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(0,100,100,0.92);
+      border: 1px solid rgba(75,225,225,0.28);
+      border-radius: 18px; padding: 11px 14px;
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 6px 28px rgba(0,0,0,0.34);
+    }
+    .install-banner-icon { font-size: 22px; flex-shrink: 0; }
+    .install-banner-text { flex: 1; }
+    .install-banner-title { font-size: 11px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 0.11em; margin: 0 0 2px; }
+    .install-banner-desc  { font-size: 10px; font-weight: 500; color: #b8f0f0; line-height: 1.4; margin: 0; }
+    .install-banner-btn {
+      appearance: none; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3);
+      color: #fff; border-radius: 10px; padding: 6px 12px;
+      font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+      cursor: pointer; flex-shrink: 0; white-space: nowrap;
+    }
+    .install-banner-btn:active { background: rgba(255,255,255,0.28); }
+    .install-banner-dismiss {
+      appearance: none; background: transparent; border: none;
+      color: rgba(255,255,255,0.55); font-size: 14px; cursor: pointer;
+      flex-shrink: 0; padding: 2px 4px; line-height: 1;
+    }
+
+    /* ── DESKTOP INSTALL MODAL ──────────────────────── */
+    .install-modal[hidden] { display: none; }
+    .install-modal {
+      position: absolute; inset: 0; z-index: 20;
+      display: flex; align-items: center; justify-content: center; padding: 24px;
+    }
+    .install-modal-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(1,12,12,0.76);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    }
+    .install-modal-dialog {
+      position: relative; width: min(100%, 380px);
+      border-radius: 24px; border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(8,31,31,0.96);
+      box-shadow: 0 26px 48px rgba(0,0,0,0.4);
+      padding: 20px; display: flex; flex-direction: column; gap: 14px;
+    }
+    .install-modal-header { display: flex; align-items: center; gap: 10px; }
+    .install-modal-appicon { width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0; }
+    .install-modal-titles { flex: 1; }
+    .install-modal-title { font-size: 14px; font-weight: 800; color: #fff; margin: 0 0 2px; letter-spacing: 0.05em; }
+    .install-modal-sub   { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; margin: 0; }
+    .install-modal-close {
+      appearance: none; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.6); border-radius: 99px; width: 28px; height: 28px;
+      font-size: 13px; cursor: pointer; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .install-modal-steps { display: flex; flex-direction: column; gap: 10px; }
+    .install-step {
+      display: flex; align-items: flex-start; gap: 10px;
+      background: rgba(255,255,255,0.05); border-radius: 14px; padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+    .install-step-num {
+      width: 20px; height: 20px; border-radius: 99px;
+      background: rgba(0,180,180,0.3); border: 1px solid rgba(0,210,210,0.4);
+      color: #4be1e1; font-size: 10px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+    }
+    .install-step-text { font-size: 11px; font-weight: 500; color: #d0f0f0; line-height: 1.5; margin: 0; }
+    .install-step-text strong { color: #fff; font-weight: 700; }
+    .install-modal-cta {
+      appearance: none; width: 100%;
+      background: linear-gradient(135deg, #007474 0%, #009a9a 100%);
+      border: none; border-radius: 14px; padding: 13px;
+      color: #fff; font-size: 12px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.12em; cursor: pointer;
+    }
+    .install-modal-cta:active { opacity: 0.85; }
+    .install-modal-note { font-size: 9.5px; color: var(--muted); text-align: center; opacity: 0.7; margin: 0; }
+
     /* ── FEEDBACK MODAL ─────────────────────────────────── */
     .feedback-modal[hidden] { display: none; }
     .feedback-modal {
@@ -667,10 +755,43 @@
         <a href="index.html" class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">🏠</span>Home</a>
         <div id="embedMenuSep" class="nav-menu-sep" style="display:none"></div>
         <button id="embedBtn" class="nav-menu-item" type="button" role="menuitem" style="display:none"><span class="nav-menu-icon">📋</span>Embed</button>
+        <div id="popoutMenuSep" class="nav-menu-sep"></div>
+        <button id="popoutBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon">🪟</span>Pop Out</button>
         <div id="installMenuSep" class="nav-menu-sep"></div>
         <button id="installBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon">📲</span>Add to Home Screen</button>
         <div class="nav-menu-sep"></div>
         <button id="feedbackBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon">💬</span>Share Feedback</button>
+      </div>
+
+      <!-- DESKTOP INSTALL BANNER -->
+      <div id="installBanner" class="install-banner" hidden>
+        <div class="install-banner-inner">
+          <span class="install-banner-icon">📲</span>
+          <div class="install-banner-text">
+            <p class="install-banner-title">Install PVHS Tools</p>
+            <p class="install-banner-desc" id="installBannerDesc">Add this to your dock for instant access — works like a real app.</p>
+          </div>
+          <button id="installBannerBtn" class="install-banner-btn" type="button">Install</button>
+          <button id="installBannerDismiss" class="install-banner-dismiss" type="button" aria-label="Dismiss">✕</button>
+        </div>
+      </div>
+
+      <!-- DESKTOP INSTALL MODAL -->
+      <div id="installModal" class="install-modal" hidden>
+        <div class="install-modal-backdrop" id="installModalBackdrop"></div>
+        <div class="install-modal-dialog">
+          <div class="install-modal-header">
+            <img src="PV_AppIcon.png" alt="" class="install-modal-appicon">
+            <div class="install-modal-titles">
+              <p class="install-modal-title">PVHS Tools</p>
+              <p class="install-modal-sub">Install as Desktop App</p>
+            </div>
+            <button id="installModalClose" class="install-modal-close" type="button">✕</button>
+          </div>
+          <div id="installModalSteps" class="install-modal-steps"></div>
+          <button id="installModalCta" class="install-modal-cta" type="button" style="display:none">Install Now</button>
+          <p class="install-modal-note">Once installed, PVHS Tools opens in its own window — no browser chrome, no tabs. Just the app.</p>
+        </div>
       </div>
 
       <!-- ADD TO HOME SCREEN PROMPT -->
@@ -822,6 +943,18 @@
       const embedBtn = document.getElementById('embedBtn');
       if (embedMenuSep) embedMenuSep.style.display = 'block';
       if (embedBtn)     { embedBtn.style.display = 'flex'; embedBtn.addEventListener('click', () => { navMenu?.classList.remove('is-open'); navMenuBtn?.classList.remove('is-open'); openEmbedModal(); }); }
+    }
+
+    // Pop-out button
+    if (isMobile || isStandalone || isPopout) {
+      document.getElementById('popoutBtn')?.remove();
+      document.getElementById('popoutMenuSep')?.remove();
+    } else {
+      document.getElementById('popoutBtn')?.addEventListener('click', () => {
+        navMenu?.classList.remove('is-open');
+        navMenuBtn?.classList.remove('is-open');
+        window.open('countdown.html?mode=popout', 'pvCountdown', 'width=450,height=900,resizable=yes,scrollbars=no');
+      });
     }
 
     function positionNavMenu() {
@@ -1463,28 +1596,139 @@
       });
     }
 
-    // Install nav button
+    // ── DESKTOP INSTALL SYSTEM ─────────────────────────────────
     (function() {
-      const btn = document.getElementById('installBtn');
-      const sep = document.getElementById('installMenuSep');
-      if (!btn) return;
-      if (isStandalone || isEmbed) { btn.remove(); sep?.remove(); return; }
+      if (isStandalone || isEmbed) {
+        document.getElementById('installBtn')?.remove();
+        document.getElementById('installMenuSep')?.remove();
+        return;
+      }
+
+      const ua        = navigator.userAgent;
+      const isChrome  = /Chrome/.test(ua) && !/Edg|OPR/.test(ua);
+      const isEdge    = /Edg\//.test(ua);
+      const isSafari  = /Safari/.test(ua) && !/Chrome/.test(ua);
+      const isFirefox = /Firefox/.test(ua);
+      const isMacOS   = /Macintosh/.test(ua);
+      const installSeen = localStorage.getItem('pvhs_install_seen');
+
       let deferredPrompt = null;
+
+      function getSteps() {
+        if (isChrome || isEdge) {
+          return [
+            { n:1, html: 'Click the <strong>install icon ⊕</strong> in your browser\'s address bar (top right)' },
+            { n:2, html: 'Click <strong>"Install"</strong> in the popup — that\'s it!' },
+            { n:3, html: 'PVHS Tools will open in its own window and appear in your <strong>' + (isMacOS ? 'Dock & Applications' : 'Taskbar & Start Menu') + '</strong>' }
+          ];
+        }
+        if (isSafari && isMacOS) {
+          return [
+            { n:1, html: 'In the Safari menu bar, click <strong>File</strong>' },
+            { n:2, html: 'Choose <strong>"Add to Dock…"</strong>' },
+            { n:3, html: 'Click <strong>Add</strong> — PVHS Tools will appear in your Dock like a real app' },
+            { n:4, html: '<em style="color:#88c8c8">Requires macOS Sonoma (14) or later</em>' }
+          ];
+        }
+        if (isFirefox) {
+          return [
+            { n:1, html: 'Firefox doesn\'t support app installation' },
+            { n:2, html: 'For the best experience, open this page in <strong>Chrome</strong> or <strong>Edge</strong>' },
+            { n:3, html: 'Then click the install icon in the address bar' }
+          ];
+        }
+        return [
+          { n:1, html: 'Open PVHS Tools in <strong>Chrome</strong> or <strong>Edge</strong>' },
+          { n:2, html: 'Click the <strong>install icon ⊕</strong> in the address bar' },
+          { n:3, html: 'Click <strong>Install</strong> to add it to your ' + (isMacOS ? 'Dock' : 'Taskbar') }
+        ];
+      }
+
+      function buildModal() {
+        const container = document.getElementById('installModalSteps');
+        const cta = document.getElementById('installModalCta');
+        if (!container) return;
+        container.innerHTML = '';
+        getSteps().forEach(s => {
+          const div = document.createElement('div');
+          div.className = 'install-step';
+          div.innerHTML = '<span class="install-step-num">' + s.n + '</span><p class="install-step-text">' + s.html + '</p>';
+          container.appendChild(div);
+        });
+        if ((isChrome || isEdge) && deferredPrompt && cta) cta.style.display = 'block';
+      }
+
+      function openModal() { buildModal(); const m = document.getElementById('installModal'); if (m) m.hidden = false; }
+      function closeModal() { const m = document.getElementById('installModal'); if (m) m.hidden = true; }
+
+      const bannerDesc = document.getElementById('installBannerDesc');
+      if (bannerDesc) {
+        if (isChrome || isEdge) bannerDesc.textContent = 'One click to install — works like a real app on your ' + (isMacOS ? 'Mac' : 'PC') + '.';
+        else if (isSafari)      bannerDesc.textContent = 'Add to your Dock for instant access — no browser needed.';
+        else                    bannerDesc.textContent = 'Open in Chrome or Edge to install as a desktop app.';
+      }
+
+      const showBanner = !isMobile && !installSeen;
+
+      function showInstallBanner() {
+        const banner = document.getElementById('installBanner');
+        if (!banner || !showBanner) return;
+        banner.hidden = false;
+        setTimeout(() => banner.classList.add('is-visible'), 800);
+      }
+
       window.addEventListener('beforeinstallprompt', e => {
         e.preventDefault();
         deferredPrompt = e;
+        showInstallBanner();
       });
-      btn.addEventListener('click', () => {
-        navMenu?.classList.remove('is-open');
-        navMenuBtn?.classList.remove('is-open');
+
+      if (!isMobile && !installSeen && (isSafari || isFirefox)) {
+        setTimeout(showInstallBanner, 800);
+      }
+
+      document.getElementById('installBannerBtn')?.addEventListener('click', () => {
         if (deferredPrompt) {
           deferredPrompt.prompt();
           deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
-        } else if (a2hsPrompt) {
-          a2hsPrompt.hidden = false;
-          setTimeout(() => a2hsPrompt.classList.add('is-visible'), 10);
+          localStorage.setItem('pvhs_install_seen', '1');
+          document.getElementById('installBanner')?.classList.remove('is-visible');
+        } else {
+          openModal();
         }
       });
+
+      document.getElementById('installBannerDismiss')?.addEventListener('click', () => {
+        document.getElementById('installBanner')?.classList.remove('is-visible');
+        localStorage.setItem('pvhs_install_seen', '1');
+      });
+
+      document.getElementById('installModalClose')?.addEventListener('click', closeModal);
+      document.getElementById('installModalBackdrop')?.addEventListener('click', closeModal);
+
+      document.getElementById('installModalCta')?.addEventListener('click', () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then(() => { deferredPrompt = null; closeModal(); });
+          localStorage.setItem('pvhs_install_seen', '1');
+        }
+      });
+
+      const navBtn = document.getElementById('installBtn');
+      if (navBtn) {
+        navBtn.addEventListener('click', () => {
+          navMenu?.classList.remove('is-open');
+          navMenuBtn?.classList.remove('is-open');
+          if (isMobile) {
+            if (a2hsPrompt) { a2hsPrompt.hidden = false; setTimeout(() => a2hsPrompt.classList.add('is-visible'), 10); }
+          } else if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+          } else {
+            openModal();
+          }
+        });
+      }
     })();
 
     // ── FEEDBACK MODAL ──────────────────────────────────────────
