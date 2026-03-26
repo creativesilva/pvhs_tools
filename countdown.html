@@ -117,6 +117,11 @@
 
     .logo-clear { width: 38px; height: 38px; object-fit: contain; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); flex-shrink: 0; }
     .page-title { position: absolute; left: 0; right: 0; text-align: center; font-size: 15px; font-weight: 700; color: #dff7f7; text-transform: uppercase; margin: 0; letter-spacing: 0.14em; pointer-events: none; }
+    .header-clock { position: absolute; left: 0; right: 0; text-align: center; pointer-events: none; display: flex; align-items: center; justify-content: center; gap: 0; }
+    .header-clock-time { font-size: 15px; font-weight: 800; color: #dff7f7; letter-spacing: 0.06em; font-variant-numeric: tabular-nums; }
+    .header-clock-colon { font-size: 15px; font-weight: 800; color: #dff7f7; animation: blink-colon 1s step-end infinite; }
+    .header-clock-ampm { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.55); letter-spacing: 0.08em; margin-left: 4px; }
+    @keyframes blink-colon { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
 
     .card { width: 100%; border-radius: 22px; background: var(--panel); border: 1px solid var(--panel-border); backdrop-filter: blur(10px); box-shadow: var(--soft-shadow); margin-bottom: 5px; }
 
@@ -638,7 +643,7 @@
       <div class="content">
         <div class="top-row">
           <a href="index.html" class="nav-link" aria-label="Home"><img src="PV_Logo.png" alt="Logo" class="logo-clear"></a>
-          <h1 class="page-title">Countdown</h1>
+          <div class="header-clock" id="headerClock"><span class="header-clock-time" id="clockHr">12</span><span class="header-clock-colon">:</span><span class="header-clock-time" id="clockMin">00</span><span class="header-clock-ampm" id="clockAmpm">PM</span></div>
           <button id="navMenuBtn" class="nav-menu-btn" type="button" aria-label="Menu" aria-expanded="false">···</button>
         </div>
 
@@ -833,6 +838,26 @@
     const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
 
     const navLinks = document.querySelectorAll(".nav-link");
+
+    // ── HEADER CLOCK ─────────────────────────────────────────
+    (function() {
+      const hrEl = document.getElementById('clockHr');
+      const minEl = document.getElementById('clockMin');
+      const ampmEl = document.getElementById('clockAmpm');
+      function updateClock() {
+        const now = new Date();
+        let h = now.getHours();
+        const m = now.getMinutes();
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        h = h % 12 || 12;
+        if (hrEl) hrEl.textContent = h;
+        if (minEl) minEl.textContent = String(m).padStart(2, '0');
+        if (ampmEl) ampmEl.textContent = ampm;
+      }
+      updateClock();
+      setInterval(updateClock, 1000);
+    })();
+
     const timerTextEl = document.getElementById("timerText");
     const daysLeftEl = document.getElementById("daysLeft");
     const accessTextEl = document.getElementById("accessText");
@@ -1490,53 +1515,46 @@
     updateProgressBars();
     scheduleFitCountdownText();
 
-    // LIVE WEATHER — National Weather Service (NWS) API
-    // Santa Maria, CA grid point: LOX/52,27
-    const NWS_OBS_URL = 'https://api.weather.gov/gridpoints/LOX/52,27/forecast/hourly';
-    const NWS_STATION_URL = 'https://api.weather.gov/stations/KSMX/observations/latest';
+    // LIVE WEATHER — Open-Meteo API (Santa Maria, CA 93454)
+    const METEO_URL = 'https://api.open-meteo.com/v1/forecast?latitude=34.9530&longitude=-120.4357&current_weather=true&temperature_unit=fahrenheit';
 
-    function nwsIcon(shortForecast, isDaytime) {
-      const f = shortForecast.toLowerCase();
-      if (f.includes('thunder')) return '⛈️';
-      if (f.includes('snow') || f.includes('blizzard')) return '❄️';
-      if (f.includes('sleet') || f.includes('freezing')) return '🌨️';
-      if (f.includes('rain') || f.includes('shower') || f.includes('drizzle')) return '🌧️';
-      if (f.includes('fog') || f.includes('haze') || f.includes('mist')) return '🌫️';
-      if (f.includes('wind')) return isDaytime ? '🌬️' : '🌬️';
-      if (f.includes('overcast') || f.includes('cloudy')) return '☁️';
-      if (f.includes('mostly cloudy') || f.includes('partly sunny')) return '⛅';
-      if (f.includes('partly cloudy') || f.includes('mostly sunny')) return '🌤️';
-      if (f.includes('sunny') || f.includes('clear')) return isDaytime ? '☀️' : '🌙';
+    function meteoIcon(code, isDay) {
+      // WMO weather interpretation codes → emoji
+      if (code <= 1)  return isDay ? '☀️' : '🌙';      // clear
+      if (code === 2)  return isDay ? '🌤️' : '☁️';     // partly cloudy
+      if (code === 3)  return '☁️';                      // overcast
+      if (code >= 45 && code <= 48) return '🌫️';        // fog
+      if (code >= 51 && code <= 57) return '🌧️';        // drizzle
+      if (code >= 61 && code <= 67) return '🌧️';        // rain
+      if (code >= 71 && code <= 77) return '❄️';         // snow
+      if (code >= 80 && code <= 82) return '🌧️';        // showers
+      if (code >= 85 && code <= 86) return '🌨️';        // snow showers
+      if (code >= 95) return '⛈️';                       // thunderstorm
       return '🌡️';
     }
+
+    const WMO_DESC = {
+      0:'Clear', 1:'Mostly Clear', 2:'Partly Cloudy', 3:'Overcast',
+      45:'Fog', 48:'Rime Fog', 51:'Light Drizzle', 53:'Drizzle', 55:'Heavy Drizzle',
+      61:'Light Rain', 63:'Rain', 65:'Heavy Rain', 71:'Light Snow', 73:'Snow', 75:'Heavy Snow',
+      77:'Snow Grains', 80:'Light Showers', 81:'Showers', 82:'Heavy Showers',
+      85:'Snow Showers', 86:'Heavy Snow Showers', 95:'Thunderstorm', 96:'Thunderstorm w/ Hail', 99:'Severe Thunderstorm'
+    };
 
     async function fetchWeather() {
       const el = document.getElementById('weatherText');
       if (!el) return;
       try {
-        // Try live station observation first (most current — updates ~5 min)
-        const obsRes = await fetch(NWS_STATION_URL, { headers: { 'User-Agent': 'pvhs-tools/1.0' } });
-        if (obsRes.ok) {
-          const obs = await obsRes.json();
-          const props = obs.properties;
-          const tempC = props.temperature?.value;
-          const desc  = props.textDescription || '';
-          if (tempC !== null && tempC !== undefined) {
-            const tempF = Math.round(tempC * 9 / 5 + 32);
-            const icon  = nwsIcon(desc, true);
-            const label = desc.length > 18 ? desc.slice(0, 18).trim() + '…' : desc;
-            el.textContent = `${icon} ${label || 'Santa Maria'} | ${tempF}°F`;
-            return;
-          }
-        }
-        // Fallback: hourly forecast for current period
-        const fcRes = await fetch(NWS_OBS_URL, { headers: { 'User-Agent': 'pvhs-tools/1.0' } });
-        if (fcRes.ok) {
-          const fc = await fcRes.json();
-          const period = fc.properties.periods[0];
-          const icon = nwsIcon(period.shortForecast, period.isDaytime);
-          const label = period.shortForecast.length > 18 ? period.shortForecast.slice(0, 18).trim() + '…' : period.shortForecast;
-          el.textContent = `${icon} ${label} | ${period.temperature}°F`;
+        const res = await fetch(METEO_URL);
+        if (res.ok) {
+          const data = await res.json();
+          const cw = data.current_weather;
+          const tempF = Math.round(cw.temperature);
+          const code = cw.weathercode;
+          const isDay = cw.is_day === 1;
+          const icon = meteoIcon(code, isDay);
+          const desc = WMO_DESC[code] || 'Santa Maria';
+          el.textContent = `${icon} ${desc} | ${tempF}°F`;
           return;
         }
         el.textContent = '🌡️ Weather Unavailable';
@@ -1545,9 +1563,9 @@
       }
     }
 
-    // Fetch immediately, then every 10 minutes
+    // Fetch immediately, then every 15 minutes
     fetchWeather();
-    setInterval(fetchWeather, 600000);
+    setInterval(fetchWeather, 900000);
 
     // embedBtn wired above in nav menu setup
     embedCloseBtn?.addEventListener("click", closeEmbedModal);
