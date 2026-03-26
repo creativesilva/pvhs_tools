@@ -73,8 +73,8 @@
     /* Header in one single line */
     .top-row {
       display: flex; align-items: center; justify-content: space-between;
-      width: 100%; gap: 10px; height: 40px; flex-shrink: 0; margin-bottom: 4px;
-      position: relative;
+      width: 100%; gap: 10px; height: 44px; flex-shrink: 0; margin-bottom: 4px;
+      padding: 6px 10px 0 10px; position: relative;
     }
 
     /* ── NAV DROPDOWN MENU ─────────────────────────────── */
@@ -117,7 +117,9 @@
 
     .logo-clear { width: 38px; height: 38px; object-fit: contain; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); flex-shrink: 0; }
     .page-title { position: absolute; left: 0; right: 0; text-align: center; font-size: 15px; font-weight: 700; color: #dff7f7; text-transform: uppercase; margin: 0; letter-spacing: 0.14em; pointer-events: none; }
-    .header-clock { position: absolute; left: 0; right: 0; text-align: center; pointer-events: none; display: flex; align-items: center; justify-content: center; gap: 0; }
+    .header-clock { position: absolute; left: 0; right: 0; text-align: center; pointer-events: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; }
+    .header-clock-row { display: flex; align-items: center; justify-content: center; gap: 0; }
+    .header-clock-label { font-size: 7px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em; color: rgba(255,255,255,0.4); margin-bottom: 1px; }
     .header-clock-time { font-size: 15px; font-weight: 800; color: #dff7f7; letter-spacing: 0.06em; font-variant-numeric: tabular-nums; }
     .header-clock-colon { font-size: 15px; font-weight: 800; color: #dff7f7; animation: blink-colon 1s step-end infinite; }
     .header-clock-ampm { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.55); letter-spacing: 0.08em; margin-left: 4px; }
@@ -643,7 +645,7 @@
       <div class="content">
         <div class="top-row">
           <a href="index.html" class="nav-link" aria-label="Home"><img src="PV_Logo.png" alt="Logo" class="logo-clear"></a>
-          <div class="header-clock" id="headerClock"><span class="header-clock-time" id="clockHr">12</span><span class="header-clock-colon">:</span><span class="header-clock-time" id="clockMin">00</span><span class="header-clock-ampm" id="clockAmpm">PM</span></div>
+          <div class="header-clock" id="headerClock"><span class="header-clock-label">Current Time</span><div class="header-clock-row"><span class="header-clock-time" id="clockHr">12</span><span class="header-clock-colon">:</span><span class="header-clock-time" id="clockMin">00</span><span class="header-clock-ampm" id="clockAmpm">PM</span></div></div>
           <button id="navMenuBtn" class="nav-menu-btn" type="button" aria-label="Menu" aria-expanded="false">···</button>
         </div>
 
