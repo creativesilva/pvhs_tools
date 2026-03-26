@@ -180,18 +180,7 @@
     body.is-embed .prog-pct   { font-size: 12px; }
 
     /* ── NOTIFICATION BELL ─────────────────────────────── */
-    .notif-btn {
-      appearance: none; background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.13); border-radius: 12px;
-      color: #fff; width: 34px; height: 34px; font-size: 16px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; flex-shrink: 0;
-      transition: background 0.2s, border-color 0.2s;
-    }
-    .notif-btn:active { background: rgba(255,255,255,0.18); }
-    .notif-btn.is-on   { background: rgba(0,180,180,0.18); border-color: rgba(0,215,215,0.38); }
-    .notif-btn.is-off  { opacity: 0.42; }
-    body.is-embed .notif-btn { display: none; }
+    body.is-embed #notifBtn { display: none; }
 
     .embed-modal[hidden] { display: none; }
     .embed-modal {
@@ -645,7 +634,6 @@
         <div class="top-row">
           <img src="PV_Logo.png" alt="Logo" class="logo-clear">
           <h1 class="page-title">Countdown</h1>
-          <button id="notifBtn" class="notif-btn" type="button" title="Alert notifications" aria-label="Toggle period alerts">🔔</button>
           <button id="navMenuBtn" class="nav-menu-btn" type="button" aria-label="Menu" aria-expanded="false">···</button>
         </div>
 
@@ -752,6 +740,8 @@
 
       <!-- NAV DROPDOWN (position:fixed, outside content scroll) -->
       <div id="navMenu" class="nav-menu" role="menu">
+        <button id="notifBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon">🔔</span><span id="notifLabel">Alerts</span></button>
+        <div class="nav-menu-sep"></div>
         <a href="extension_search.html" class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">🔍</span>Directory</a>
         <a href="index.html" class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">🏠</span>Home</a>
         <div id="embedMenuSep" class="nav-menu-sep" style="display:none"></div>
@@ -1202,14 +1192,14 @@
 
     function updateNotifBtn() {
       const btn = document.getElementById('notifBtn');
+      const label = document.getElementById('notifLabel');
+      const icon = btn?.querySelector('.nav-menu-icon');
       if (!btn || typeof Notification === 'undefined') { if (btn) btn.style.display = 'none'; return; }
       const p = Notification.permission;
-      btn.classList.toggle('is-on',  p === 'granted');
-      btn.classList.toggle('is-off', p === 'denied');
-      btn.title       = p === 'granted' ? 'Period alerts ON — tap to info'
-                      : p === 'denied'  ? 'Notifications blocked in browser settings'
-                      : 'Tap to enable period alerts';
-      btn.textContent = p === 'granted' ? '🔔' : p === 'denied' ? '🔕' : '🔔';
+      if (icon) icon.textContent = p === 'granted' ? '🔔' : p === 'denied' ? '🔕' : '🔔';
+      if (label) label.textContent = p === 'granted' ? 'Alerts On'
+                                   : p === 'denied'  ? 'Alerts Blocked'
+                                   : 'Enable Alerts';
     }
 
     async function fireNotif(title, body, tag) {
