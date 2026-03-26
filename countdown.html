@@ -20,7 +20,7 @@
   <style>
     :root {
       --teal: #007474; --white: #f7fbfb; --muted: #cfe3e3;
-      --panel: rgba(255,255,255,0.03); --panel-border: rgba(255,255,255,0.07);
+      --panel: rgba(255,255,255,0.02); --panel-border: rgba(255,255,255,0.05);
       --shadow: 0 20px 46px rgba(0,0,0,0.30); --app-spacing: 16px; --radius: 34px;
       --white-gradient: linear-gradient(180deg, #ffffff 0%, #dceaea 100%);
       --orange-gradient: linear-gradient(180deg, #ffe1b5 0%, #ffac39 56%, #e06f00 100%);
@@ -88,7 +88,7 @@
     .nav-menu-btn:active { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.26); }
     .nav-menu {
       position: fixed; z-index: 9999; min-width: 172px;
-      background: rgba(3, 20, 20, 0.72);
+      background: rgba(3, 20, 20, 0.58);
       border: 1px solid rgba(255,255,255,0.16);
       border-radius: 16px; padding: 5px;
       box-shadow: 0 14px 44px rgba(0,0,0,0.52);
@@ -535,7 +535,7 @@
     .install-modal-dialog {
       position: relative; width: min(100%, 380px);
       border-radius: 24px; border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(8,31,31,0.96);
+      background: rgba(8,31,31,0.85);
       box-shadow: 0 26px 48px rgba(0,0,0,0.4);
       padding: 20px; display: flex; flex-direction: column; gap: 14px;
     }
@@ -588,7 +588,7 @@
     .feedback-dialog {
       position: relative; width: min(100%, 360px);
       border-radius: 24px; border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(6,26,26,0.97);
+      background: rgba(6,26,26,0.85);
       box-shadow: 0 26px 48px rgba(0,0,0,0.44);
       padding: 18px; display: flex; flex-direction: column; gap: 12px;
       max-height: calc(100% - 20px); overflow-y: auto;
@@ -751,7 +751,7 @@
         <div id="popoutMenuSep" class="nav-menu-sep"></div>
         <button id="popoutBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon">🪟</span>Pop Out</button>
         <div id="installMenuSep" class="nav-menu-sep"></div>
-        <button id="installBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon">📲</span>Add to Home Screen</button>
+        <button id="installBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon" id="installIcon">📲</span><span id="installLabel">Add to Home Screen</span></button>
         <div class="nav-menu-sep"></div>
         <button id="feedbackBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon">💬</span>Share Feedback</button>
       </div>
@@ -1606,6 +1606,14 @@
       const installSeen = localStorage.getItem('pvhs_install_seen');
 
       let deferredPrompt = null;
+
+      // Desktop: update install button label & icon
+      if (!isMobile) {
+        const installIcon = document.getElementById('installIcon');
+        const installLabel = document.getElementById('installLabel');
+        if (installIcon) installIcon.textContent = '🖥️';
+        if (installLabel) installLabel.textContent = isMacOS ? 'Add to Dock' : 'Add to Taskbar';
+      }
 
       function getSteps() {
         if (isChrome || isEdge) {

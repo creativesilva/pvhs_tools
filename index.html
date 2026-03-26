@@ -20,7 +20,7 @@
   <style>
     :root {
       --teal: #007474; --white: #f7fbfb; --muted: #cfe3e3;
-      --panel: rgba(255,255,255,0.03); --panel-border: rgba(255,255,255,0.07);
+      --panel: rgba(255,255,255,0.02); --panel-border: rgba(255,255,255,0.05);
       --shadow: 0 20px 46px rgba(0,0,0,0.30); --soft-shadow: 0 12px 24px rgba(0,0,0,0.22);
       --card-hover: rgba(255,255,255,0.12); --app-spacing: 16px; --radius: 34px;
       --standalone-app-width: 100vw; --standalone-app-height: 100dvh;
@@ -89,7 +89,7 @@
     .nav-menu-btn:active { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.26); }
     .nav-menu {
       position: fixed; z-index: 9999; min-width: 172px;
-      background: rgba(3, 20, 20, 0.72);
+      background: rgba(3, 20, 20, 0.58);
       border: 1px solid rgba(255,255,255,0.16);
       border-radius: 16px; padding: 5px;
       box-shadow: 0 14px 44px rgba(0,0,0,0.52);
@@ -122,12 +122,12 @@
     .primary-nav { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
     .primary-btn {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 10px 6px; border-radius: 18px; text-decoration: none; color: #fff;
-      background: rgba(0,180,180,0.10); border: 1px solid rgba(0,210,210,0.22);
+      padding: 10px 6px; height: 56px; border-radius: 18px; text-decoration: none; color: #fff;
+      background: rgba(0,180,180,0.07); border: 1px solid rgba(0,210,210,0.16);
       backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); text-align: center;
       gap: 3px; transition: background 0.2s, transform 0.1s;
     }
-    .primary-btn:active { transform: scale(0.97); background: rgba(0,180,180,0.18); }
+    .primary-btn:active { transform: scale(0.97); background: rgba(0,180,180,0.14); }
     .primary-btn .quick-link-icon { font-size: 20px; }
     .primary-btn .quick-link-label { font-size: 10px; font-weight: 800; letter-spacing: 0.13em; color: #b8f4f4; }
 
@@ -135,8 +135,8 @@
     .quick-links-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; width: 100%; flex: 1; }
     .quick-link-btn {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 6px 6px; border-radius: 16px; text-decoration: none; color: #fff;
-      background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
+      padding: 6px 6px; height: 48px; border-radius: 16px; text-decoration: none; color: #fff;
+      background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04);
       backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); text-align: center;
       gap: 3px; transition: background 0.2s;
     }
@@ -171,7 +171,7 @@
     .a2hs-prompt.is-visible { transform: translateY(0); pointer-events: auto; }
     .a2hs-inner {
       display: flex; align-items: center; gap: 11px;
-      background: rgba(2, 22, 22, 0.93);
+      background: rgba(2, 22, 22, 0.82);
       border: 1px solid rgba(255,255,255,0.16);
       border-radius: 20px; padding: 12px 14px;
       backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
@@ -207,7 +207,7 @@
     .install-banner.is-visible { transform: translateY(0); pointer-events: auto; }
     .install-banner-inner {
       display: flex; align-items: center; gap: 10px;
-      background: rgba(0,100,100,0.92);
+      background: rgba(0,100,100,0.78);
       border: 1px solid rgba(75,225,225,0.28);
       border-radius: 18px; padding: 11px 14px;
       backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
@@ -244,7 +244,7 @@
     .install-modal-dialog {
       position: relative; width: min(100%, 380px);
       border-radius: 24px; border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(8,31,31,0.96);
+      background: rgba(8,31,31,0.85);
       box-shadow: 0 26px 48px rgba(0,0,0,0.4);
       padding: 20px; display: flex; flex-direction: column; gap: 14px;
     }
@@ -355,7 +355,7 @@
     .feedback-dialog {
       position: relative; width: min(100%, 360px);
       border-radius: 24px; border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(6,26,26,0.97);
+      background: rgba(6,26,26,0.85);
       box-shadow: 0 26px 48px rgba(0,0,0,0.44);
       padding: 18px; display: flex; flex-direction: column; gap: 12px;
       max-height: calc(100% - 20px); overflow-y: auto;
@@ -469,12 +469,10 @@
       <div id="navMenu" class="nav-menu" role="menu">
         <a href="countdown.html"       class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">⏱</span>Countdown</a>
         <a href="extension_search.html" class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">🔍</span>Directory</a>
-        <a href="https://pvhs.smjuhsd.org/about/calendars" class="nav-menu-item" role="menuitem" target="_blank"><span class="nav-menu-icon">📅</span>Calendar</a>
-        <a href="https://scratchcafepvhs.wixsite.com/scratchcafe" class="nav-menu-item" role="menuitem" target="_blank"><span class="nav-menu-icon">☕</span>Scratch Cafe</a>
         <div id="popoutMenuSep" class="nav-menu-sep"></div>
         <button id="popoutBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon">🪟</span>Pop Out</button>
         <div id="installMenuSep" class="nav-menu-sep"></div>
-        <button id="installBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon">📲</span>Add to Home Screen</button>
+        <button id="installBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon" id="installIcon">📲</span><span id="installLabel">Add to Home Screen</span></button>
         <div class="nav-menu-sep"></div>
         <button id="feedbackBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon">💬</span>Share Feedback</button>
       </div>
@@ -482,12 +480,12 @@
       <!-- DESKTOP INSTALL BANNER -->
       <div id="installBanner" class="install-banner" hidden>
         <div class="install-banner-inner">
-          <span class="install-banner-icon">📲</span>
+          <span class="install-banner-icon" id="installBannerIcon">🖥️</span>
           <div class="install-banner-text">
-            <p class="install-banner-title">Install PVHS Tools</p>
-            <p class="install-banner-desc" id="installBannerDesc">Add this to your dock for instant access — works like a real app.</p>
+            <p class="install-banner-title" id="installBannerTitle">Pop Out PVHS Tools</p>
+            <p class="install-banner-desc" id="installBannerDesc">Open in its own window — no tabs, no browser chrome. Like a real desktop app.</p>
           </div>
-          <button id="installBannerBtn" class="install-banner-btn" type="button">Install</button>
+          <button id="installBannerBtn" class="install-banner-btn" type="button">Pop Out</button>
           <button id="installBannerDismiss" class="install-banner-dismiss" type="button" aria-label="Dismiss">✕</button>
         </div>
       </div>
@@ -746,6 +744,14 @@
 
       let deferredPrompt = null;
 
+      // Desktop: update install button label & icon
+      if (!isMobile) {
+        const installIcon = document.getElementById('installIcon');
+        const installLabel = document.getElementById('installLabel');
+        if (installIcon) installIcon.textContent = '🖥️';
+        if (installLabel) installLabel.textContent = isMacOS ? 'Add to Dock' : 'Add to Taskbar';
+      }
+
       // Step definitions per browser
       function getSteps() {
         if (isChrome || isEdge) {
@@ -833,9 +839,27 @@
         setTimeout(showInstallBanner, 800);
       }
 
-      // Banner Install button
-      document.getElementById('installBannerBtn')?.addEventListener('click', () => {
-        if (deferredPrompt) {
+      // Desktop banner promotes Pop Out first, then install
+      const popoutSeen = localStorage.getItem('pvhs_popout_seen');
+      const bannerBtn = document.getElementById('installBannerBtn');
+      const bannerTitle = document.getElementById('installBannerTitle');
+      const bannerIcon = document.getElementById('installBannerIcon');
+
+      if (popoutSeen && !installSeen) {
+        // Already saw popout promo — switch to install promo
+        if (bannerTitle) bannerTitle.textContent = 'Install PVHS Tools';
+        if (bannerIcon) bannerIcon.textContent = '🖥️';
+        if (bannerBtn) bannerBtn.textContent = 'Install';
+        if (bannerDesc) bannerDesc.textContent = isMacOS ? 'Add to your Dock for instant access.' : 'Pin to your Taskbar for instant access.';
+      }
+
+      bannerBtn?.addEventListener('click', () => {
+        if (!popoutSeen) {
+          // Pop out action
+          localStorage.setItem('pvhs_popout_seen', '1');
+          document.getElementById('installBanner')?.classList.remove('is-visible');
+          window.open('index.html?mode=popout', 'pvTools', 'width=450,height=900,resizable=yes,scrollbars=no');
+        } else if (deferredPrompt) {
           deferredPrompt.prompt();
           deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
           localStorage.setItem('pvhs_install_seen', '1');
