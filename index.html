@@ -18,7 +18,7 @@
   <style>
     :root {
       --teal: #007474; --white: #f7fbfb; --muted: #cfe3e3;
-      --panel: rgba(255,255,255,0.05); --panel-border: rgba(255,255,255,0.10);
+      --panel: rgba(255,255,255,0.03); --panel-border: rgba(255,255,255,0.07);
       --shadow: 0 20px 46px rgba(0,0,0,0.30); --soft-shadow: 0 12px 24px rgba(0,0,0,0.22);
       --card-hover: rgba(255,255,255,0.12); --app-spacing: 16px; --radius: 34px;
       --standalone-app-width: 100vw; --standalone-app-height: 100dvh;
@@ -115,12 +115,25 @@
     .greeting { margin: 2px 0 4px 0; font-size: 15px; font-weight: 700; font-style: italic; color: #4be1e1; text-transform: uppercase; letter-spacing: 0.14em; }
     .subtitle { margin: 4px 0 6px 0; max-width: 296px; font-size: 10.5px; line-height: 1.35; font-weight: 500; color: var(--muted); text-align: center; }
 
+    /* ── PRIMARY NAV (Countdown & Directory) ─────────── */
+    .primary-nav { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+    .primary-btn {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 10px 6px; border-radius: 18px; text-decoration: none; color: #fff;
+      background: rgba(0,180,180,0.10); border: 1px solid rgba(0,210,210,0.22);
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); text-align: center;
+      gap: 3px; transition: background 0.2s, transform 0.1s;
+    }
+    .primary-btn:active { transform: scale(0.97); background: rgba(0,180,180,0.18); }
+    .primary-btn .quick-link-icon { font-size: 20px; }
+    .primary-btn .quick-link-label { font-size: 10px; font-weight: 800; letter-spacing: 0.13em; color: #b8f4f4; }
+
     .section-label { width: 100%; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.18em; color: var(--muted); opacity: 0.65; margin-bottom: 4px; text-align: center; }
     .quick-links-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; width: 100%; flex: 1; }
     .quick-link-btn {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       padding: 6px 6px; border-radius: 16px; text-decoration: none; color: #fff;
-      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
       backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); text-align: center;
       gap: 3px; transition: background 0.2s;
     }
@@ -392,18 +405,20 @@
         <div class="header">
           <p class="greeting" id="greetingText">Welcome</p>
         </div>
+        <div class="primary-nav">
+          <a class="primary-btn nav-link" href="countdown.html"><span class="quick-link-icon">⏱</span><p class="quick-link-label">Countdown</p></a>
+          <a class="primary-btn nav-link" href="extension_search.html"><span class="quick-link-icon">🔍</span><p class="quick-link-label">Directory</p></a>
+        </div>
         <p class="section-label">Quick Links</p>
         <div class="quick-links-grid">
-          <a class="quick-link-btn nav-link" href="countdown.html"><span class="quick-link-icon">⏱</span><p class="quick-link-label">Countdown</p></a>
-          <a class="quick-link-btn nav-link" href="extension_search.html"><span class="quick-link-icon">🔍</span><p class="quick-link-label">Directory</p></a>
-          <a class="quick-link-btn" href="https://pvhs.smjuhsd.org/about/calendars" target="_blank"><span class="quick-link-icon">📅</span><p class="quick-link-label">Calendar</p></a>
-          <a class="quick-link-btn" href="https://scratchcafepvhs.wixsite.com/scratchcafe" target="_blank"><span class="quick-link-icon">☕</span><p class="quick-link-label">Scratch Cafe</p></a>
           <a class="quick-link-btn" href="https://www.facilitron.com/accounts/signin/" target="_blank"><span class="quick-link-icon">🔧</span><p class="quick-link-label">Maintenance</p></a>
           <a class="quick-link-btn" href="https://smjuhsd.incidentiq.com/" target="_blank"><span class="quick-link-icon">🖥️</span><p class="quick-link-label">IT Support</p></a>
           <a class="quick-link-btn" href="https://login.frontlineeducation.com/login?signin=fb4604f28ef1253869f30c5315641ca3&clientId=superSuit#/login" target="_blank"><span class="quick-link-icon">📋</span><p class="quick-link-label">Absences</p></a>
           <a class="quick-link-btn" href="https://smjuhsd-my.sharepoint.com/:x:/g/personal/etorres_smjuhsd_org/IQBiSObgdkR3R68_dXHYrDwfAbA5RpN-scClTiKQddgcsLU" target="_blank"><span class="quick-link-icon">📝</span><p class="quick-link-label">In Lieu</p></a>
           <a class="quick-link-btn" href="https://drive.google.com/drive/home" target="_blank"><span class="quick-link-icon">📁</span><p class="quick-link-label">Google</p></a>
           <a class="quick-link-btn" href="https://www.parentsquare.com/signin" target="_blank"><span class="quick-link-icon">💬</span><p class="quick-link-label">ParentSquare</p></a>
+          <a class="quick-link-btn" href="https://pvhs.smjuhsd.org/about/calendars" target="_blank"><span class="quick-link-icon">📅</span><p class="quick-link-label">Calendar</p></a>
+          <a class="quick-link-btn" href="https://scratchcafepvhs.wixsite.com/scratchcafe" target="_blank"><span class="quick-link-icon">☕</span><p class="quick-link-label">Scratch Cafe</p></a>
         </div>
         <div class="daily-quote" id="dailyQuote">
           <p class="daily-quote-text" id="quoteText"></p>
