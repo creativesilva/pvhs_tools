@@ -142,6 +142,20 @@
 
     .footer-note { margin-top: auto; padding: 9px 0 2px 0; font-size: 9.5px; color: #b5d4d4; font-weight: 600; text-align: center; flex-shrink: 0; }
 
+    /* ── DAILY QUOTE ───────────────────────────────────── */
+    .daily-quote {
+      width: 100%; text-align: center; padding: 10px 8px 0;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+    }
+    .daily-quote-text {
+      font-size: 12px; font-weight: 500; font-style: italic;
+      color: rgba(255,255,255,0.72); line-height: 1.5; margin: 0;
+    }
+    .daily-quote-author {
+      font-size: 9.5px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.12em; color: rgba(0,210,210,0.55); margin: 0;
+    }
+
     /* ── ADD TO HOME SCREEN PROMPT ─────────────────────── */
     .a2hs-prompt {
       position: absolute; bottom: 0; left: 0; right: 0; z-index: 10;
@@ -410,6 +424,10 @@
           <a class="quick-link-btn" href="https://smjuhsd-my.sharepoint.com/:x:/g/personal/etorres_smjuhsd_org/IQBiSObgdkR3R68_dXHYrDwfAbA5RpN-scClTiKQddgcsLU" target="_blank"><span class="quick-link-icon">📝</span><p class="quick-link-label">In Lieu</p></a>
           <a class="quick-link-btn" href="https://drive.google.com/drive/home" target="_blank"><span class="quick-link-icon">📁</span><p class="quick-link-label">Google</p></a>
           <a class="quick-link-btn" href="https://www.parentsquare.com/signin" target="_blank"><span class="quick-link-icon">💬</span><p class="quick-link-label">ParentSquare</p></a>
+        </div>
+        <div class="daily-quote" id="dailyQuote">
+          <p class="daily-quote-text" id="quoteText"></p>
+          <p class="daily-quote-author" id="quoteAuthor"></p>
         </div>
         <div class="footer-note">By: CreativeSilva</div>
       </div>
@@ -836,6 +854,114 @@
           }
         });
       }
+    })();
+
+    // ── DAILY QUOTE ──────────────────────────────────────────────
+    (function() {
+      const tz = 'America/Los_Angeles';
+      const today = new Intl.DateTimeFormat('en-CA', {timeZone: tz, year:'numeric', month:'2-digit', day:'2-digit'}).format(new Date());
+
+      // Remaining school days (from today through end of year)
+      const schoolDays = [
+        "2026-03-25","2026-03-26","2026-03-27","2026-03-30","2026-03-31",
+        "2026-04-01","2026-04-02","2026-04-13","2026-04-14","2026-04-15",
+        "2026-04-16","2026-04-17","2026-04-20","2026-04-21","2026-04-22",
+        "2026-04-23","2026-04-24","2026-04-27","2026-04-28","2026-04-29",
+        "2026-04-30","2026-05-01","2026-05-04","2026-05-05","2026-05-06",
+        "2026-05-07","2026-05-08","2026-05-11","2026-05-12","2026-05-13",
+        "2026-05-14","2026-05-15","2026-05-18","2026-05-19","2026-05-20",
+        "2026-05-21","2026-05-22","2026-05-26","2026-05-27","2026-05-28",
+        "2026-05-29","2026-06-01","2026-06-02","2026-06-03","2026-06-04",
+        "2026-06-05","2026-06-08","2026-06-09","2026-06-10"
+      ];
+
+      // 49 unique quotes for school days (covers 48 remaining + buffer)
+      const teacherQuotes = [
+        {q:"A teacher affects eternity; no one can tell where their influence stops.", a:"Henry Adams"},
+        {q:"The art of teaching is the art of assisting discovery.", a:"Mark Van Doren"},
+        {q:"Education is not the filling of a pail, but the lighting of a fire.", a:"W.B. Yeats"},
+        {q:"What a teacher is, is more important than what they teach.", a:"Karl Menninger"},
+        {q:"The best teachers teach from the heart, not from the book.", a:"Unknown"},
+        {q:"Teaching is the one profession that creates all other professions.", a:"Unknown"},
+        {q:"Every child deserves a champion — an adult who will never give up on them.", a:"Rita Pierson"},
+        {q:"The influence of a great teacher can never be erased.", a:"Unknown"},
+        {q:"To teach is to learn twice.", a:"Joseph Joubert"},
+        {q:"Nine-tenths of education is encouragement.", a:"Anatole France"},
+        {q:"Students don't care how much you know until they know how much you care.", a:"John C. Maxwell"},
+        {q:"The dream begins, most of the time, with a teacher who believes in you.", a:"Dan Rather"},
+        {q:"Good teaching is one-fourth preparation and three-fourths pure theatre.", a:"Gail Godwin"},
+        {q:"In learning you will teach, and in teaching you will learn.", a:"Phil Collins"},
+        {q:"Education is the most powerful weapon which you can use to change the world.", a:"Nelson Mandela"},
+        {q:"A good teacher can inspire hope, ignite the imagination, and instill a love of learning.", a:"Brad Henry"},
+        {q:"The mediocre teacher tells. The good teacher explains. The great teacher inspires.", a:"William Arthur Ward"},
+        {q:"What we learn with pleasure we never forget.", a:"Alfred Mercier"},
+        {q:"It is the supreme art of the teacher to awaken joy in creative expression and knowledge.", a:"Albert Einstein"},
+        {q:"Teachers plant seeds that grow forever.", a:"Unknown"},
+        {q:"The beautiful thing about learning is that nobody can take it away from you.", a:"B.B. King"},
+        {q:"Tell me and I forget. Teach me and I remember. Involve me and I learn.", a:"Benjamin Franklin"},
+        {q:"A teacher takes a hand, opens a mind, and touches a heart.", a:"Unknown"},
+        {q:"You are not just teaching a subject, you are shaping a future.", a:"Unknown"},
+        {q:"Teaching kids to count is fine, but teaching them what counts is best.", a:"Bob Talbert"},
+        {q:"The task of the modern educator is not to cut down jungles, but to irrigate deserts.", a:"C.S. Lewis"},
+        {q:"The best teachers are those who show you where to look but don't tell you what to see.", a:"Alexandra K. Trenfor"},
+        {q:"One child, one teacher, one book, one pen can change the world.", a:"Malala Yousafzai"},
+        {q:"Education breeds confidence. Confidence breeds hope. Hope breeds peace.", a:"Confucius"},
+        {q:"Teachers can change lives with just the right mix of chalk and challenges.", a:"Joyce Meyer"},
+        {q:"Be the teacher you needed when you were younger.", a:"Unknown"},
+        {q:"Your patience and dedication change lives every single day.", a:"Unknown"},
+        {q:"A great coach can change a game. A great teacher can change a life.", a:"Unknown"},
+        {q:"The energy you bring to your classroom is the energy your students carry into the world.", a:"Unknown"},
+        {q:"Behind every successful person is a substantial amount of coffee and a great teacher.", a:"Unknown"},
+        {q:"Teaching is not about answering questions but about raising questions.", a:"Unknown"},
+        {q:"You are the difference in someone's story today.", a:"Unknown"},
+        {q:"Not all superheroes wear capes — some carry lesson plans.", a:"Unknown"},
+        {q:"The world needs more people like you — patient, passionate, present.", a:"Unknown"},
+        {q:"Your impact on your students goes far beyond the classroom walls.", a:"Unknown"},
+        {q:"Great leaders don't set out to be a leader. They set out to make a difference.", a:"Jeremy Bravo"},
+        {q:"A coach is someone who tells you what you don't want to hear so you can be who you want to be.", a:"Tom Landry"},
+        {q:"The growth of a student is the greatest reward a teacher can receive.", a:"Unknown"},
+        {q:"What you do today can improve all your tomorrows.", a:"Ralph Marston"},
+        {q:"Leadership is not about being in charge — it's about taking care of those in your charge.", a:"Simon Sinek"},
+        {q:"Keep showing up. Your students are watching and learning more than the curriculum.", a:"Unknown"},
+        {q:"You don't have to be perfect to inspire others. Let them be inspired by how you deal with your imperfections.", a:"Unknown"},
+        {q:"Almost there. Finish strong — your students are counting on you.", a:"Unknown"},
+        {q:"The finish line is near. What a year you have made it.", a:"Unknown"}
+      ];
+
+      // Recycling quotes for weekends & days off
+      const dayOffQuotes = [
+        {q:"Rest is not idleness; it is the key to a powerful tomorrow.", a:"John Lubbock"},
+        {q:"You deserve this break. Recharge and come back even stronger.", a:"Unknown"},
+        {q:"Take care of yourself — you can't pour from an empty cup.", a:"Unknown"},
+        {q:"The time you enjoy wasting is not wasted time.", a:"Bertrand Russell"},
+        {q:"Almost everything will work again if you unplug it for a few minutes, including you.", a:"Anne Lamott"},
+        {q:"Breathe. Let go. And remind yourself that this very moment is the only one you have for sure.", a:"Oprah Winfrey"},
+        {q:"Happiness is not something ready-made. It comes from your own actions.", a:"Dalai Lama"},
+        {q:"Do something today that your future self will thank you for.", a:"Sean Patrick Flanery"},
+        {q:"The only way to do great work is to love what you do.", a:"Steve Jobs"},
+        {q:"Believe you can and you're halfway there.", a:"Theodore Roosevelt"},
+        {q:"In the middle of difficulty lies opportunity.", a:"Albert Einstein"},
+        {q:"You are braver than you believe, stronger than you seem, and smarter than you think.", a:"A.A. Milne"},
+        {q:"Every day is a fresh start.", a:"Unknown"},
+        {q:"You are enough, just as you are.", a:"Meghan Markle"},
+        {q:"Life is short. Smile while you still have teeth.", a:"Unknown"}
+      ];
+
+      const idx = schoolDays.indexOf(today);
+      let quote;
+      if (idx >= 0) {
+        quote = teacherQuotes[idx % teacherQuotes.length];
+      } else {
+        // Hash the date string to pick a recycling quote
+        let hash = 0;
+        for (let i = 0; i < today.length; i++) hash = ((hash << 5) - hash + today.charCodeAt(i)) | 0;
+        quote = dayOffQuotes[Math.abs(hash) % dayOffQuotes.length];
+      }
+
+      const textEl = document.getElementById('quoteText');
+      const authEl = document.getElementById('quoteAuthor');
+      if (textEl && quote) textEl.textContent = '\u201C' + quote.q + '\u201D';
+      if (authEl && quote) authEl.textContent = '\u2014 ' + quote.a;
     })();
   </script>
 </body>
