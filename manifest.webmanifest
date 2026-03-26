@@ -1,0 +1,19 @@
+{
+  "id": "/pvhs_tools/",
+  "name": "PVHS Tools",
+  "short_name": "PVHS Tools",
+  "start_url": "/pvhs_tools/",
+  "scope": "/pvhs_tools/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#021414",
+  "theme_color": "#007474",
+  "icons": [
+    {
+      "src": "/pvhs_tools/PV_AppIcon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
