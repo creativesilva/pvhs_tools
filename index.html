@@ -14,6 +14,8 @@
   <link rel="apple-touch-icon" href="PV_AppIcon.png">
   <link rel="icon" type="image/png" sizes="1024x1024" href="PV_AppIcon.png">
   <title>PVHS Tools</title>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>emailjs.init('68UkiTjqHIKZMkeCC');</script>
 
   <style>
     :root {
@@ -459,7 +461,7 @@
             <input id="feedbackName" class="feedback-input" type="text" placeholder="e.g. Ms. Johnson">
           </div>
           <button id="feedbackSubmit" class="feedback-submit" type="button">Send Feedback ✉️</button>
-          <p class="feedback-note">Your feedback goes directly to the developer at csilva@smjuhsd.org</p>
+          <p class="feedback-note">Your feedback is sent directly to the developer.</p>
         </div>
       </div>
 
@@ -657,22 +659,50 @@
         });
       });
       document.getElementById('feedbackSubmit')?.addEventListener('click', () => {
+        const submitBtn = document.getElementById('feedbackSubmit');
         const ratingLabels = ['','😕 Needs Work','😐 It\'s OK','🙂 Pretty Good','😊 Love It','🤩 Amazing!'];
         const rating   = selectedRating ? ratingLabels[selectedRating] : 'Not rated';
         const good     = document.getElementById('feedbackGood')?.value.trim()    || '(none)';
         const improve  = document.getElementById('feedbackImprove')?.value.trim() || '(none)';
         const name     = document.getElementById('feedbackName')?.value.trim()    || 'Anonymous';
-        const subject  = encodeURIComponent('PVHS Tools Feedback');
-        const body     = encodeURIComponent(
-          `PVHS Tools Feedback\n` +
-          `━━━━━━━━━━━━━━━━━━━━\n` +
-          `Rating:  ${rating}\n` +
-          `From:    ${name}\n\n` +
+        const page     = document.title || 'Unknown Page';
+        const message  =
+          `Rating: ${rating}\n` +
+          `Page: ${page}\n\n` +
           `What's working well:\n${good}\n\n` +
-          `What to add or change:\n${improve}\n`
-        );
-        window.open(`mailto:csilva@smjuhsd.org?subject=${subject}&body=${body}`);
-        closeFeedback();
+          `What to add or change:\n${improve}`;
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+
+        emailjs.send('service_4mhkbik', 'template_fd0suj3', {
+          name: name,
+          message: message,
+          rating: rating,
+        }).then(() => {
+          submitBtn.textContent = '✅ Sent! Thank you!';
+          submitBtn.style.background = '#2e7d32';
+          setTimeout(() => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Send Feedback ✉️';
+            submitBtn.style.background = '';
+            closeFeedback();
+            selectedRating = 0;
+            document.querySelectorAll('.feedback-rating-btn').forEach(b => b.classList.remove('is-selected'));
+            document.getElementById('feedbackGood').value = '';
+            document.getElementById('feedbackImprove').value = '';
+            document.getElementById('feedbackName').value = '';
+          }, 2000);
+        }).catch((err) => {
+          console.error('EmailJS error:', err);
+          submitBtn.textContent = '❌ Error, try again';
+          submitBtn.style.background = '#c62828';
+          setTimeout(() => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Send Feedback ✉️';
+            submitBtn.style.background = '';
+          }, 3000);
+        });
       });
     })();
 
