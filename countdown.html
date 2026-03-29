@@ -119,10 +119,10 @@
     .page-title { position: absolute; left: 0; right: 0; text-align: center; font-size: 15px; font-weight: 700; color: #dff7f7; text-transform: uppercase; margin: 0; letter-spacing: 0.14em; pointer-events: none; }
     .header-clock { position: absolute; left: 0; right: 0; text-align: center; pointer-events: none; display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 0; }
     .header-clock-row { display: flex; align-items: center; justify-content: center; gap: 0; }
-    .header-clock-label { font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: rgba(255,255,255,0.45); margin-right: 6px; }
-    .header-clock-time { font-size: 15px; font-weight: 800; color: #dff7f7; letter-spacing: 0.06em; font-variant-numeric: tabular-nums; }
-    .header-clock-colon { font-size: 15px; font-weight: 800; color: #dff7f7; animation: blink-colon 1s step-end infinite; }
-    .header-clock-ampm { font-size: 15px; font-weight: 700; color: rgba(255,255,255,0.45); letter-spacing: 0.08em; margin-left: 5px; }
+    .header-clock-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: rgba(255,255,255,0.45); margin-right: 5px; }
+    .header-clock-time { font-size: 20px; font-weight: 800; color: #dff7f7; letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }
+    .header-clock-colon { font-size: 20px; font-weight: 800; color: #dff7f7; animation: blink-colon 1s step-end infinite; }
+    .header-clock-ampm { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.45); letter-spacing: 0.08em; margin-left: 5px; align-self: center; }
     @keyframes blink-colon { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
 
     .card { width: 100%; border-radius: 22px; background: var(--panel); border: 1px solid var(--panel-border); backdrop-filter: blur(10px); box-shadow: var(--soft-shadow); margin-bottom: 5px; }
@@ -645,7 +645,7 @@
       <div class="content">
         <div class="top-row">
           <a href="index.html" class="nav-link" aria-label="Home"><img src="PV_Logo.png" alt="Logo" class="logo-clear"></a>
-          <div class="header-clock" id="headerClock"><span class="header-clock-label">Current Time</span><span class="header-clock-time" id="clockHr">12</span><span class="header-clock-colon">:</span><span class="header-clock-time" id="clockMin">00</span><span class="header-clock-ampm" id="clockAmpm">PM</span></div>
+          <div class="header-clock" id="headerClock"><span class="header-clock-label">TIME</span><span class="header-clock-time" id="clockHr">12</span><span class="header-clock-colon">:</span><span class="header-clock-time" id="clockMin">00</span><span class="header-clock-colon">:</span><span class="header-clock-time" id="clockSec">00</span><span class="header-clock-ampm" id="clockAmpm">PM</span></div>
           <button id="navMenuBtn" class="nav-menu-btn" type="button" aria-label="Menu" aria-expanded="false">···</button>
         </div>
 
@@ -845,15 +845,18 @@
     (function() {
       const hrEl = document.getElementById('clockHr');
       const minEl = document.getElementById('clockMin');
+      const secEl = document.getElementById('clockSec');
       const ampmEl = document.getElementById('clockAmpm');
       function updateClock() {
         const now = new Date();
         let h = now.getHours();
         const m = now.getMinutes();
+        const s = now.getSeconds();
         const ampm = h >= 12 ? 'PM' : 'AM';
         h = h % 12 || 12;
         if (hrEl) hrEl.textContent = h;
         if (minEl) minEl.textContent = String(m).padStart(2, '0');
+        if (secEl) secEl.textContent = String(s).padStart(2, '0');
         if (ampmEl) ampmEl.textContent = ampm;
       }
       updateClock();
