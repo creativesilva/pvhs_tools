@@ -1426,30 +1426,43 @@
         return md ? schedules.minimum : (wd === 'Monday' ? schedules.monday : schedules.regular);
       }
 
-      // ── 1. SCHOOL DAY / RESTING ─────────────────────────────
-      // A school day runs from 12:00 AM to 11:59 PM (full calendar day)
-      let sdFrac = 0, sdLabel = 'School Day', sdCls = 'prog-bar--day';
-      if (isSD) {
-        // During a school day: progress = fraction of the full day elapsed
-        sdFrac = totalSec / 86399; // 86399 = 23:59:59
+      // ── 1. SCHOOL DAY — countdown bar (1st bell → end of 7th period) ──
+      // Bar drains full→empty during school hours. After 7th bell: empty + "SCHOOL IS OUT".
+      // Before school / non-school day: empty + appropriate label.
+      const schoolStart = firstStart;          // 8:30 — 1st period bell
+      // 7th period end = last block that contains "PERIOD" in its label
+      const lastPeriodBlk = [...blks].reverse().find(b => /PERIOD/i.test(b.l));
+      const schoolEnd = lastPeriodBlk ? parseToSec(lastPeriodBlk.e) : lastEnd;
+      const schoolDuration = schoolEnd - schoolStart;  // total instructional seconds
+
+      let sdFrac = 0, sdLabel = 'School Day', sdRight = '';
+      if (!isSD) {
+        // Not a school day
+        sdLabel = 'School Is Out';
+        sdRight = '';
+      } else if (totalSec < schoolStart) {
+        // Before 1st bell — show time until school starts
+        const minsUntil = Math.ceil((schoolStart - totalSec) / 60);
+        const h = Math.floor(minsUntil / 60), m = minsUntil % 60;
+        sdLabel = 'School Day';
+        sdRight = h > 0 ? `Starts in ${h}h ${m}m` : `Starts in ${m}m`;
+        sdFrac = 0;
+      } else if (totalSec >= schoolStart && totalSec < schoolEnd) {
+        // ✅ During school: bar drains, show time remaining
+        const remaining = schoolEnd - totalSec;
+        const h = Math.floor(remaining / 3600);
+        const m = Math.floor((remaining % 3600) / 60);
+        sdFrac = remaining / schoolDuration;           // 1.0 at start → 0.0 at end
+        sdLabel = 'School Day';
+        sdRight = h > 0 ? `${h}h ${m}m left` : `${m}m left`;
       } else {
-        sdLabel = 'Resting'; sdCls = 'prog-bar--rest';
-        const nextSD = schoolDays.find(d => d > dateStr) || null;
-        if (nextSD) {
-          // Rest period: from end of last school day (midnight) to start of next (midnight)
-          const prevSD = [...schoolDays].reverse().find(d => d < dateStr);
-          const restStartMs = prevSD
-            ? new Date(prevSD + 'T12:00:00').getTime() + 12 * 3600000 // midnight after prev school day
-            : todayMidnightMs - 86400000;
-          const restEndMs = new Date(nextSD + 'T12:00:00').getTime() - 12 * 3600000; // midnight of next school day
-          const restTotal = restEndMs - restStartMs;
-          sdFrac = restTotal > 0 ? (nowMs - restStartMs) / restTotal : 0;
-        } else {
-          sdFrac = 1; sdLabel = 'Graduated! 🎓'; sdCls = 'prog-bar--grad';
-        }
+        // After 7th period bell
+        sdFrac = 0;
+        sdLabel = 'School Is Out';
+        sdRight = '';
       }
-      setFill('schoolDayFill', sdFrac, sdCls);
-      setTxt('schoolDayPct',       pctStr(sdFrac));
+      setFill('schoolDayFill', sdFrac, 'prog-bar--day');
+      setTxt('schoolDayPct',       sdRight);
       setTxt('schoolDayProgLabel', sdLabel);
 
       // ── 2. THIS WEEK ────────────────────────────────────────
