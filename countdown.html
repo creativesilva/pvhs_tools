@@ -186,10 +186,41 @@
     .prog-bar--grad { background: linear-gradient(90deg, #ffd44a 0%, #e07000 100%); }
     .prog-bar--vac  { background: linear-gradient(90deg, #ff9a5c 0%, #d94f00 100%); }
     .prog-bar--pr   { background: linear-gradient(90deg, #ff7070 0%, #b80000 100%); }
-    body.is-embed .progress-card { padding: 14px 16px; }
-    body.is-embed .prog-track { height: 7px; }
-    body.is-embed .prog-label { font-size: 11px; }
-    body.is-embed .prog-pct   { font-size: 12px; }
+    /* ── EMBED CLOCK TILE ──────────────────────────────── */
+    .embed-clock-tile { display: none; }
+    body.is-embed .embed-clock-tile {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      padding: 10px 16px;
+    }
+    .embed-clock-time {
+      font-size: clamp(28px, 8vw, 48px);
+      font-weight: 900;
+      color: #dff7f7;
+      letter-spacing: 0.02em;
+      font-variant-numeric: tabular-nums;
+    }
+    .embed-clock-colon {
+      font-size: clamp(28px, 8vw, 48px);
+      font-weight: 900;
+      color: #dff7f7;
+      animation: blink-colon 1s step-end infinite;
+    }
+    .embed-clock-ampm {
+      font-size: clamp(12px, 3vw, 18px);
+      font-weight: 700;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0.08em;
+      margin-left: 6px;
+      align-self: center;
+    }
+
+    body.is-embed .progress-card { padding: clamp(8px, 3vw, 14px) clamp(10px, 4vw, 16px); }
+    body.is-embed .prog-track { height: clamp(5px, 1.8vw, 7px); }
+    body.is-embed .prog-label { font-size: clamp(8px, 3vw, 11px); }
+    body.is-embed .prog-pct   { font-size: clamp(9px, 3.2vw, 12px); }
 
     /* ── NOTIFICATION BELL ─────────────────────────────── */
     body.is-embed #notifBtn { display: none; }
@@ -323,13 +354,13 @@
     body.is-embed .frame {
       align-items: flex-start;
       justify-content: flex-start;
-      padding: 10px 0 0 10px;
+      padding: 10px;
       background: transparent;
     }
     body.is-embed .app {
-      width: min(290px, calc(100vw - 20px));
+      width: calc(100vw - 20px);
       height: auto;
-      max-width: min(290px, calc(100vw - 20px));
+      max-width: calc(100vw - 20px);
       max-height: none;
       border-radius: 0;
       border: none;
@@ -346,7 +377,7 @@
       width: 100%;
       height: auto;
       padding: 0;
-      gap: 12px;
+      gap: clamp(6px, 2.5vw, 12px);
       align-items: stretch;
       overflow: visible;
     }
@@ -377,35 +408,35 @@
     body.is-embed .info-strip {
       padding: 20px 16px 18px;
     }
-    body.is-embed .info-number { font-size: 80px; }
-    body.is-embed .info-main { font-size: 20px; }
-    body.is-embed .info-label { font-size: 13px; letter-spacing: 0.18em; }
-    body.is-embed .info-sub { font-size: 11px; }
+    body.is-embed .info-number { font-size: clamp(42px, 22vw, 80px); }
+    body.is-embed .info-main { font-size: clamp(14px, 5.5vw, 20px); }
+    body.is-embed .info-label { font-size: clamp(9px, 3.5vw, 13px); letter-spacing: 0.18em; }
+    body.is-embed .info-sub { font-size: clamp(8px, 3vw, 11px); }
     body.is-embed .block-label {
-      font-size: clamp(24px, 8vw, 30px);
+      font-size: clamp(16px, 8vw, 30px);
       margin-bottom: 6px;
       letter-spacing: 0.09em;
     }
     body.is-embed .subtext {
-      font-size: 15px;
+      font-size: clamp(10px, 4vw, 15px);
       line-height: 1.2;
       letter-spacing: 0.06em;
     }
     body.is-embed .access-row {
-      font-size: 14px;
+      font-size: clamp(9px, 3.8vw, 14px);
       line-height: 1.18;
       letter-spacing: 0.08em;
       margin-top: 8px;
       text-shadow: 0 4px 12px rgba(0,0,0,0.22);
     }
     body.is-embed .status-row {
-      font-size: 13px;
+      font-size: clamp(9px, 3.5vw, 13px);
       margin-top: 8px;
       letter-spacing: 0.08em;
       opacity: 0.9;
     }
     body.is-embed .footer-note {
-      font-size: 11px;
+      font-size: clamp(8px, 3vw, 11px);
       margin-top: 4px;
     }
 
@@ -649,6 +680,10 @@
           <button id="navMenuBtn" class="nav-menu-btn" type="button" aria-label="Menu" aria-expanded="false">···</button>
         </div>
 
+        <div class="card embed-clock-tile" id="embedClockTile">
+          <span class="embed-clock-time" id="embedClockHr">12</span><span class="embed-clock-colon">:</span><span class="embed-clock-time" id="embedClockMin">00</span><span class="embed-clock-colon">:</span><span class="embed-clock-time" id="embedClockSec">00</span><span class="embed-clock-ampm" id="embedClockAmpm">PM</span>
+        </div>
+
         <div class="card period-card">
           <div class="block-label" id="blockLabel">Loading</div>
           <div class="timer normal" id="timerText">--:--</div>
@@ -847,6 +882,10 @@
       const minEl = document.getElementById('clockMin');
       const secEl = document.getElementById('clockSec');
       const ampmEl = document.getElementById('clockAmpm');
+      const eHrEl = document.getElementById('embedClockHr');
+      const eMinEl = document.getElementById('embedClockMin');
+      const eSecEl = document.getElementById('embedClockSec');
+      const eAmpmEl = document.getElementById('embedClockAmpm');
       function updateClock() {
         const now = new Date();
         let h = now.getHours();
@@ -854,10 +893,17 @@
         const s = now.getSeconds();
         const ampm = h >= 12 ? 'PM' : 'AM';
         h = h % 12 || 12;
-        if (hrEl) hrEl.textContent = h;
-        if (minEl) minEl.textContent = String(m).padStart(2, '0');
-        if (secEl) secEl.textContent = String(s).padStart(2, '0');
+        const hStr = String(h);
+        const mStr = String(m).padStart(2, '0');
+        const sStr = String(s).padStart(2, '0');
+        if (hrEl) hrEl.textContent = hStr;
+        if (minEl) minEl.textContent = mStr;
+        if (secEl) secEl.textContent = sStr;
         if (ampmEl) ampmEl.textContent = ampm;
+        if (eHrEl) eHrEl.textContent = hStr;
+        if (eMinEl) eMinEl.textContent = mStr;
+        if (eSecEl) eSecEl.textContent = sStr;
+        if (eAmpmEl) eAmpmEl.textContent = ampm;
       }
       updateClock();
       setInterval(updateClock, 1000);
