@@ -756,10 +756,10 @@
         <div class="nav-menu-sep"></div>
         <a href="extension_search.html" class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">🔍</span>Directory</a>
         <a href="index.html" class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">🏠</span>Home</a>
-        <div id="embedMenuSep" class="nav-menu-sep" style="display:none"></div>
-        <button id="embedBtn" class="nav-menu-item" type="button" role="menuitem" style="display:none"><span class="nav-menu-icon">📋</span>Embed</button>
         <div id="popoutMenuSep" class="nav-menu-sep"></div>
         <button id="popoutBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon">🪟</span>Pop Out</button>
+        <div id="embedMenuSep" class="nav-menu-sep" style="display:none"></div>
+        <button id="embedBtn" class="nav-menu-item" type="button" role="menuitem" style="display:none"><span class="nav-menu-icon">📋</span>Embed</button>
         <div id="installMenuSep" class="nav-menu-sep"></div>
         <button id="installBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon" id="installIcon">📲</span><span id="installLabel">Add to Home Screen</span></button>
         <div class="nav-menu-sep"></div>
@@ -1361,7 +1361,8 @@
       const firstStart = parseToSec(blks[0].s);
       const lastEnd    = parseToSec(blks[blks.length - 1].e);
       const isSD       = schoolDays.includes(dateStr);
-      const isAfterSchoolToday = isSD && totalSec >= lastEnd;
+      // A school day lasts until 11:59 PM — only "done" when the calendar flips
+      const isAfterSchoolToday = false;
 
       function toMs(dayOff, sec) { return todayMidnightMs + dayOff * 86400000 + sec * 1000; }
       function clamp01(v) { return Math.max(0, Math.min(1, v)); }
@@ -1380,30 +1381,21 @@
       }
 
       // ── 1. SCHOOL DAY / RESTING ─────────────────────────────
+      // A school day runs from 12:00 AM to 11:59 PM (full calendar day)
       let sdFrac = 0, sdLabel = 'School Day', sdCls = 'prog-bar--day';
-      if (isSD && totalSec >= firstStart && totalSec < lastEnd) {
-        sdFrac = (totalSec - firstStart) / (lastEnd - firstStart);
+      if (isSD) {
+        // During a school day: progress = fraction of the full day elapsed
+        sdFrac = totalSec / 86399; // 86399 = 23:59:59
       } else {
         sdLabel = 'Resting'; sdCls = 'prog-bar--rest';
-        const nextSD = (isSD && totalSec < firstStart)
-          ? dateStr
-          : (schoolDays.find(d => d > dateStr) || null);
+        const nextSD = schoolDays.find(d => d > dateStr) || null;
         if (nextSD) {
-          const nextOff = Math.round((new Date(nextSD + 'T12:00:00') - new Date(dateStr + 'T12:00:00')) / 86400000);
-          const restEndMs = toMs(nextOff, parseToSec(getSchBlocks(nextSD)[0].s));
-          let restStartMs;
-          if (isSD && totalSec >= lastEnd) {
-            restStartMs = toMs(0, lastEnd);
-          } else {
-            const prevSD = [...schoolDays].reverse().find(d => d < dateStr);
-            if (prevSD) {
-              const prevOff  = Math.round((new Date(prevSD + 'T12:00:00') - new Date(dateStr + 'T12:00:00')) / 86400000);
-              const prevBlks = getSchBlocks(prevSD);
-              restStartMs = toMs(prevOff, parseToSec(prevBlks[prevBlks.length - 1].e));
-            } else {
-              restStartMs = restEndMs - 86400000;
-            }
-          }
+          // Rest period: from end of last school day (midnight) to start of next (midnight)
+          const prevSD = [...schoolDays].reverse().find(d => d < dateStr);
+          const restStartMs = prevSD
+            ? new Date(prevSD + 'T12:00:00').getTime() + 12 * 3600000 // midnight after prev school day
+            : todayMidnightMs - 86400000;
+          const restEndMs = new Date(nextSD + 'T12:00:00').getTime() - 12 * 3600000; // midnight of next school day
           const restTotal = restEndMs - restStartMs;
           sdFrac = restTotal > 0 ? (nowMs - restStartMs) / restTotal : 0;
         } else {
@@ -1433,7 +1425,7 @@
         const wkStart = toMs(fw.off, parseToSec(fwB[0].s));
         const wkEnd   = toMs(lw.off, parseToSec(lwB[lwB.length - 1].e));
         wkFrac = wkStart < wkEnd ? (nowMs - wkStart) / (wkEnd - wkStart) : 0;
-        if (isWeekend || (isAfterSchoolToday && dow === 5)) {
+        if (isWeekend) {
           wkLabel = 'Back to School';
           const nextSD = schoolDays.find(d => d > dateStr);
           if (nextSD) {
@@ -1441,7 +1433,7 @@
             wkRight = cal === 1 ? '1 Day' : `${cal} Days`;
           }
         } else {
-          const remSDs = weekSDs.filter(sd => sd.dStr > dateStr || (sd.dStr === dateStr && !isAfterSchoolToday));
+          const remSDs = weekSDs.filter(sd => sd.dStr >= dateStr);
           const cnt = remSDs.length;
           wkLabel  = cnt === 0 ? 'Weekend! 🎉' : 'Till the Weekend';
           wkRight  = cnt === 0 ? '🎉' : cnt === 1 ? '1 Day' : `${cnt} Days`;
@@ -1456,11 +1448,11 @@
 
       // ── 3. GRADUATION ───────────────────────────────────────
       const total   = schoolDays.length;
-      const afterToday = isSD && totalSec >= lastEnd;
-      const passed  = schoolDays.filter(d => d < dateStr).length + (afterToday ? 1 : 0);
+      const passed  = schoolDays.filter(d => d < dateStr).length;
       const grFrac  = total > 0 ? passed / total : 0;
+      const grRemaining = total - passed;
       setFill('gradFill', grFrac, 'prog-bar--grad');
-      setTxt('gradPct',   pctStr(grFrac));
+      setTxt('gradPct',   grRemaining === 0 ? '🎓' : grRemaining === 1 ? '1 Day' : `${grRemaining} Days`);
 
       // ── 4. NEXT VACATION ────────────────────────────────────
       const vacations = [
@@ -1471,11 +1463,12 @@
       if (nextVac) {
         const { name: vacName, start: vacStart, stretchFrom } = nextVac;
         const totalVacSDs  = schoolDays.filter(d => d >= stretchFrom && d < vacStart).length;
-        const passedVacSDs = schoolDays.filter(d => d >= stretchFrom && (d < dateStr || (d === dateStr && isAfterSchoolToday))).length;
+        const passedVacSDs = schoolDays.filter(d => d >= stretchFrom && d < dateStr).length;
         const vacFrac = totalVacSDs > 0 ? passedVacSDs / totalVacSDs : 0;
+        const vacRemaining = totalVacSDs - passedVacSDs;
         setFill('vacFill', vacFrac, 'prog-bar--vac');
         setTxt('vacLabel', `Till ${vacName}`);
-        setTxt('vacPct', pctStr(vacFrac));
+        setTxt('vacPct', vacRemaining === 0 ? '🎉' : vacRemaining === 1 ? '1 Day' : `${vacRemaining} Days`);
       } else {
         setFill('vacFill', 1, 'prog-bar--vac');
         setTxt('vacLabel', 'Summer Break! 🌴');
@@ -1490,19 +1483,14 @@
         { from: "2025-10-31", to: "2026-02-27" },
         { from: "2026-02-27", to: "2026-04-24" }
       ];
-      const nextPR = progressReports.find(d => dateStr < d || (dateStr === d && !isAfterSchoolToday));
+      const nextPR = progressReports.find(d => dateStr <= d);
       if (nextPR) {
         const stretch = prStretches.find(s => s.to === nextPR);
         if (stretch) {
           const totalPRSDs  = schoolDays.filter(d => d >= stretch.from && d <= stretch.to).length;
-          const passedPRSDs = schoolDays.filter(d => d >= stretch.from && (d < dateStr || (d === dateStr && isAfterSchoolToday))).length;
+          const passedPRSDs = schoolDays.filter(d => d >= stretch.from && d < dateStr).length;
           const prFrac = totalPRSDs > 0 ? passedPRSDs / totalPRSDs : 0;
-          const dToPR = schoolDays.filter(d => {
-            if (d > nextPR) return false;
-            if (d > dateStr) return true;
-            if (d === dateStr && !isAfterSchoolToday) return true;
-            return false;
-          }).length;
+          const dToPR = schoolDays.filter(d => d >= dateStr && d <= nextPR).length;
           const prRight = dToPR === 0 ? '🎉 Today!' : dToPR === 1 ? '1 Day' : `${dToPR} Days`;
           setFill('prFill', prFrac, 'prog-bar--pr');
           setTxt('prPct',   prRight);
