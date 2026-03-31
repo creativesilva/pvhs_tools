@@ -1177,8 +1177,8 @@
       const isSchoolDay = schoolDays.includes(now.dateStr);
       const firstStart = parseToSec(blocks[0].s);
       const lastEnd = parseToSec(blocks[blocks.length - 1].e);
-      const isAfterSchool = isSchoolDay && now.totalSec >= lastEnd;
-      const remainingSchoolDays = schoolDays.filter(d => d > now.dateStr || (d === now.dateStr && !isAfterSchool)).length;
+      // Today counts as a remaining school day until midnight
+      const remainingSchoolDays = schoolDays.filter(d => d >= now.dateStr).length;
       document.getElementById("daysLeft").textContent = remainingSchoolDays;
 
       if (isSchoolDay && now.totalSec >= firstStart && now.totalSec < lastEnd) {
@@ -1506,10 +1506,10 @@
       setTxt('weekProgLabel', wkLabel);
 
       // ── 3. GRADUATION ───────────────────────────────────────
-      const total   = schoolDays.length;
-      const passed  = schoolDays.filter(d => d < dateStr).length;
-      const grFrac  = total > 0 ? passed / total : 0;
-      const grRemaining = total - passed;
+      const total      = schoolDays.length;
+      const grRemaining = schoolDays.filter(d => d >= dateStr).length;
+      const passed     = total - grRemaining;
+      const grFrac     = total > 0 ? passed / total : 0;
       setFill('gradFill', grFrac, 'prog-bar--grad');
       setTxt('gradPct',   grRemaining === 0 ? '🎓' : grRemaining === 1 ? '1 Day' : `${grRemaining} Days`);
 
