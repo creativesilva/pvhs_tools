@@ -343,6 +343,55 @@
       body { touch-action: pan-y; }
     }
 
+    /* ── MAINTENANCE MODAL ──────────────────────────────── */
+    .maint-modal[hidden] { display: none; }
+    .maint-modal {
+      position: absolute; inset: 0; z-index: 20;
+      display: flex; align-items: center; justify-content: center; padding: 24px;
+    }
+    .maint-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(1,12,12,0.80);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    }
+    .maint-dialog {
+      position: relative; width: min(100%, 340px);
+      border-radius: 26px; border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(6,26,26,0.88);
+      box-shadow: 0 28px 52px rgba(0,0,0,0.46);
+      padding: 20px; display: flex; flex-direction: column; gap: 14px;
+    }
+    .maint-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .maint-title-row { display: flex; align-items: center; gap: 9px; }
+    .maint-title-icon { font-size: 22px; line-height: 1; }
+    .maint-title { font-size: 13px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 0.12em; margin: 0; }
+    .maint-subtitle { font-size: 9.5px; font-weight: 600; color: var(--muted); opacity: 0.7; text-transform: uppercase; letter-spacing: 0.12em; margin: 2px 0 0; }
+    .maint-close {
+      appearance: none; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.6); border-radius: 99px; width: 28px; height: 28px;
+      font-size: 13px; cursor: pointer; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .maint-close:active { background: rgba(255,255,255,0.18); }
+    .maint-options { display: flex; flex-direction: column; gap: 9px; }
+    .maint-option {
+      display: flex; align-items: center; gap: 13px;
+      padding: 14px 15px; border-radius: 18px; text-decoration: none;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      transition: background 0.18s, border-color 0.18s; cursor: pointer;
+    }
+    .maint-option:active { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.18); }
+    .maint-option-icon {
+      width: 42px; height: 42px; border-radius: 13px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 22px;
+    }
+    .maint-option-icon--reserve { background: rgba(0,160,160,0.18); border: 1px solid rgba(0,200,200,0.2); }
+    .maint-option-icon--repair  { background: rgba(255,140,60,0.16); border: 1px solid rgba(255,160,80,0.22); }
+    .maint-option-text { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+    .maint-option-label { font-size: 12px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 0.09em; margin: 0; }
+    .maint-option-desc  { font-size: 9.5px; font-weight: 500; color: var(--muted); line-height: 1.4; margin: 0; opacity: 0.82; }
+    .maint-option-arrow { font-size: 14px; color: rgba(255,255,255,0.3); flex-shrink: 0; }
+
     /* ── FEEDBACK MODAL ─────────────────────────────────── */
     .feedback-modal[hidden] { display: none; }
     .feedback-modal {
@@ -416,7 +465,7 @@
         </div>
         <p class="section-label">Quick Links</p>
         <div class="quick-links-grid">
-          <a class="quick-link-btn" href="https://www.facilitron.com/accounts/signin/" target="_blank"><span class="quick-link-icon">🔧</span><p class="quick-link-label">Maintenance</p></a>
+          <button id="maintBtn" class="quick-link-btn" type="button"><span class="quick-link-icon">🔧</span><p class="quick-link-label">Maintenance</p></button>
           <a class="quick-link-btn" href="https://smjuhsd.incidentiq.com/" target="_blank"><span class="quick-link-icon">🖥️</span><p class="quick-link-label">IT Support</p></a>
           <a class="quick-link-btn" href="https://login.frontlineeducation.com/login?signin=fb4604f28ef1253869f30c5315641ca3&clientId=superSuit#/login" target="_blank"><span class="quick-link-icon">📋</span><p class="quick-link-label">Absences</p></a>
           <a class="quick-link-btn" href="https://smjuhsd-my.sharepoint.com/:x:/g/personal/etorres_smjuhsd_org/IQBiSObgdkR3R68_dXHYrDwfAbA5RpN-scClTiKQddgcsLU" target="_blank"><span class="quick-link-icon">📝</span><p class="quick-link-label">In Lieu</p></a>
@@ -432,6 +481,41 @@
           <p class="daily-quote-author" id="quoteAuthor"></p>
         </div>
         <div class="footer-note">By: CreativeSilva</div>
+      </div>
+
+      <!-- MAINTENANCE MODAL -->
+      <div id="maintModal" class="maint-modal" hidden>
+        <div class="maint-backdrop" id="maintBackdrop"></div>
+        <div class="maint-dialog">
+          <div class="maint-header">
+            <div class="maint-title-row">
+              <span class="maint-title-icon">🔧</span>
+              <div>
+                <p class="maint-title">Maintenance</p>
+                <p class="maint-subtitle">Choose an option</p>
+              </div>
+            </div>
+            <button id="maintClose" class="maint-close" type="button">✕</button>
+          </div>
+          <div class="maint-options">
+            <a class="maint-option" href="https://www.facilitron.com/accounts/signin/" target="_blank" id="maintReserveLink">
+              <div class="maint-option-icon maint-option-icon--reserve">🏫</div>
+              <div class="maint-option-text">
+                <p class="maint-option-label">Reserve a Space</p>
+                <p class="maint-option-desc">Book a room, gym, or facility for a class, event, or presentation.</p>
+              </div>
+              <span class="maint-option-arrow">›</span>
+            </a>
+            <a class="maint-option" href="https://maintenance.facilitron.com/anonymous/SantaMariaJUHSD/newworkorder" target="_blank" id="maintRepairLink">
+              <div class="maint-option-icon maint-option-icon--repair">🛠️</div>
+              <div class="maint-option-text">
+                <p class="maint-option-label">Request a Repair</p>
+                <p class="maint-option-desc">Submit a work order for a broken item, fixture, or facility issue.</p>
+              </div>
+              <span class="maint-option-arrow">›</span>
+            </a>
+          </div>
+        </div>
       </div>
 
       <!-- FEEDBACK MODAL -->
@@ -637,6 +721,18 @@
       navMenuBtn?.classList.remove('is-open');
       window.open('index.html?mode=popout', 'pvTools', 'width=450,height=900,resizable=yes,scrollbars=no');
     });
+
+    // ── MAINTENANCE MODAL ───────────────────────────────────────
+    (function() {
+      function openMaint()  { document.getElementById('maintModal').hidden = false; }
+      function closeMaint() { document.getElementById('maintModal').hidden = true;  }
+      document.getElementById('maintBtn')?.addEventListener('click', openMaint);
+      document.getElementById('maintClose')?.addEventListener('click', closeMaint);
+      document.getElementById('maintBackdrop')?.addEventListener('click', closeMaint);
+      // Close modal when either link is tapped (they open in new tab)
+      document.getElementById('maintReserveLink')?.addEventListener('click', closeMaint);
+      document.getElementById('maintRepairLink')?.addEventListener('click', closeMaint);
+    })();
 
     // ── FEEDBACK MODAL ──────────────────────────────────────────
     (function() {
