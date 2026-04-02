@@ -478,40 +478,105 @@
       padding-top: max(14px, env(safe-area-inset-top));
     }
 
-    /* ── ATHLETICS VIEW ── */
-    .athletics-view { display: none; flex-direction: column; width: 100%; height: 100%; }
+    /* ── ATHLETICS DASHBOARD ── */
+    .athletics-view { display: none; flex-direction: column; width: 100%; height: 100%; min-height: 0; }
     .athletics-view.is-active { display: flex; }
-    .athletics-list {
+
+    /* Sport filter tabs */
+    .ath-tabs {
+      display: flex; gap: 6px; overflow-x: auto; flex-shrink: 0;
+      padding: 2px 0 8px 0; -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .ath-tabs::-webkit-scrollbar { display: none; }
+    .ath-tab {
+      appearance: none; border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.6);
+      border-radius: 20px; padding: 5px 12px; font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap;
+      cursor: pointer; flex-shrink: 0; transition: all 0.15s;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .ath-tab.is-active {
+      background: rgba(0,160,160,0.22); border-color: rgba(0,220,220,0.35);
+      color: #4be1e1;
+    }
+    .ath-tab:active { background: rgba(255,255,255,0.12); }
+    .ath-tab-emoji { font-size: 13px; line-height: 1; }
+
+    /* Event list */
+    .ath-list {
       flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
-      display: flex; flex-direction: column; gap: 5px;
+      display: flex; flex-direction: column; gap: 4px;
       padding-bottom: 14px;
       scrollbar-width: thin;
       scrollbar-color: rgba(255,255,255,0.15) transparent;
     }
-    .athletics-list::-webkit-scrollbar { width: 5px; }
-    .athletics-list::-webkit-scrollbar-track { background: transparent; }
-    .athletics-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
-    .athletics-season {
-      font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.16em;
-      color: #4be1e1; margin: 8px 0 4px 2px;
+    .ath-list::-webkit-scrollbar { width: 5px; }
+    .ath-list::-webkit-scrollbar-track { background: transparent; }
+    .ath-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+
+    /* Date group header */
+    .ath-date-hdr {
+      font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.14em;
+      color: #4be1e1; margin: 10px 0 3px 2px; opacity: 0.85;
     }
-    .athletics-card {
-      display: flex; align-items: center; gap: 13px;
-      padding: 12px 14px; border-radius: 16px; text-decoration: none; color: inherit;
+    .ath-date-hdr:first-child { margin-top: 2px; }
+
+    /* Today banner */
+    .ath-today-banner {
+      font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.14em;
+      color: #fff; background: rgba(0,180,180,0.18); border: 1px solid rgba(0,220,220,0.25);
+      border-radius: 12px; padding: 6px 12px; margin: 0 0 4px 0; text-align: center;
+    }
+
+    /* Event card */
+    .ath-ev {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 10px 12px; border-radius: 14px;
       background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04);
       backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-      transition: background 0.2s; cursor: pointer;
     }
-    .athletics-card:active { background: var(--card-hover); }
-    .athletics-card-icon {
-      width: 42px; height: 42px; border-radius: 13px; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center; font-size: 22px;
-      background: rgba(255,100,60,0.12); border: 1px solid rgba(255,130,80,0.18);
+    .ath-ev.is-past { opacity: 0.35; }
+    .ath-ev.is-today {
+      background: rgba(0,180,180,0.08); border-color: rgba(0,220,220,0.18);
     }
-    .athletics-card-text { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
-    .athletics-card-title { font-size: 12px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 0.06em; margin: 0; }
-    .athletics-card-desc { font-size: 9.5px; font-weight: 500; color: var(--muted); line-height: 1.4; margin: 0; opacity: 0.82; }
-    .athletics-card-arrow { font-size: 14px; color: rgba(255,255,255,0.3); flex-shrink: 0; }
+    .ath-ev-icon { font-size: 20px; line-height: 1; flex-shrink: 0; margin-top: 1px; }
+    .ath-ev-body { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+    .ath-ev-opponent {
+      font-size: 12px; font-weight: 800; color: #f0fbfb; margin: 0;
+      line-height: 1.25; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    }
+    .ath-ev-meta {
+      font-size: 9px; font-weight: 600; color: var(--muted); opacity: 0.7; margin: 0;
+      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    }
+    .ath-ev-sport {
+      font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+      color: #4be1e1; opacity: 0.8;
+    }
+    /* Badges */
+    .ath-badge {
+      font-size: 7.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em;
+      padding: 1px 5px; border-radius: 4px; white-space: nowrap;
+    }
+    .ath-badge--home {
+      color: #5bff61; background: rgba(91,255,97,0.12); border: 1px solid rgba(91,255,97,0.22);
+    }
+    .ath-badge--away {
+      color: #ffb74d; background: rgba(255,183,77,0.12); border: 1px solid rgba(255,183,77,0.22);
+    }
+    .ath-badge--level {
+      color: rgba(255,255,255,0.55); background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* Empty state */
+    .ath-empty {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 6px; padding: 30px; text-align: center;
+    }
+    .ath-empty-icon { font-size: 28px; opacity: 0.4; }
+    .ath-empty-text { font-size: 11px; font-weight: 600; color: var(--muted); opacity: 0.6; }
 
     /* ── News top-row (mirrors .top-row exactly) ── */
     .news-top-row {
@@ -846,75 +911,19 @@
           <div class="news-detail-scroll" id="newsDetailScroll"></div>
         </div>
 
-        <!-- ATHLETICS VIEW -->
+        <!-- ATHLETICS DASHBOARD -->
         <div class="athletics-view" id="athleticsView">
-          <p class="athletics-season">Spring 2026 Schedules</p>
-          <div class="athletics-list">
-            <a class="athletics-card" href="Sports/PVHS%20VarJV%20Baseball%20Schedule%202026%20(1).xlsx.pdf" target="_blank">
-              <div class="athletics-card-icon">⚾</div>
-              <div class="athletics-card-text">
-                <p class="athletics-card-title">Varsity / JV Baseball</p>
-                <p class="athletics-card-desc">Full season schedule with game times and locations.</p>
-              </div>
-              <span class="athletics-card-arrow">›</span>
-            </a>
-            <a class="athletics-card" href="Sports/Frosh%20Baseball%20(1).xlsx.pdf" target="_blank">
-              <div class="athletics-card-icon">⚾</div>
-              <div class="athletics-card-text">
-                <p class="athletics-card-title">Frosh Baseball</p>
-                <p class="athletics-card-desc">Freshman baseball schedule and game details.</p>
-              </div>
-              <span class="athletics-card-arrow">›</span>
-            </a>
-            <a class="athletics-card" href="Sports/Softball_VarJV_Schedule_2026.xlsx.pdf" target="_blank">
-              <div class="athletics-card-icon">🥎</div>
-              <div class="athletics-card-text">
-                <p class="athletics-card-title">Softball (Var / JV)</p>
-                <p class="athletics-card-desc">Varsity and JV softball schedule.</p>
-              </div>
-              <span class="athletics-card-arrow">›</span>
-            </a>
-            <a class="athletics-card" href="Sports/Men's_Volleyball_2026%20(1).xlsx.pdf" target="_blank">
-              <div class="athletics-card-icon">🏐</div>
-              <div class="athletics-card-text">
-                <p class="athletics-card-title">Men's Volleyball</p>
-                <p class="athletics-card-desc">Full match schedule for the 2026 season.</p>
-              </div>
-              <span class="athletics-card-arrow">›</span>
-            </a>
-            <a class="athletics-card" href="Sports/PVHS%20Men's%20Tennis%20Schedule%202026%20(2).xlsx.pdf" target="_blank">
-              <div class="athletics-card-icon">🎾</div>
-              <div class="athletics-card-text">
-                <p class="athletics-card-title">Men's Tennis</p>
-                <p class="athletics-card-desc">Match dates, times, and opponents.</p>
-              </div>
-              <span class="athletics-card-arrow">›</span>
-            </a>
-            <a class="athletics-card" href="Sports/Men's_Golf_Schedule_2026%20(1).xlsx.pdf" target="_blank">
-              <div class="athletics-card-icon">⛳</div>
-              <div class="athletics-card-text">
-                <p class="athletics-card-title">Men's Golf</p>
-                <p class="athletics-card-desc">Tournament and match schedule.</p>
-              </div>
-              <span class="athletics-card-arrow">›</span>
-            </a>
-            <a class="athletics-card" href="Sports/Swim%20and%20Dive%202026%20Schedule%20NEW.xlsx.pdf" target="_blank">
-              <div class="athletics-card-icon">🏊</div>
-              <div class="athletics-card-text">
-                <p class="athletics-card-title">Swim & Dive</p>
-                <p class="athletics-card-desc">Meet schedule for the 2026 season.</p>
-              </div>
-              <span class="athletics-card-arrow">›</span>
-            </a>
-            <a class="athletics-card" href="Sports/Track%20and%20Field%202026%20Schedule%20NEW.xlsx.pdf" target="_blank">
-              <div class="athletics-card-icon">🏃</div>
-              <div class="athletics-card-text">
-                <p class="athletics-card-title">Track & Field</p>
-                <p class="athletics-card-desc">Meet dates and event details.</p>
-              </div>
-              <span class="athletics-card-arrow">›</span>
-            </a>
+          <div class="ath-tabs" id="athTabs">
+            <button class="ath-tab is-active" data-sport="all" type="button">All</button>
+            <button class="ath-tab" data-sport="baseball" type="button"><span class="ath-tab-emoji">⚾</span> Baseball</button>
+            <button class="ath-tab" data-sport="softball" type="button"><span class="ath-tab-emoji">🥎</span> Softball</button>
+            <button class="ath-tab" data-sport="volleyball" type="button"><span class="ath-tab-emoji">🏐</span> Volleyball</button>
+            <button class="ath-tab" data-sport="tennis" type="button"><span class="ath-tab-emoji">🎾</span> Tennis</button>
+            <button class="ath-tab" data-sport="golf" type="button"><span class="ath-tab-emoji">⛳</span> Golf</button>
+            <button class="ath-tab" data-sport="swim" type="button"><span class="ath-tab-emoji">🏊</span> Swim</button>
+            <button class="ath-tab" data-sport="track" type="button"><span class="ath-tab-emoji">🏃</span> Track</button>
           </div>
+          <div class="ath-list" id="athList"></div>
         </div>
       </div>
 
@@ -1449,6 +1458,8 @@
           newsDetail.classList.remove('is-active');
           athleticsView.classList.add('is-active');
           document.querySelector('.news-page-title').textContent = 'Athletics';
+          renderAthletics();
+          checkAthGameDay();
         } else {
           athleticsView.classList.remove('is-active');
           showList();
@@ -1609,6 +1620,335 @@
                 '<p class="news-empty-text">Could not load news. Try again later.</p>' +
               '</div>';
           });
+      }
+
+      // ── ATHLETICS DASHBOARD DATA & LOGIC ─────────────────────────
+      const ATH = [
+        // ── BASEBALL VAR/JV ──
+        {sport:"baseball",emoji:"⚾",opponent:"Cesar Chavez",date:"2026-02-27",time:"2:00",location:"PVHS",level:"Varsity",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"Cesar Chavez",date:"2026-02-27",time:"2:00",location:"PVHS",level:"JV",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"Monache",date:"2026-02-28",time:"11:00",location:"PVHS",level:"Varsity",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"San Luis Obispo",date:"2026-02-28",time:"2:00",location:"SLO HS",level:"JV",home:false},
+        {sport:"baseball",emoji:"⚾",opponent:"Dinuba",date:"2026-03-03",time:"3:30",location:"PVHS",level:"Varsity",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"Cabrillo",date:"2026-03-03",time:"5:00",location:"Cabrillo HS",level:"JV",home:false},
+        {sport:"baseball",emoji:"⚾",opponent:"Sierra",date:"2026-03-05",time:"3:30",location:"PVHS",level:"Varsity",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"Golden West (Visalia)",date:"2026-03-06",time:"3:30",location:"Golden West HS",level:"Varsity",home:false},
+        {sport:"baseball",emoji:"⚾",opponent:"Golden West (Visalia)",date:"2026-03-06",time:"3:30",location:"Golden West HS",level:"JV",home:false},
+        {sport:"baseball",emoji:"⚾",opponent:"Cabrillo",date:"2026-03-10",time:"4:00",location:"Cabrillo HS",level:"Varsity",home:false},
+        {sport:"baseball",emoji:"⚾",opponent:"Cabrillo",date:"2026-03-10",time:"4:00",location:"PVHS",level:"JV",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"Santa Maria",date:"2026-03-12",time:"4:30",location:"SMHS",level:"Varsity",home:false},
+        {sport:"baseball",emoji:"⚾",opponent:"Santa Maria",date:"2026-03-12",time:"4:30",location:"PVHS",level:"JV",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"Mission Prep",date:"2026-03-17",time:"6:00",location:"MPHS",level:"JV",home:false},
+        {sport:"baseball",emoji:"⚾",opponent:"Santa Ynez",date:"2026-03-19",time:"4:30",location:"PVHS",level:"Varsity",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"Santa Ynez",date:"2026-03-19",time:"4:30",location:"SYHS",level:"JV",home:false},
+        {sport:"baseball",emoji:"⚾",opponent:"Bishop Diego",date:"2026-03-20",time:"4:00",location:"PVHS",level:"Varsity",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"Taft",date:"2026-03-24",time:"4:00",location:"THS",level:"Varsity",home:false},
+        {sport:"baseball",emoji:"⚾",opponent:"Taft",date:"2026-03-24",time:"4:00",location:"THS",level:"JV",home:false},
+        {sport:"baseball",emoji:"⚾",opponent:"Nipomo",date:"2026-03-26",time:"4:30",location:"PVHS",level:"Varsity",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"Nipomo",date:"2026-03-26",time:"4:30",location:"NHS",level:"JV",home:false},
+        {sport:"baseball",emoji:"⚾",opponent:"Santa Maria",date:"2026-03-31",time:"4:30",location:"PVHS",level:"Varsity",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"Santa Maria",date:"2026-03-31",time:"4:30",location:"SMHS",level:"JV",home:false},
+        {sport:"baseball",emoji:"⚾",opponent:"Santa Maria",date:"2026-04-02",time:"4:30",location:"SMHS",level:"Varsity",home:false},
+        {sport:"baseball",emoji:"⚾",opponent:"Santa Maria",date:"2026-04-02",time:"4:30",location:"PVHS",level:"JV",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"Village Christian",date:"2026-04-07",time:"1:00",location:"PVHS",level:"Varsity",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"University Prep",date:"2026-04-08",time:"1:00",location:"PVHS",level:"Varsity",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"Cathedral",date:"2026-04-09",time:"1:00",location:"PVHS",level:"Varsity",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"St. Francis",date:"2026-04-10",time:"10:00",location:"PVHS",level:"Varsity",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"SLO Classical",date:"2026-04-13",time:"4:30",location:"PVHS",level:"Varsity",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"Paso Robles",date:"2026-04-14",time:"4:30",location:"PRHS",level:"JV",home:false},
+        {sport:"baseball",emoji:"⚾",opponent:"Bishop Diego",date:"2026-04-15",time:"4:00",location:"BDHS",level:"Varsity",home:false},
+        {sport:"baseball",emoji:"⚾",opponent:"Mission Prep",date:"2026-04-16",time:"4:30",location:"PVHS",level:"JV",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"Santa Ynez",date:"2026-04-21",time:"4:30",location:"SYHS",level:"Varsity",home:false},
+        {sport:"baseball",emoji:"⚾",opponent:"Santa Ynez",date:"2026-04-21",time:"4:30",location:"PVHS",level:"JV",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"Santa Ynez",date:"2026-04-23",time:"4:30",location:"PVHS",level:"Varsity",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"Santa Ynez",date:"2026-04-23",time:"4:30",location:"SYHS",level:"JV",home:false},
+        {sport:"baseball",emoji:"⚾",opponent:"Atascadero",date:"2026-04-28",time:"4:30",location:"PVHS",level:"Varsity",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"Atascadero",date:"2026-04-28",time:"4:30",location:"AHS",level:"JV",home:false},
+        {sport:"baseball",emoji:"⚾",opponent:"Atascadero",date:"2026-04-30",time:"4:30",location:"AHS",level:"Varsity",home:false},
+        {sport:"baseball",emoji:"⚾",opponent:"Atascadero",date:"2026-04-30",time:"4:30",location:"PVHS",level:"JV",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"Nipomo",date:"2026-05-03",time:"4:30",location:"NHS",level:"Varsity",home:false},
+        {sport:"baseball",emoji:"⚾",opponent:"Nipomo",date:"2026-05-03",time:"4:30",location:"PVHS",level:"JV",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"Nipomo",date:"2026-05-07",time:"4:30",location:"PVHS",level:"Varsity",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"Nipomo",date:"2026-05-07",time:"4:30",location:"NHS",level:"JV",home:false},
+        // ── FROSH BASEBALL ──
+        {sport:"baseball",emoji:"⚾",opponent:"Santa Maria",date:"2026-03-10",time:"4:30",location:"PVHS",level:"Frosh",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"Righetti",date:"2026-03-13",time:"4:30",location:"PVHS",level:"Frosh",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"Atascadero",date:"2026-03-17",time:"4:30",location:"PVHS",level:"Frosh",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"San Luis Obispo",date:"2026-03-20",time:"4:30",location:"SLO HS",level:"Frosh",home:false},
+        {sport:"baseball",emoji:"⚾",opponent:"Arroyo Grande",date:"2026-03-24",time:"4:30",location:"PVHS",level:"Frosh",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"Righetti",date:"2026-03-31",time:"4:30",location:"RHS",level:"Frosh",home:false},
+        {sport:"baseball",emoji:"⚾",opponent:"Righetti",date:"2026-04-03",time:"4:30",location:"PVHS",level:"Frosh",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"Atascadero",date:"2026-04-14",time:"4:30",location:"AHS",level:"Frosh",home:false},
+        {sport:"baseball",emoji:"⚾",opponent:"Atascadero",date:"2026-04-17",time:"4:30",location:"PVHS",level:"Frosh",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"San Luis Obispo",date:"2026-04-21",time:"4:30",location:"PVHS",level:"Frosh",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"San Luis Obispo",date:"2026-04-24",time:"4:30",location:"SLO HS",level:"Frosh",home:false},
+        {sport:"baseball",emoji:"⚾",opponent:"Arroyo Grande",date:"2026-04-28",time:"4:30",location:"AGHS",level:"Frosh",home:false},
+        {sport:"baseball",emoji:"⚾",opponent:"Arroyo Grande",date:"2026-05-01",time:"4:30",location:"PVHS",level:"Frosh",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"Nipomo",date:"2026-05-05",time:"4:30",location:"PVHS",level:"Frosh",home:true},
+        {sport:"baseball",emoji:"⚾",opponent:"Nipomo",date:"2026-05-08",time:"4:30",location:"NHS",level:"Frosh",home:false},
+        // ── SOFTBALL ──
+        {sport:"softball",emoji:"🥎",opponent:"Lompoc",date:"2026-02-24",time:"3:30",location:"PVHS",level:"Varsity",home:true},
+        {sport:"softball",emoji:"🥎",opponent:"Lompoc",date:"2026-02-24",time:"3:30",location:"Lompoc",level:"JV",home:false},
+        {sport:"softball",emoji:"🥎",opponent:"Atascadero",date:"2026-02-26",time:"3:30",location:"Atascadero",level:"Varsity",home:false},
+        {sport:"softball",emoji:"🥎",opponent:"Atascadero",date:"2026-02-26",time:"3:30",location:"PVHS",level:"JV",home:true},
+        {sport:"softball",emoji:"🥎",opponent:"Mission Prep",date:"2026-03-03",time:"4:30",location:"PVHS",level:"Varsity",home:true},
+        {sport:"softball",emoji:"🥎",opponent:"Santa Maria",date:"2026-03-04",time:"3:30",location:"Santa Maria",level:"Varsity",home:false},
+        {sport:"softball",emoji:"🥎",opponent:"Arroyo Grande",date:"2026-03-05",time:"3:30",location:"PVHS",level:"Varsity",home:true},
+        {sport:"softball",emoji:"🥎",opponent:"Arroyo Grande",date:"2026-03-05",time:"3:30",location:"Arroyo Grande",level:"JV",home:false},
+        {sport:"softball",emoji:"🥎",opponent:"Nipomo",date:"2026-03-12",time:"4:30",location:"PVHS",level:"Varsity",home:true},
+        {sport:"softball",emoji:"🥎",opponent:"Nipomo",date:"2026-03-12",time:"4:30",location:"Nipomo",level:"JV",home:false},
+        {sport:"softball",emoji:"🥎",opponent:"Orcutt Academy",date:"2026-03-19",time:"4:30",location:"Lakeview",level:"Varsity",home:false},
+        {sport:"softball",emoji:"🥎",opponent:"Orcutt Academy",date:"2026-03-19",time:"4:30",location:"PVHS",level:"JV",home:true},
+        {sport:"softball",emoji:"🥎",opponent:"Driller Tournament",date:"2026-03-20",time:"TBA",location:"Bakersfield",level:"Varsity",home:false},
+        {sport:"softball",emoji:"🥎",opponent:"Paso Robles",date:"2026-03-24",time:"4:30",location:"PVHS",level:"Varsity",home:true},
+        {sport:"softball",emoji:"🥎",opponent:"Paso Robles",date:"2026-03-24",time:"4:30",location:"Paso Robles",level:"JV",home:false},
+        {sport:"softball",emoji:"🥎",opponent:"Cabrillo",date:"2026-03-26",time:"4:30",location:"Cabrillo",level:"Varsity",home:false},
+        {sport:"softball",emoji:"🥎",opponent:"Cabrillo",date:"2026-03-27",time:"4:30",location:"PVHS",level:"JV",home:true},
+        {sport:"softball",emoji:"🥎",opponent:"Nipomo",date:"2026-03-31",time:"4:30",location:"Nipomo",level:"Varsity",home:false},
+        {sport:"softball",emoji:"🥎",opponent:"Nipomo",date:"2026-03-31",time:"4:30",location:"PVHS",level:"JV",home:true},
+        {sport:"softball",emoji:"🥎",opponent:"Best of the West Tournament",date:"2026-04-09",time:"TBA",location:"TBA",level:"Varsity",home:false},
+        {sport:"softball",emoji:"🥎",opponent:"Orcutt Academy",date:"2026-04-14",time:"4:30",location:"PVHS",level:"Varsity",home:true},
+        {sport:"softball",emoji:"🥎",opponent:"Orcutt Academy",date:"2026-04-14",time:"4:30",location:"Lakeview",level:"JV",home:false},
+        {sport:"softball",emoji:"🥎",opponent:"Paso Robles",date:"2026-04-16",time:"4:30",location:"Paso Robles",level:"Varsity",home:false},
+        {sport:"softball",emoji:"🥎",opponent:"Paso Robles",date:"2026-04-16",time:"4:30",location:"PVHS",level:"JV",home:true},
+        {sport:"softball",emoji:"🥎",opponent:"Cabrillo",date:"2026-04-21",time:"4:30",location:"PVHS",level:"Varsity",home:true},
+        {sport:"softball",emoji:"🥎",opponent:"Cabrillo",date:"2026-04-22",time:"4:30",location:"Cabrillo",level:"JV",home:false},
+        {sport:"softball",emoji:"🥎",opponent:"Nipomo",date:"2026-04-23",time:"4:30",location:"PVHS",level:"Varsity",home:true},
+        {sport:"softball",emoji:"🥎",opponent:"Nipomo",date:"2026-04-23",time:"4:30",location:"Nipomo",level:"JV",home:false},
+        {sport:"softball",emoji:"🥎",opponent:"Orcutt Academy",date:"2026-04-30",time:"4:30",location:"Lakeview",level:"Varsity",home:false},
+        {sport:"softball",emoji:"🥎",opponent:"Orcutt Academy",date:"2026-04-30",time:"4:30",location:"PVHS",level:"JV",home:true},
+        {sport:"softball",emoji:"🥎",opponent:"Paso Robles",date:"2026-05-05",time:"4:30",location:"PVHS",level:"Varsity",home:true},
+        {sport:"softball",emoji:"🥎",opponent:"Paso Robles",date:"2026-05-05",time:"4:30",location:"Paso Robles",level:"JV",home:false},
+        {sport:"softball",emoji:"🥎",opponent:"Cabrillo",date:"2026-05-07",time:"4:30",location:"Cabrillo",level:"Varsity",home:false},
+        {sport:"softball",emoji:"🥎",opponent:"Cabrillo",date:"2026-05-08",time:"4:30",location:"PVHS",level:"JV",home:true},
+        // ── MEN'S VOLLEYBALL ──
+        {sport:"volleyball",emoji:"🏐",opponent:"Carpinteria HS",date:"2026-02-20",time:"5:30",location:"Carpinteria",level:"Varsity",home:false},
+        {sport:"volleyball",emoji:"🏐",opponent:"Carpinteria HS",date:"2026-02-20",time:"4:30",location:"Carpinteria",level:"JV",home:false},
+        {sport:"volleyball",emoji:"🏐",opponent:"Morro Bay at the Rock Tournament",date:"2026-03-06",time:"TBA",location:"Morro Bay",level:"Varsity",home:false},
+        {sport:"volleyball",emoji:"🏐",opponent:"Edison-Fresno",date:"2026-03-10",time:"5:30",location:"Edison",level:"Varsity",home:false},
+        {sport:"volleyball",emoji:"🏐",opponent:"Edison-Fresno",date:"2026-03-10",time:"4:30",location:"Edison",level:"JV",home:false},
+        {sport:"volleyball",emoji:"🏐",opponent:"Righetti",date:"2026-03-12",time:"6:00",location:"PVHS",level:"Varsity",home:true},
+        {sport:"volleyball",emoji:"🏐",opponent:"Righetti",date:"2026-03-12",time:"5:00",location:"PVHS",level:"JV",home:true},
+        {sport:"volleyball",emoji:"🏐",opponent:"Morro Bay JV Tournament",date:"2026-03-14",time:"TBA",location:"Morro Bay",level:"JV",home:false},
+        {sport:"volleyball",emoji:"🏐",opponent:"Paso Robles",date:"2026-03-19",time:"6:00",location:"PVHS",level:"Varsity",home:true},
+        {sport:"volleyball",emoji:"🏐",opponent:"Paso Robles",date:"2026-03-19",time:"5:00",location:"PVHS",level:"JV",home:true},
+        {sport:"volleyball",emoji:"🏐",opponent:"Lompoc",date:"2026-03-24",time:"6:00",location:"PVHS",level:"Varsity",home:true},
+        {sport:"volleyball",emoji:"🏐",opponent:"Lompoc",date:"2026-03-24",time:"5:00",location:"PVHS",level:"JV",home:true},
+        {sport:"volleyball",emoji:"🏐",opponent:"Santa Maria",date:"2026-03-26",time:"6:00",location:"Santa Maria",level:"Varsity",home:false},
+        {sport:"volleyball",emoji:"🏐",opponent:"Santa Maria",date:"2026-03-26",time:"5:00",location:"Santa Maria",level:"JV",home:false},
+        {sport:"volleyball",emoji:"🏐",opponent:"Kings River Varsity Invitational",date:"2026-03-27",time:"TBA",location:"Kings River",level:"Varsity",home:false},
+        {sport:"volleyball",emoji:"🏐",opponent:"Templeton",date:"2026-03-31",time:"6:00",location:"Templeton",level:"Varsity",home:false},
+        {sport:"volleyball",emoji:"🏐",opponent:"Templeton",date:"2026-03-31",time:"5:00",location:"Templeton",level:"JV",home:false},
+        {sport:"volleyball",emoji:"🏐",opponent:"Nipomo",date:"2026-04-01",time:"6:00",location:"PVHS",level:"Varsity",home:true},
+        {sport:"volleyball",emoji:"🏐",opponent:"Nipomo",date:"2026-04-01",time:"5:00",location:"PVHS",level:"JV",home:true},
+        {sport:"volleyball",emoji:"🏐",opponent:"Cabrillo",date:"2026-04-02",time:"6:00",location:"PVHS",level:"Varsity",home:true},
+        {sport:"volleyball",emoji:"🏐",opponent:"Cabrillo",date:"2026-04-02",time:"5:00",location:"PVHS",level:"JV",home:true},
+        {sport:"volleyball",emoji:"🏐",opponent:"Mission Prep",date:"2026-04-14",time:"6:00",location:"Mission Prep",level:"Varsity",home:false},
+        {sport:"volleyball",emoji:"🏐",opponent:"Mission Prep",date:"2026-04-14",time:"5:00",location:"Mission Prep",level:"JV",home:false},
+        {sport:"volleyball",emoji:"🏐",opponent:"Lompoc",date:"2026-04-16",time:"6:00",location:"Lompoc",level:"Varsity",home:false},
+        {sport:"volleyball",emoji:"🏐",opponent:"Lompoc",date:"2026-04-16",time:"5:00",location:"Lompoc",level:"JV",home:false},
+        {sport:"volleyball",emoji:"🏐",opponent:"Bakersfield Christian",date:"2026-04-17",time:"4:30",location:"BCHS",level:"Varsity",home:false},
+        {sport:"volleyball",emoji:"🏐",opponent:"Battle of the Coast JV Tournament",date:"2026-04-18",time:"8:00",location:"PVHS",level:"JV",home:true},
+        {sport:"volleyball",emoji:"🏐",opponent:"Santa Maria",date:"2026-04-21",time:"6:00",location:"PVHS",level:"Varsity",home:true},
+        {sport:"volleyball",emoji:"🏐",opponent:"Santa Maria",date:"2026-04-21",time:"5:00",location:"PVHS",level:"JV",home:true},
+        {sport:"volleyball",emoji:"🏐",opponent:"Templeton",date:"2026-04-23",time:"6:00",location:"PVHS",level:"Varsity",home:true},
+        {sport:"volleyball",emoji:"🏐",opponent:"Templeton",date:"2026-04-23",time:"5:00",location:"PVHS",level:"JV",home:true},
+        {sport:"volleyball",emoji:"🏐",opponent:"Bakersfield Christian",date:"2026-04-24",time:"5:30",location:"PVHS",level:"Varsity",home:true},
+        {sport:"volleyball",emoji:"🏐",opponent:"Nipomo & Reedley",date:"2026-04-25",time:"1:30",location:"Nipomo",level:"Varsity",home:false},
+        {sport:"volleyball",emoji:"🏐",opponent:"Cabrillo",date:"2026-04-28",time:"6:00",location:"Cabrillo",level:"Varsity",home:false},
+        {sport:"volleyball",emoji:"🏐",opponent:"Cabrillo",date:"2026-04-28",time:"5:00",location:"Cabrillo",level:"JV",home:false},
+        {sport:"volleyball",emoji:"🏐",opponent:"Mission Prep",date:"2026-04-30",time:"6:00",location:"PVHS",level:"Varsity",home:true},
+        {sport:"volleyball",emoji:"🏐",opponent:"Mission Prep",date:"2026-04-30",time:"5:00",location:"PVHS",level:"JV",home:true},
+        // ── MEN'S TENNIS ──
+        {sport:"tennis",emoji:"🎾",opponent:"Lompoc",date:"2026-02-19",time:"3:30",location:"PVHS",level:"Varsity",home:true},
+        {sport:"tennis",emoji:"🎾",opponent:"Mission Prep",date:"2026-02-24",time:"3:30",location:"Sinsheimer Park, SLO",level:"Varsity",home:false},
+        {sport:"tennis",emoji:"🎾",opponent:"Lompoc",date:"2026-02-27",time:"3:30",location:"Lompoc",level:"Varsity",home:false},
+        {sport:"tennis",emoji:"🎾",opponent:"Independence",date:"2026-03-03",time:"3:30",location:"PVHS",level:"Varsity",home:true},
+        {sport:"tennis",emoji:"🎾",opponent:"Mission Prep",date:"2026-03-05",time:"3:30",location:"PVHS",level:"Varsity",home:true},
+        {sport:"tennis",emoji:"🎾",opponent:"Righetti",date:"2026-03-10",time:"3:30",location:"PVHS",level:"Varsity",home:true},
+        {sport:"tennis",emoji:"🎾",opponent:"Righetti",date:"2026-03-10",time:"3:30",location:"ERHS",level:"JV",home:false},
+        {sport:"tennis",emoji:"🎾",opponent:"Nipomo",date:"2026-03-12",time:"3:30",location:"NHS",level:"Varsity",home:false},
+        {sport:"tennis",emoji:"🎾",opponent:"Santa Maria",date:"2026-03-17",time:"3:30",location:"SMHS",level:"Varsity",home:false},
+        {sport:"tennis",emoji:"🎾",opponent:"Santa Maria",date:"2026-03-17",time:"3:30",location:"PVHS",level:"JV",home:true},
+        {sport:"tennis",emoji:"🎾",opponent:"Cabrillo",date:"2026-03-19",time:"3:30",location:"PVHS",level:"Varsity",home:true},
+        {sport:"tennis",emoji:"🎾",opponent:"Cabrillo",date:"2026-03-19",time:"3:30",location:"CHS",level:"JV",home:false},
+        {sport:"tennis",emoji:"🎾",opponent:"Morro Bay",date:"2026-03-24",time:"3:30",location:"PVHS",level:"Varsity",home:true},
+        {sport:"tennis",emoji:"🎾",opponent:"Morro Bay",date:"2026-03-24",time:"3:30",location:"MBHS",level:"JV",home:false},
+        {sport:"tennis",emoji:"🎾",opponent:"Righetti",date:"2026-03-26",time:"3:30",location:"ERHS",level:"Varsity",home:false},
+        {sport:"tennis",emoji:"🎾",opponent:"Nipomo",date:"2026-03-31",time:"3:30",location:"PVHS",level:"Varsity",home:true},
+        {sport:"tennis",emoji:"🎾",opponent:"Santa Maria",date:"2026-04-02",time:"3:30",location:"PVHS",level:"Varsity",home:true},
+        {sport:"tennis",emoji:"🎾",opponent:"Santa Maria",date:"2026-04-02",time:"3:30",location:"SMHS",level:"JV",home:false},
+        {sport:"tennis",emoji:"🎾",opponent:"Cabrillo",date:"2026-04-14",time:"3:30",location:"CHS",level:"Varsity",home:false},
+        {sport:"tennis",emoji:"🎾",opponent:"Cabrillo",date:"2026-04-14",time:"3:30",location:"PVHS",level:"JV",home:true},
+        {sport:"tennis",emoji:"🎾",opponent:"Morro Bay",date:"2026-04-16",time:"3:30",location:"MBHS",level:"Varsity",home:false},
+        {sport:"tennis",emoji:"🎾",opponent:"Morro Bay",date:"2026-04-16",time:"3:30",location:"PVHS",level:"JV",home:true},
+        // ── MEN'S GOLF ──
+        {sport:"golf",emoji:"⛳",opponent:"Coastal Christian",date:"2026-03-10",time:"3:00",location:"Blacklake GC",level:"Varsity",home:false},
+        {sport:"golf",emoji:"⛳",opponent:"Santa Maria",date:"2026-03-16",time:"3:00",location:"Blacklake GC",level:"Varsity",home:false},
+        {sport:"golf",emoji:"⛳",opponent:"Highland's Impossible River Shootout",date:"2026-03-18",time:"12:00",location:"Kern River GC",level:"Varsity",home:false},
+        {sport:"golf",emoji:"⛳",opponent:"Sierra Pacific",date:"2026-03-24",time:"12:00",location:"Blacklake GC",level:"Varsity",home:false},
+        {sport:"golf",emoji:"⛳",opponent:"League Mini Tournament #1",date:"2026-03-30",time:"TBA",location:"Santa Maria CC",level:"Varsity",home:false},
+        {sport:"golf",emoji:"⛳",opponent:"Bishop Diego",date:"2026-04-02",time:"TBA",location:"TBA",level:"Varsity",home:false},
+        {sport:"golf",emoji:"⛳",opponent:"League Mini Tournament #2",date:"2026-04-13",time:"TBA",location:"Rancho Maria GC",level:"Varsity",home:false},
+        {sport:"golf",emoji:"⛳",opponent:"League Mini Tournament #3",date:"2026-04-21",time:"12:00",location:"Blacklake GC",level:"Varsity",home:false},
+        {sport:"golf",emoji:"⛳",opponent:"Santa Maria",date:"2026-04-23",time:"3:00",location:"Blacklake GC",level:"Varsity/JV",home:false},
+        {sport:"golf",emoji:"⛳",opponent:"League Mini Tournament #4",date:"2026-04-27",time:"TBA",location:"La Purisima GC",level:"Varsity",home:false},
+        {sport:"golf",emoji:"⛳",opponent:"Santa Maria",date:"2026-04-30",time:"3:00",location:"Santa Maria CC",level:"Varsity/JV",home:false},
+        {sport:"golf",emoji:"⛳",opponent:"League Final Tournament",date:"2026-05-04",time:"TBA",location:"TBA",level:"Varsity",home:false},
+        // ── SWIM & DIVE ──
+        {sport:"swim",emoji:"🏊",opponent:"Orcutt Academy Dual",date:"2026-03-13",time:"3:00",location:"PVHS",level:"All",home:true},
+        {sport:"swim",emoji:"🏊",opponent:"Santa Maria",date:"2026-03-20",time:"3:00",location:"PVHS",level:"All",home:true},
+        {sport:"swim",emoji:"🏊",opponent:"Nipomo",date:"2026-03-27",time:"3:00",location:"Nipomo",level:"All",home:false},
+        {sport:"swim",emoji:"🏊",opponent:"St. Joseph",date:"2026-04-03",time:"3:00",location:"PVHS",level:"All",home:true},
+        {sport:"swim",emoji:"🏊",opponent:"Tri-County Invite Swim Championships",date:"2026-04-09",time:"1:00",location:"San Marcos",level:"Varsity",home:false},
+        {sport:"swim",emoji:"🏊",opponent:"Lompoc",date:"2026-04-17",time:"3:00",location:"PVHS",level:"All",home:true},
+        {sport:"swim",emoji:"🏊",opponent:"Sierra Pacific Swimming Invitational",date:"2026-04-18",time:"7:30",location:"Sierra Pacific",level:"Varsity",home:false},
+        {sport:"swim",emoji:"🏊",opponent:"Mission Prep",date:"2026-04-24",time:"3:00",location:"PVHS",level:"All",home:true},
+        {sport:"swim",emoji:"🏊",opponent:"Ocean League Prelims",date:"2026-04-29",time:"2:00",location:"Lompoc",level:"All",home:false},
+        {sport:"swim",emoji:"🏊",opponent:"Ocean League Prelims",date:"2026-04-30",time:"2:00",location:"Lompoc",level:"All",home:false},
+        {sport:"swim",emoji:"🏊",opponent:"Ocean League Finals",date:"2026-05-01",time:"2:00",location:"Lompoc",level:"All",home:false},
+        {sport:"swim",emoji:"🏊",opponent:"CIF Central Section Playoffs",date:"2026-05-06",time:"2:00",location:"TBD",level:"Varsity",home:false},
+        {sport:"swim",emoji:"🏊",opponent:"CIF State",date:"2026-05-14",time:"2:00",location:"TBD",level:"Varsity",home:false},
+        // ── TRACK & FIELD ──
+        {sport:"track",emoji:"🏃",opponent:"Season Kickoff Scrimmage @ Santa Maria HS",date:"2026-02-16",time:"2:00",location:"SMHS",level:"All",home:false},
+        {sport:"track",emoji:"🏃",opponent:"Dual Meet vs. Orcutt Academy HS",date:"2026-02-21",time:"9:00",location:"PVHS",level:"All",home:true},
+        {sport:"track",emoji:"🏃",opponent:"Royal Classic @ San Marcos HS",date:"2026-02-28",time:"9:00",location:"San Marcos",level:"All",home:false},
+        {sport:"track",emoji:"🏃",opponent:"Nipomo/Mission/Morro Bay Quad Meet",date:"2026-03-04",time:"3:00",location:"NHS",level:"All",home:false},
+        {sport:"track",emoji:"🏃",opponent:"66th Annual East Bakersfield Relays",date:"2026-03-06",time:"12:00",location:"BCC",level:"Varsity",home:false},
+        {sport:"track",emoji:"🏃",opponent:"Atascadero Memorial Meet",date:"2026-03-07",time:"8:00",location:"Atascadero",level:"Varsity",home:false},
+        {sport:"track",emoji:"🏃",opponent:"CCAA Ocean League Quad Meet (PV,SM,MP,LHS)",date:"2026-03-12",time:"2:30",location:"SMHS",level:"Varsity",home:false},
+        {sport:"track",emoji:"🏃",opponent:"Red Estes Invitational",date:"2026-03-20",time:"2:00",location:"BHS",level:"Varsity",home:false},
+        {sport:"track",emoji:"🏃",opponent:"CCAA Ocean League Quad Meet (SM,CHS,PV,MB)",date:"2026-03-26",time:"2:30",location:"SMHS",level:"Varsity",home:false},
+        {sport:"track",emoji:"🏃",opponent:"Bearcat (Paso Robles)",date:"2026-03-28",time:"8:00",location:"PRHS",level:"Varsity",home:false},
+        {sport:"track",emoji:"🏃",opponent:"Santa Maria City Classic (Battle for the Baton)",date:"2026-04-04",time:"8:30",location:"RHS",level:"Varsity",home:false},
+        {sport:"track",emoji:"🏃",opponent:"CCAA Ocean League Quad Meet (SM,PV,SJ,OA)",date:"2026-04-09",time:"2:30",location:"PVHS",level:"Varsity",home:true},
+        {sport:"track",emoji:"🏃",opponent:"West Coast Relays",date:"2026-04-11",time:"10:00",location:"BHS",level:"Varsity",home:false},
+        {sport:"track",emoji:"🏃",opponent:"Unified Track and Field Invite",date:"2026-04-15",time:"3:30",location:"PVHS",level:"Unified",home:true},
+        {sport:"track",emoji:"🏃",opponent:"SLO Invitational",date:"2026-04-18",time:"TBD",location:"SLOHS",level:"Varsity",home:false},
+        {sport:"track",emoji:"🏃",opponent:"Santa Barbara County Championships",date:"2026-04-25",time:"TBD",location:"RHS",level:"Varsity",home:false},
+        {sport:"track",emoji:"🏃",opponent:"Ocean League Prelims",date:"2026-05-01",time:"2:30",location:"LHS",level:"All",home:false},
+        {sport:"track",emoji:"🏃",opponent:"Ocean League Finals",date:"2026-05-08",time:"1:30",location:"LHS",level:"All",home:false},
+        {sport:"track",emoji:"🏃",opponent:"CIF Division II Meet",date:"2026-05-15",time:"4:00",location:"Dinuba",level:"Varsity",home:false},
+        {sport:"track",emoji:"🏃",opponent:"CIF Masters",date:"2026-05-22",time:"4:00",location:"Buchanan",level:"Varsity",home:false},
+        {sport:"track",emoji:"🏃",opponent:"CIF State",date:"2026-05-29",time:"5:00",location:"Buchanan",level:"Varsity",home:false}
+      ];
+
+      // Sort all events by date then time
+      ATH.sort(function(a,b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : (a.time < b.time ? -1 : 1); });
+
+      let athFilter = 'all';
+      const athListEl = document.getElementById('athList');
+      const athTabsEl = document.getElementById('athTabs');
+      const athTZ = 'America/Los_Angeles';
+
+      function getAthToday() {
+        return new Intl.DateTimeFormat('en-CA', {timeZone: athTZ, year:'numeric', month:'2-digit', day:'2-digit'}).format(new Date());
+      }
+
+      function fmtAthDate(d) {
+        var p = d.split('-'); var dt = new Date(Number(p[0]), Number(p[1])-1, Number(p[2]));
+        return dt.toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'});
+      }
+
+      function buildAthCard(ev, isToday, isPast) {
+        var cls = 'ath-ev' + (isToday ? ' is-today' : '') + (isPast ? ' is-past' : '');
+        var homeBadge = ev.home
+          ? '<span class="ath-badge ath-badge--home">HOME</span>'
+          : '<span class="ath-badge ath-badge--away">AWAY</span>';
+        var levelBadge = '<span class="ath-badge ath-badge--level">' + ev.level + '</span>';
+        var sportLabel = athFilter === 'all' ? '<span class="ath-ev-sport">' + ev.sport.toUpperCase() + '</span>' : '';
+        return '<div class="' + cls + '">' +
+          '<span class="ath-ev-icon">' + ev.emoji + '</span>' +
+          '<div class="ath-ev-body">' +
+            sportLabel +
+            '<p class="ath-ev-opponent">' + ev.opponent + ' ' + homeBadge + ' ' + levelBadge + '</p>' +
+            '<p class="ath-ev-meta">' + ev.time + (ev.time !== 'TBA' && ev.time !== 'TBD' ? ' PM' : '') + ' &middot; ' + ev.location + '</p>' +
+          '</div>' +
+        '</div>';
+      }
+
+      function renderAthletics() {
+        if (!athListEl) return;
+        var today = getAthToday();
+        var filtered = athFilter === 'all' ? ATH : ATH.filter(function(e) { return e.sport === athFilter; });
+        if (!filtered.length) {
+          athListEl.innerHTML = '<div class="ath-empty"><span class="ath-empty-icon">🏟️</span><p class="ath-empty-text">No events for this sport.</p></div>';
+          return;
+        }
+        var todayEvents = filtered.filter(function(e) { return e.date === today; });
+        var futureEvents = filtered.filter(function(e) { return e.date > today; });
+        var pastEvents = filtered.filter(function(e) { return e.date < today; });
+
+        var html = '';
+        // Today's games hero
+        if (todayEvents.length) {
+          html += '<div class="ath-today-banner">🏟️ ' + todayEvents.length + ' Game' + (todayEvents.length > 1 ? 's' : '') + ' Today!</div>';
+          todayEvents.forEach(function(ev) { html += buildAthCard(ev, true, false); });
+        }
+        // Upcoming grouped by date
+        var lastDate = '';
+        futureEvents.forEach(function(ev) {
+          if (ev.date !== lastDate) {
+            html += '<p class="ath-date-hdr">' + fmtAthDate(ev.date) + '</p>';
+            lastDate = ev.date;
+          }
+          html += buildAthCard(ev, false, false);
+        });
+        // Past events (dimmed)
+        if (pastEvents.length) {
+          html += '<p class="ath-date-hdr" style="opacity:0.4;margin-top:16px;">Past Events</p>';
+          lastDate = '';
+          pastEvents.forEach(function(ev) {
+            if (ev.date !== lastDate) {
+              html += '<p class="ath-date-hdr" style="opacity:0.35">' + fmtAthDate(ev.date) + '</p>';
+              lastDate = ev.date;
+            }
+            html += buildAthCard(ev, false, true);
+          });
+        }
+        athListEl.innerHTML = html;
+        athListEl.scrollTop = 0;
+      }
+
+      // Tab filtering
+      if (athTabsEl) athTabsEl.addEventListener('click', function(e) {
+        var tab = e.target.closest('.ath-tab');
+        if (!tab) return;
+        athTabsEl.querySelectorAll('.ath-tab').forEach(function(t) { t.classList.remove('is-active'); });
+        tab.classList.add('is-active');
+        athFilter = tab.dataset.sport;
+        renderAthletics();
+      });
+
+      // Game day notifications
+      function athFireNotif(title, body) {
+        if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+        var opts = { body: body, icon: './PV_AppIcon.png', badge: './PV_AppIcon.png', tag: 'pvhs-gameday', renotify: true, vibrate: [180,80,180] };
+        try {
+          navigator.serviceWorker?.getRegistration?.().then(function(reg) {
+            if (reg?.showNotification) { reg.showNotification(title, opts); return; }
+            try { new Notification(title, opts); } catch(_) {}
+          }).catch(function() { try { new Notification(title, opts); } catch(_) {} });
+        } catch(_) { try { new Notification(title, opts); } catch(_2) {} }
+      }
+
+      function checkAthGameDay() {
+        var today = getAthToday();
+        var key = 'pvhs_ath_notif_' + today;
+        if (localStorage.getItem(key)) return;
+        var todayGames = ATH.filter(function(e) { return e.date === today; });
+        if (!todayGames.length) return;
+        var sports = [];
+        todayGames.forEach(function(e) { if (sports.indexOf(e.sport) === -1) sports.push(e.sport); });
+        var body = todayGames.length + ' game' + (todayGames.length > 1 ? 's' : '') + ' today: ' +
+          sports.map(function(s) { return s.charAt(0).toUpperCase() + s.slice(1); }).join(', ') + '. Go Panthers!';
+        athFireNotif('🏟️ Game Day at PVHS!', body);
+        localStorage.setItem(key, '1');
+      }
+
+      // Also check on page load for background alerts
+      checkAthGameDay();
+
       }
     })();
 
