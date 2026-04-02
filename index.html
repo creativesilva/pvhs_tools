@@ -445,56 +445,47 @@
     .feedback-submit:active { opacity: 0.85; }
     .feedback-note { font-size: 9px; color: var(--muted); text-align: center; opacity: 0.65; margin: 0; }
 
-    /* ── NEWS FEED MODAL ───────────────────────────────── */
+    /* ── NEWS FEED (matches app design language) ─────────── */
     .news-modal[hidden] { display: none; }
     .news-modal {
       position: absolute; inset: 0; z-index: 20;
       display: flex; flex-direction: column;
-    }
-    .news-modal-backdrop {
-      position: absolute; inset: 0;
-      background: rgba(1,12,12,0.88);
-      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-    }
-    .news-modal-inner {
-      position: relative; z-index: 1;
-      width: 100%; height: 100%;
-      display: flex; flex-direction: column;
       padding: 14px var(--app-spacing) var(--app-spacing) var(--app-spacing);
     }
-    body.is-standalone .news-modal-inner {
+    body.is-standalone .news-modal {
       padding-top: max(14px, env(safe-area-inset-top));
     }
-    .news-header {
+
+    /* ── News top-row (mirrors .top-row exactly) ── */
+    .news-top-row {
       display: flex; align-items: center; justify-content: space-between;
-      gap: 10px; flex-shrink: 0; margin-bottom: 10px;
+      width: 100%; gap: 10px; height: 44px; flex-shrink: 0; margin-bottom: 4px;
+      position: relative;
     }
-    .news-title-row { display: flex; align-items: center; gap: 8px; }
-    .news-title {
-      font-size: 15px; font-weight: 800; color: #fff;
-      text-transform: uppercase; letter-spacing: 0.12em; margin: 0;
-    }
-    .news-badge {
-      font-size: 8px; font-weight: 800; text-transform: uppercase;
-      letter-spacing: 0.1em; color: #4be1e1;
-      background: rgba(0,180,180,0.15); border: 1px solid rgba(0,210,210,0.25);
-      border-radius: 6px; padding: 2px 6px;
+    .news-page-title {
+      position: absolute; left: 0; right: 0; text-align: center;
+      font-size: 15px; font-weight: 700; color: #dff7f7;
+      text-transform: uppercase; margin: 0; letter-spacing: 0.14em;
+      pointer-events: none;
     }
     .news-close {
       appearance: none; background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.12);
-      color: rgba(255,255,255,0.6); border-radius: 99px;
-      width: 28px; height: 28px; font-size: 13px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      border: 1px solid rgba(255,255,255,0.13); border-radius: 12px;
+      color: rgba(255,255,255,0.92); width: 34px; height: 34px;
+      font-size: 14px; cursor: pointer; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.16s, border-color 0.16s;
     }
-    .news-close:active { background: rgba(255,255,255,0.16); }
+    .news-close:active { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.26); }
     .news-updated {
       font-size: 9px; font-weight: 600; color: var(--muted); opacity: 0.6;
-      margin: 0 0 8px 0; flex-shrink: 0;
+      margin: 0 0 6px 0; flex-shrink: 0; text-align: center;
     }
+
+    /* ── News feed list ── */
     .news-feed {
       flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
-      display: flex; flex-direction: column; gap: 8px;
+      display: flex; flex-direction: column; gap: 5px;
       padding-bottom: 14px;
       scrollbar-width: thin;
       scrollbar-color: rgba(255,255,255,0.15) transparent;
@@ -502,21 +493,18 @@
     .news-feed::-webkit-scrollbar { width: 5px; }
     .news-feed::-webkit-scrollbar-track { background: transparent; }
     .news-feed::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
-    .news-feed::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+
+    /* ── News cards (glass tiles matching quick-link-btn) ── */
     .news-card {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.015);
+      border: 1px solid rgba(255,255,255,0.04);
       border-radius: 16px; padding: 12px 14px;
-      display: flex; flex-direction: column; gap: 6px;
+      display: flex; flex-direction: column; gap: 5px;
       text-decoration: none; color: inherit;
-      transition: background 0.2s, border-color 0.2s; cursor: pointer;
+      backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      transition: background 0.2s; cursor: pointer;
     }
-    .news-card:active { background: rgba(255,255,255,0.08); }
-    .news-card.is-expanded {
-      background: rgba(75,225,225,0.05);
-      border-color: rgba(75,225,225,0.22);
-      cursor: default;
-    }
+    .news-card:active { background: var(--card-hover); }
     .news-card-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
     .news-card-date {
       font-size: 9px; font-weight: 700; text-transform: uppercase;
@@ -528,41 +516,28 @@
       background: rgba(255,183,77,0.12); border: 1px solid rgba(255,183,77,0.25);
       border-radius: 5px; padding: 1px 5px;
     }
-    .news-card-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
     .news-card-title {
       font-size: 12.5px; font-weight: 700; color: #f0fbfb;
-      line-height: 1.35; margin: 0; flex: 1;
+      line-height: 1.35; margin: 0;
     }
-    .news-card-chevron {
-      font-size: 10px; color: rgba(255,255,255,0.35);
-      flex-shrink: 0; margin-top: 2px;
-      transition: transform 0.2s;
-    }
-    .news-card.is-expanded .news-card-chevron { transform: rotate(180deg); color: #4be1e1; }
     .news-card-summary {
-      font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.6);
+      font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.55);
       line-height: 1.4; margin: 0;
     }
-    .news-card.is-expanded .news-card-summary { display: none; }
     .news-card-author {
-      font-size: 9px; font-weight: 600; color: var(--muted); opacity: 0.55;
-      margin: 0;
+      font-size: 9px; font-weight: 600; color: var(--muted); opacity: 0.55; margin: 0;
     }
-    .news-card-thumb-wrap {
-      margin: 6px 0 2px 0;
-    }
+    .news-card-thumb-wrap { margin: 4px 0 2px 0; }
     .news-card-thumb {
       width: 100%; max-height: 160px; object-fit: cover;
-      border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);
       display: block; cursor: pointer; transition: opacity 0.15s;
     }
     .news-card-thumb:active { opacity: 0.7; }
     .news-card::after {
-      content: "Read more ›";
-      display: block;
+      content: "Read more ›"; display: block;
       font-size: 9px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.1em; color: #4be1e1; opacity: 0.7;
-      margin-top: 6px;
+      letter-spacing: 0.1em; color: #4be1e1; opacity: 0.7; margin-top: 4px;
     }
     .news-empty {
       flex: 1; display: flex; flex-direction: column;
@@ -571,9 +546,7 @@
     }
     .news-empty-icon { font-size: 28px; opacity: 0.5; }
     .news-empty-text { font-size: 11px; font-weight: 600; color: var(--muted); opacity: 0.7; }
-    .news-loading {
-      flex: 1; display: flex; align-items: center; justify-content: center;
-    }
+    .news-loading { flex: 1; display: flex; align-items: center; justify-content: center; }
     .news-loading-dot {
       width: 6px; height: 6px; border-radius: 50%;
       background: rgba(75,225,225,0.5); margin: 0 3px;
@@ -586,7 +559,7 @@
       50% { opacity: 1; transform: scale(1.2); }
     }
 
-    /* ── NEWS DETAIL VIEW ──────────────────────────────── */
+    /* ── News detail view ── */
     .news-detail { display: none; flex-direction: column; width: 100%; height: 100%; }
     .news-detail.is-active { display: flex; }
     .news-list { flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
@@ -597,12 +570,12 @@
     }
     .news-back {
       appearance: none; background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.12);
-      color: rgba(255,255,255,0.7); border-radius: 10px;
-      padding: 5px 10px; font-size: 10px; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.1em;
-      cursor: pointer; flex-shrink: 0;
+      border: 1px solid rgba(255,255,255,0.13); border-radius: 12px;
+      color: rgba(255,255,255,0.7); padding: 6px 12px;
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; cursor: pointer; flex-shrink: 0;
       display: flex; align-items: center; gap: 4px;
+      transition: background 0.16s;
     }
     .news-back:active { background: rgba(255,255,255,0.16); }
     .news-detail-scroll {
@@ -615,16 +588,13 @@
     .news-detail-scroll::-webkit-scrollbar-track { background: transparent; }
     .news-detail-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
     .news-detail-meta {
-      display: flex; align-items: center; gap: 8px;
-      flex-wrap: wrap; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;
     }
     .news-detail-date {
       font-size: 9px; font-weight: 700; text-transform: uppercase;
       letter-spacing: 0.1em; color: #4be1e1;
     }
-    .news-detail-author {
-      font-size: 9px; font-weight: 600; color: var(--muted); opacity: 0.7;
-    }
+    .news-detail-author { font-size: 9px; font-weight: 600; color: var(--muted); opacity: 0.7; }
     .news-detail-title {
       font-size: 16px; font-weight: 800; color: #fff;
       line-height: 1.3; margin: 0 0 12px 0;
@@ -635,42 +605,33 @@
     }
     .news-detail-body p { margin: 0 0 10px 0; }
     .news-detail-body strong, .news-detail-body b { color: #fff; font-weight: 700; }
-    .news-detail-body ul, .news-detail-body ol {
-      margin: 8px 0; padding-left: 20px;
-    }
+    .news-detail-body ul, .news-detail-body ol { margin: 8px 0; padding-left: 20px; }
     .news-detail-body li { margin-bottom: 4px; }
     .news-detail-body a { color: #4be1e1; text-decoration: underline; }
-    .news-detail-imgs {
-      display: flex; flex-wrap: wrap; gap: 6px;
-      margin: 4px 0 14px 0;
-    }
+    .news-detail-imgs { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 14px 0; }
     .news-detail-img {
-      flex: 1 1 calc(50% - 3px);
-      min-width: 80px; max-width: 100%;
-      height: 150px; object-fit: cover;
-      border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.08);
-      display: block;
+      flex: 1 1 calc(50% - 3px); min-width: 80px; max-width: 100%;
+      height: 150px; object-fit: cover; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.08); display: block;
+      cursor: pointer; transition: opacity 0.15s;
     }
     .news-detail-imgs .news-detail-img:only-child {
-      flex: none; width: 100%; height: auto;
-      max-height: 240px; object-fit: contain;
+      flex: none; width: 100%; height: auto; max-height: 240px; object-fit: contain;
     }
-    .news-detail-img { cursor: pointer; transition: opacity 0.15s; }
     .news-detail-img:active { opacity: 0.7; }
+
+    /* ── Image lightbox ── */
     .news-lightbox {
       position: fixed; inset: 0; z-index: 100;
       display: flex; align-items: center; justify-content: center;
       background: rgba(0,0,0,0.92);
       backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-      opacity: 0; transition: opacity 0.2s ease;
-      pointer-events: none;
+      opacity: 0; transition: opacity 0.2s ease; pointer-events: none;
     }
     .news-lightbox.is-open { opacity: 1; pointer-events: auto; }
     .news-lightbox-img {
-      max-width: 92vw; max-height: 88vh;
-      object-fit: contain; border-radius: 8px;
-      transform: scale(0.92); transition: transform 0.25s ease;
+      max-width: 92vw; max-height: 88vh; object-fit: contain;
+      border-radius: 8px; transform: scale(0.92); transition: transform 0.25s ease;
     }
     .news-lightbox.is-open .news-lightbox-img { transform: scale(1); }
     .news-lightbox-close {
@@ -693,9 +654,7 @@
     }
     .news-ps-link:active { background: rgba(0,180,180,0.22); }
     .news-detail-divider {
-      width: 100%; height: 1px;
-      background: rgba(255,255,255,0.08);
-      margin: 14px 0;
+      width: 100%; height: 1px; background: rgba(255,255,255,0.08); margin: 14px 0;
     }
   </style>
 </head>
@@ -771,33 +730,28 @@
         </div>
       </div>
 
-      <!-- NEWS FEED MODAL -->
+      <!-- NEWS FEED -->
       <div id="newsModal" class="news-modal" hidden>
-        <div class="news-modal-backdrop" id="newsBackdrop"></div>
-        <div class="news-modal-inner">
-          <div class="news-header">
-            <div class="news-title-row">
-              <p class="news-title">📰 School News</p>
-              <span class="news-badge">Live</span>
-            </div>
-            <button id="newsClose" class="news-close" type="button">✕</button>
-          </div>
-          <div class="news-list" id="newsList">
-            <p class="news-updated" id="newsUpdated"></p>
-            <div class="news-feed" id="newsFeed">
-              <div class="news-loading">
-                <span class="news-loading-dot"></span>
-                <span class="news-loading-dot"></span>
-                <span class="news-loading-dot"></span>
-              </div>
+        <div class="news-top-row">
+          <a href="index.html" class="nav-link" aria-label="Home"><img src="PV_Logo.png" alt="Logo" class="logo-clear"></a>
+          <h1 class="news-page-title">News</h1>
+          <button id="newsClose" class="news-close" type="button" aria-label="Close">✕</button>
+        </div>
+        <div class="news-list" id="newsList">
+          <p class="news-updated" id="newsUpdated"></p>
+          <div class="news-feed" id="newsFeed">
+            <div class="news-loading">
+              <span class="news-loading-dot"></span>
+              <span class="news-loading-dot"></span>
+              <span class="news-loading-dot"></span>
             </div>
           </div>
-          <div class="news-detail" id="newsDetail">
-            <div class="news-detail-header">
-              <button class="news-back" id="newsBack" type="button">&#8592; Back</button>
-            </div>
-            <div class="news-detail-scroll" id="newsDetailScroll"></div>
+        </div>
+        <div class="news-detail" id="newsDetail">
+          <div class="news-detail-header">
+            <button class="news-back" id="newsBack" type="button">&#8592; Back</button>
           </div>
+          <div class="news-detail-scroll" id="newsDetailScroll"></div>
         </div>
       </div>
 
@@ -846,6 +800,7 @@
       <div id="navMenu" class="nav-menu" role="menu">
         <a href="countdown.html"       class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">⏱</span>Countdown</a>
         <a href="extension_search.html" class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">🔍</span>Directory</a>
+        <button id="newsMenuBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon">📰</span>News</button>
         <div id="popoutMenuSep" class="nav-menu-sep"></div>
         <button id="popoutBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon">🪟</span>Pop Out</button>
         <div id="installMenuSep" class="nav-menu-sep"></div>
@@ -1311,8 +1266,12 @@
       function closeNews() { if (newsModal) newsModal.hidden = true; showList(); }
 
       document.getElementById('newsBtn')?.addEventListener('click', openNews);
+      document.getElementById('newsMenuBtn')?.addEventListener('click', function() {
+        navMenu?.classList.remove('is-open');
+        navMenuBtn?.classList.remove('is-open');
+        openNews();
+      });
       document.getElementById('newsClose')?.addEventListener('click', closeNews);
-      document.getElementById('newsBackdrop')?.addEventListener('click', closeNews);
       document.getElementById('newsBack')?.addEventListener('click', showList);
 
       function showList() {
