@@ -730,17 +730,18 @@
     .news-detail-body ul, .news-detail-body ol { margin: 8px 0; padding-left: 20px; }
     .news-detail-body li { margin-bottom: 4px; }
     .news-detail-body a { color: #4be1e1; text-decoration: underline; }
-    .news-detail-imgs { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 14px 0; }
-    .news-detail-img {
-      flex: 1 1 calc(50% - 3px); min-width: 80px; max-width: 100%;
-      height: 150px; object-fit: cover; border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.08); display: block;
+    .news-detail-imgs { display: none; }
+    .news-detail-img-inline {
+      float: right; margin: 4px 0 8px 12px;
+      width: 42%; max-width: 160px; height: auto;
+      border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);
       cursor: pointer; transition: opacity 0.15s;
+      object-fit: cover;
     }
-    .news-detail-imgs .news-detail-img:only-child {
-      flex: none; width: 100%; height: auto; max-height: 240px; object-fit: contain;
+    .news-detail-img-inline:nth-of-type(even) {
+      float: left; margin: 4px 12px 8px 0;
     }
-    .news-detail-img:active { opacity: 0.7; }
+    .news-detail-img-inline:active { opacity: 0.7; }
 
     /* ── Image lightbox ── */
     .news-lightbox {
@@ -1504,7 +1505,7 @@
       });
 
       newsDetailScroll.addEventListener('click', function(e) {
-        if (e.target.classList.contains('news-detail-img')) {
+        if (e.target.classList.contains('news-detail-img') || e.target.classList.contains('news-detail-img-inline')) {
           openLightbox(e.target.src);
         }
       });
@@ -1524,11 +1525,30 @@
 
       function showDetail(post) {
         var bodyHtml = post.body ? makeBodySafe(post.body) : ('<p>' + (post.summary || '') + '</p>');
-        var imagesHtml = '';
+        // Inject images inline within the body text for natural reading flow
         if (post.images && post.images.length > 0) {
-          imagesHtml = post.images.map(function(src) {
-            return '<img class="news-detail-img" src="' + src + '" alt="" loading="lazy">';
-          }).join('');
+          var parser = new DOMParser();
+          var doc = parser.parseFromString('<div>' + bodyHtml + '</div>', 'text/html');
+          var container = doc.body.firstChild;
+          var paras = container.querySelectorAll('p, div, li, h1, h2, h3, h4, br');
+          var insertPoints = paras.length > 0 ? Array.from(paras) : [];
+          post.images.forEach(function(src, i) {
+            var img = doc.createElement('img');
+            img.className = 'news-detail-img-inline';
+            img.src = src;
+            img.alt = '';
+            img.loading = 'lazy';
+            // Distribute images evenly through the body
+            if (insertPoints.length > 1) {
+              var idx = Math.min(Math.floor((i + 1) * insertPoints.length / (post.images.length + 1)), insertPoints.length - 1);
+              var target = insertPoints[idx];
+              target.parentNode.insertBefore(img, target);
+            } else {
+              // If few paragraphs, prepend to the body
+              container.insertBefore(img, container.firstChild);
+            }
+          });
+          bodyHtml = container.innerHTML;
         }
         var pinHtml = post.pinned ? '<span class="news-card-pin" style="margin-left:6px;">Important</span>' : '';
         newsDetailScroll.innerHTML =
@@ -1539,7 +1559,6 @@
             '<span class="news-detail-author">' + (post.author || '') + '</span>' +
           '</div>' +
           '<h2 class="news-detail-title">' + (post.title || 'Untitled Post') + '</h2>' +
-          (imagesHtml ? '<div class="news-detail-imgs">' + imagesHtml + '</div>' : '') +
           '<div class="news-detail-body">' + bodyHtml + '</div>' +
           (post.url ? '<a class="news-ps-link" href="' + post.url + '" target="_blank" rel="noopener noreferrer">See in ParentSquare ↗</a>' : '');
         newsDetailScroll.scrollTop = 0;
