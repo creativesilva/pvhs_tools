@@ -1439,6 +1439,12 @@
       document.getElementById('newsChooserClose')?.addEventListener('click', closeChooser);
       document.getElementById('newsChooserBackdrop')?.addEventListener('click', closeChooser);
 
+      // Auto-open news chooser when arriving via #news hash
+      if (window.location.hash === '#news') {
+        openChooser();
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
+
       // ── NEWS FEED ──
       const newsModal   = document.getElementById('newsModal');
       const newsFeed    = document.getElementById('newsFeed');
@@ -1968,7 +1974,6 @@
       // Also check on page load for background alerts
       checkAthGameDay();
 
-      }
     })();
 
     // ── DAILY QUOTE ──────────────────────────────────────────────
