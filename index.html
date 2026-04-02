@@ -493,16 +493,27 @@
       flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
       display: flex; flex-direction: column; gap: 8px;
       padding-bottom: 14px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.15) transparent;
     }
+    .news-feed::-webkit-scrollbar { width: 5px; }
+    .news-feed::-webkit-scrollbar-track { background: transparent; }
+    .news-feed::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+    .news-feed::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
     .news-card {
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 16px; padding: 12px 14px;
       display: flex; flex-direction: column; gap: 6px;
       text-decoration: none; color: inherit;
-      transition: background 0.18s;
+      transition: background 0.2s, border-color 0.2s; cursor: pointer;
     }
-    .news-card:active { background: rgba(255,255,255,0.09); }
+    .news-card:active { background: rgba(255,255,255,0.08); }
+    .news-card.is-expanded {
+      background: rgba(75,225,225,0.05);
+      border-color: rgba(75,225,225,0.22);
+      cursor: default;
+    }
     .news-card-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
     .news-card-date {
       font-size: 9px; font-weight: 700; text-transform: uppercase;
@@ -514,17 +525,48 @@
       background: rgba(255,183,77,0.12); border: 1px solid rgba(255,183,77,0.25);
       border-radius: 5px; padding: 1px 5px;
     }
+    .news-card-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
     .news-card-title {
       font-size: 12.5px; font-weight: 700; color: #f0fbfb;
-      line-height: 1.35; margin: 0;
+      line-height: 1.35; margin: 0; flex: 1;
     }
+    .news-card-chevron {
+      font-size: 10px; color: rgba(255,255,255,0.35);
+      flex-shrink: 0; margin-top: 2px;
+      transition: transform 0.2s;
+    }
+    .news-card.is-expanded .news-card-chevron { transform: rotate(180deg); color: #4be1e1; }
     .news-card-summary {
       font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.6);
       line-height: 1.4; margin: 0;
     }
+    .news-card.is-expanded .news-card-summary { display: none; }
     .news-card-author {
       font-size: 9px; font-weight: 600; color: var(--muted); opacity: 0.55;
       margin: 0;
+    }
+    .news-card-expand {
+      display: none; flex-direction: column; gap: 8px;
+      margin-top: 6px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 12px;
+    }
+    .news-card.is-expanded .news-card-expand { display: flex; }
+    .news-card-body {
+      font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.78);
+      line-height: 1.65;
+    }
+    .news-card-body p { margin: 0 0 10px 0; }
+    .news-card-body p:last-child { margin-bottom: 0; }
+    .news-card-body strong, .news-card-body b { color: #fff; font-weight: 700; }
+    .news-card-body em, .news-card-body i { color: rgba(255,255,255,0.65); }
+    .news-card-body ul, .news-card-body ol { margin: 6px 0 10px 0; padding-left: 18px; }
+    .news-card-body li { margin-bottom: 4px; }
+    .news-card-body a { color: #4be1e1; text-decoration: underline; pointer-events: auto; }
+    .news-card-img {
+      width: 100%; border-radius: 12px; margin: 6px 0;
+      border: 1px solid rgba(255,255,255,0.08);
+      display: block;
     }
     .news-empty {
       flex: 1; display: flex; flex-direction: column;
@@ -546,6 +588,69 @@
     @keyframes newsPulse {
       0%, 100% { opacity: 0.3; transform: scale(0.8); }
       50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    /* ── NEWS DETAIL VIEW ──────────────────────────────── */
+    .news-detail { display: none; flex-direction: column; width: 100%; height: 100%; }
+    .news-detail.is-active { display: flex; }
+    .news-list.is-hidden { display: none; }
+    .news-detail-header {
+      display: flex; align-items: center; gap: 10px;
+      flex-shrink: 0; margin-bottom: 10px;
+    }
+    .news-back {
+      appearance: none; background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.7); border-radius: 10px;
+      padding: 5px 10px; font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      cursor: pointer; flex-shrink: 0;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .news-back:active { background: rgba(255,255,255,0.16); }
+    .news-detail-scroll {
+      flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+      padding-bottom: 14px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.15) transparent;
+    }
+    .news-detail-scroll::-webkit-scrollbar { width: 5px; }
+    .news-detail-scroll::-webkit-scrollbar-track { background: transparent; }
+    .news-detail-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+    .news-detail-meta {
+      display: flex; align-items: center; gap: 8px;
+      flex-wrap: wrap; margin-bottom: 10px;
+    }
+    .news-detail-date {
+      font-size: 9px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; color: #4be1e1;
+    }
+    .news-detail-author {
+      font-size: 9px; font-weight: 600; color: var(--muted); opacity: 0.7;
+    }
+    .news-detail-title {
+      font-size: 16px; font-weight: 800; color: #fff;
+      line-height: 1.3; margin: 0 0 12px 0;
+    }
+    .news-detail-body {
+      font-size: 12.5px; font-weight: 500; color: rgba(255,255,255,0.78);
+      line-height: 1.6; margin: 0;
+    }
+    .news-detail-body p { margin: 0 0 10px 0; }
+    .news-detail-body strong, .news-detail-body b { color: #fff; font-weight: 700; }
+    .news-detail-body ul, .news-detail-body ol {
+      margin: 8px 0; padding-left: 20px;
+    }
+    .news-detail-body li { margin-bottom: 4px; }
+    .news-detail-body a { color: #4be1e1; text-decoration: underline; }
+    .news-detail-img {
+      width: 100%; border-radius: 12px; margin: 10px 0;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .news-detail-divider {
+      width: 100%; height: 1px;
+      background: rgba(255,255,255,0.08);
+      margin: 14px 0;
     }
   </style>
 </head>
@@ -632,13 +737,21 @@
             </div>
             <button id="newsClose" class="news-close" type="button">✕</button>
           </div>
-          <p class="news-updated" id="newsUpdated"></p>
-          <div class="news-feed" id="newsFeed">
-            <div class="news-loading">
-              <span class="news-loading-dot"></span>
-              <span class="news-loading-dot"></span>
-              <span class="news-loading-dot"></span>
+          <div class="news-list" id="newsList">
+            <p class="news-updated" id="newsUpdated"></p>
+            <div class="news-feed" id="newsFeed">
+              <div class="news-loading">
+                <span class="news-loading-dot"></span>
+                <span class="news-loading-dot"></span>
+                <span class="news-loading-dot"></span>
+              </div>
             </div>
+          </div>
+          <div class="news-detail" id="newsDetail">
+            <div class="news-detail-header">
+              <button class="news-back" id="newsBack" type="button">&#8592; Back</button>
+            </div>
+            <div class="news-detail-scroll" id="newsDetailScroll"></div>
           </div>
         </div>
       </div>
@@ -1135,30 +1248,61 @@
 
     // ── NEWS FEED ────────────────────────────────────────────────
     (function() {
-      const newsModal = document.getElementById('newsModal');
-      const newsFeed  = document.getElementById('newsFeed');
+      const newsModal   = document.getElementById('newsModal');
+      const newsFeed    = document.getElementById('newsFeed');
       const newsUpdated = document.getElementById('newsUpdated');
+      const newsList    = document.getElementById('newsList');
+      const newsDetail  = document.getElementById('newsDetail');
+      const newsDetailScroll = document.getElementById('newsDetailScroll');
+      let postsData = [];
 
-      function openNews() { if (newsModal) newsModal.hidden = false; loadNews(); }
-      function closeNews() { if (newsModal) newsModal.hidden = true; }
+      function openNews() { if (newsModal) newsModal.hidden = false; showList(); loadNews(); }
+      function closeNews() { if (newsModal) newsModal.hidden = true; showList(); }
 
       document.getElementById('newsBtn')?.addEventListener('click', openNews);
       document.getElementById('newsClose')?.addEventListener('click', closeNews);
       document.getElementById('newsBackdrop')?.addEventListener('click', closeNews);
+      document.getElementById('newsBack')?.addEventListener('click', showList);
+
+      function showList() {
+        newsList.classList.remove('is-hidden');
+        newsDetail.classList.remove('is-active');
+      }
+
+      function makeBodySafe(html) {
+        // Ensure all links open in new tab and never navigate away
+        return html.replace(/<a /gi, '<a target="_blank" rel="noopener noreferrer" ');
+      }
+
+      function toggleCard(card, post) {
+        var isExpanded = card.classList.contains('is-expanded');
+        // Collapse all cards first
+        document.querySelectorAll('.news-card.is-expanded').forEach(function(c) {
+          c.classList.remove('is-expanded');
+        });
+        // If it wasn't expanded, expand it now
+        if (!isExpanded) {
+          card.classList.add('is-expanded');
+          // Scroll the card into view smoothly
+          setTimeout(function() {
+            card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }, 80);
+        }
+      }
 
       function formatDate(dateStr) {
         try {
-          const d = new Date(dateStr + 'T00:00:00');
+          var d = new Date(dateStr + 'T00:00:00');
           return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        } catch { return dateStr; }
+        } catch(e) { return dateStr; }
       }
 
       function formatUpdated(ts) {
         try {
-          const d = new Date(ts);
+          var d = new Date(ts);
           return 'Updated ' + d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) +
             ' at ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-        } catch { return ''; }
+        } catch(e) { return ''; }
       }
 
       function renderPosts(data) {
@@ -1171,24 +1315,46 @@
             '</div>';
           return;
         }
+        postsData = data.posts;
         if (newsUpdated && data.last_updated) {
           newsUpdated.textContent = formatUpdated(data.last_updated);
         }
-        newsFeed.innerHTML = data.posts.map(function(post) {
+        newsFeed.innerHTML = data.posts.map(function(post, idx) {
           var pinHtml = post.pinned ? '<span class="news-card-pin">Important</span>' : '';
-          var url = post.url || 'https://www.parentsquare.com';
+          var bodyHtml = post.body ? makeBodySafe(post.body) : ('<p>' + (post.summary || '') + '</p>');
+          var imagesHtml = '';
+          if (post.images && post.images.length > 0) {
+            imagesHtml = post.images.map(function(src) {
+              return '<img class="news-card-img" src="' + src + '" alt="" loading="lazy">';
+            }).join('');
+          }
           return (
-            '<a class="news-card" href="' + url + '" target="_blank" rel="noopener">' +
+            '<div class="news-card" data-idx="' + idx + '">' +
               '<div class="news-card-top">' +
                 '<p class="news-card-date">' + formatDate(post.date) + '</p>' +
                 pinHtml +
               '</div>' +
-              '<p class="news-card-title">' + (post.title || 'Untitled Post') + '</p>' +
+              '<div class="news-card-title-row">' +
+                '<p class="news-card-title">' + (post.title || 'Untitled Post') + '</p>' +
+                '<span class="news-card-chevron">▾</span>' +
+              '</div>' +
               '<p class="news-card-summary">' + (post.summary || '') + '</p>' +
               '<p class="news-card-author">' + (post.author || '') + '</p>' +
-            '</a>'
+              '<div class="news-card-expand">' +
+                imagesHtml +
+                '<div class="news-card-body">' + bodyHtml + '</div>' +
+              '</div>' +
+            '</div>'
           );
         }).join('');
+        newsFeed.querySelectorAll('.news-card').forEach(function(card) {
+          card.addEventListener('click', function(e) {
+            // Don't collapse when clicking links inside body
+            if (e.target.tagName === 'A') return;
+            var idx = parseInt(card.getAttribute('data-idx'));
+            if (postsData[idx]) toggleCard(card, postsData[idx]);
+          });
+        });
       }
 
       function loadNews() {
