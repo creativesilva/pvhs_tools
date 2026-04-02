@@ -652,6 +652,42 @@
       flex: none; width: 100%; height: auto;
       max-height: 240px; object-fit: contain;
     }
+    .news-detail-img { cursor: pointer; transition: opacity 0.15s; }
+    .news-detail-img:active { opacity: 0.7; }
+    .news-lightbox {
+      position: fixed; inset: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.92);
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      opacity: 0; transition: opacity 0.2s ease;
+      pointer-events: none;
+    }
+    .news-lightbox.is-open { opacity: 1; pointer-events: auto; }
+    .news-lightbox-img {
+      max-width: 92vw; max-height: 88vh;
+      object-fit: contain; border-radius: 8px;
+      transform: scale(0.92); transition: transform 0.25s ease;
+    }
+    .news-lightbox.is-open .news-lightbox-img { transform: scale(1); }
+    .news-lightbox-close {
+      position: absolute; top: 14px; right: 14px;
+      appearance: none; background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: #fff; border-radius: 99px;
+      width: 34px; height: 34px; font-size: 16px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .news-lightbox-close:active { background: rgba(255,255,255,0.24); }
+    .news-ps-link {
+      display: inline-flex; align-items: center; gap: 4px;
+      margin-top: 16px; padding: 8px 14px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; text-decoration: none;
+      color: #4be1e1; background: rgba(0,180,180,0.1);
+      border: 1px solid rgba(0,210,210,0.22);
+      border-radius: 10px; transition: background 0.15s;
+    }
+    .news-ps-link:active { background: rgba(0,180,180,0.22); }
     .news-detail-divider {
       width: 100%; height: 1px;
       background: rgba(255,255,255,0.08);
@@ -759,6 +795,12 @@
             <div class="news-detail-scroll" id="newsDetailScroll"></div>
           </div>
         </div>
+      </div>
+
+      <!-- IMAGE LIGHTBOX -->
+      <div id="newsLightbox" class="news-lightbox">
+        <img class="news-lightbox-img" id="newsLightboxImg" src="" alt="">
+        <button class="news-lightbox-close" id="newsLightboxClose" type="button">✕</button>
       </div>
 
       <!-- FEEDBACK MODAL -->
@@ -1275,6 +1317,30 @@
         newsDetailScroll.innerHTML = '';
       }
 
+      /* ── IMAGE LIGHTBOX ── */
+      var lightbox = document.getElementById('newsLightbox');
+      var lightboxImg = document.getElementById('newsLightboxImg');
+      var lightboxClose = document.getElementById('newsLightboxClose');
+
+      function openLightbox(src) {
+        lightboxImg.src = src;
+        lightbox.classList.add('is-open');
+      }
+      function closeLightbox() {
+        lightbox.classList.remove('is-open');
+        setTimeout(function() { lightboxImg.src = ''; }, 200);
+      }
+      lightboxClose.addEventListener('click', closeLightbox);
+      lightbox.addEventListener('click', function(e) {
+        if (e.target === lightbox) closeLightbox();
+      });
+
+      newsDetailScroll.addEventListener('click', function(e) {
+        if (e.target.classList.contains('news-detail-img')) {
+          openLightbox(e.target.src);
+        }
+      });
+
       function makeBodySafe(html) {
         // Ensure all links open in new tab and never navigate away
         return html.replace(/<a /gi, '<a target="_blank" rel="noopener noreferrer" ');
@@ -1298,7 +1364,8 @@
           '</div>' +
           '<h2 class="news-detail-title">' + (post.title || 'Untitled Post') + '</h2>' +
           (imagesHtml ? '<div class="news-detail-imgs">' + imagesHtml + '</div>' : '') +
-          '<div class="news-detail-body">' + bodyHtml + '</div>';
+          '<div class="news-detail-body">' + bodyHtml + '</div>' +
+          (post.url ? '<a class="news-ps-link" href="' + post.url + '" target="_blank" rel="noopener noreferrer">See in ParentSquare ↗</a>' : '');
         newsDetailScroll.scrollTop = 0;
         newsList.classList.add('is-hidden');
         newsDetail.classList.add('is-active');
