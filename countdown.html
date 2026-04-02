@@ -153,7 +153,25 @@
     .timer.normal { background: var(--white-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .timer.caution { background: var(--orange-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .timer.warning { background: var(--red-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .timer.warning.blink { animation: blinkTimer 1s step-end infinite; }
+    @keyframes blinkTimer {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
     .timer.rest { background: var(--green-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+    .wait-bell {
+      display: none;
+      font-size: clamp(13px, 3.8vw, 18px);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #ff5b5b;
+      text-align: center;
+      margin: 2px 0 0 0;
+      animation: blinkTimer 1s step-end infinite;
+    }
+    .wait-bell.show { display: block; }
 
     .subtext { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; margin: 0; text-wrap: balance; text-align: center; letter-spacing: 0.04em; }
     .access-row {
@@ -688,6 +706,7 @@
           <div class="block-label" id="blockLabel">Loading</div>
           <div class="timer normal" id="timerText">--:--</div>
           <p class="subtext" id="subText">Syncing Calendar...</p>
+          <p class="wait-bell" id="waitBell">WAIT FOR THE BELL</p>
           <p class="access-row" id="accessText">No Restroom Access</p>
           <p class="status-row" id="scheduleText">Schedule: --</p>
         </div>
@@ -1206,18 +1225,33 @@
             }
 
             const isCollab = /COLLAB/i.test(blocks[i].l);
+            const waitBellEl = document.getElementById("waitBell");
             document.getElementById("blockLabel").textContent = blocks[i].l;
-            document.getElementById("timerText").textContent = formatTime(rem);
-            document.getElementById("timerText").className = `timer ${timerState}`;
-            document.getElementById("subText").textContent = isCollab
-              ? "Collab ends at 3:55 PM — then rest!"
-              : (i < blocks.length - 1 ? `Next: ${blocks[i + 1].l}` : "Almost done for today!");
+
+            // For class periods (1st-7th), freeze at 05:00 and blink
+            if (isLastFive) {
+              document.getElementById("timerText").textContent = "05:00";
+              document.getElementById("timerText").className = "timer warning blink";
+              waitBellEl.className = "wait-bell show";
+              document.getElementById("subText").textContent = "";
+            } else {
+              document.getElementById("timerText").textContent = formatTime(rem);
+              document.getElementById("timerText").className = `timer ${timerState}`;
+              waitBellEl.className = "wait-bell";
+              document.getElementById("subText").textContent = isCollab
+                ? "Collab ends at 3:55 PM — then rest!"
+                : (i < blocks.length - 1 ? `Next: ${blocks[i + 1].l}` : "Almost done for today!");
+            }
+
             updatePeriodAlert(timerState === "normal" ? "" : timerState, alertMessage || "No Restroom Access");
             scheduleFitCountdownText();
             return;
           }
         }
       }
+
+      // Hide "WAIT FOR THE BELL" when outside active class periods
+      document.getElementById("waitBell").className = "wait-bell";
 
       const upcomingDay = isSchoolDay && now.totalSec < firstStart
         ? now.dateStr
