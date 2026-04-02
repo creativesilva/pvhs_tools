@@ -545,28 +545,20 @@
       font-size: 9px; font-weight: 600; color: var(--muted); opacity: 0.55;
       margin: 0;
     }
-    .news-card-expand {
-      display: none; flex-direction: column; gap: 8px;
-      margin-top: 6px;
-      border-top: 1px solid rgba(255,255,255,0.08);
-      padding-top: 12px;
+    .news-card-thumb-wrap {
+      margin: 6px 0 2px 0;
     }
-    .news-card.is-expanded .news-card-expand { display: flex; }
-    .news-card-body {
-      font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.78);
-      line-height: 1.65;
-    }
-    .news-card-body p { margin: 0 0 10px 0; }
-    .news-card-body p:last-child { margin-bottom: 0; }
-    .news-card-body strong, .news-card-body b { color: #fff; font-weight: 700; }
-    .news-card-body em, .news-card-body i { color: rgba(255,255,255,0.65); }
-    .news-card-body ul, .news-card-body ol { margin: 6px 0 10px 0; padding-left: 18px; }
-    .news-card-body li { margin-bottom: 4px; }
-    .news-card-body a { color: #4be1e1; text-decoration: underline; pointer-events: auto; }
-    .news-card-img {
-      width: 100%; border-radius: 12px; margin: 6px 0;
-      border: 1px solid rgba(255,255,255,0.08);
+    .news-card-thumb {
+      width: 100%; max-height: 120px; object-fit: cover;
+      border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);
       display: block;
+    }
+    .news-card::after {
+      content: "Read more ›";
+      display: block;
+      font-size: 9px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; color: #4be1e1; opacity: 0.7;
+      margin-top: 6px;
     }
     .news-empty {
       flex: 1; display: flex; flex-direction: column;
@@ -593,6 +585,7 @@
     /* ── NEWS DETAIL VIEW ──────────────────────────────── */
     .news-detail { display: none; flex-direction: column; width: 100%; height: 100%; }
     .news-detail.is-active { display: flex; }
+    .news-list { flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
     .news-list.is-hidden { display: none; }
     .news-detail-header {
       display: flex; align-items: center; gap: 10px;
@@ -643,9 +636,21 @@
     }
     .news-detail-body li { margin-bottom: 4px; }
     .news-detail-body a { color: #4be1e1; text-decoration: underline; }
+    .news-detail-imgs {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      margin: 4px 0 14px 0;
+    }
     .news-detail-img {
-      width: 100%; border-radius: 12px; margin: 10px 0;
+      flex: 1 1 calc(50% - 3px);
+      min-width: 80px; max-width: 100%;
+      height: 150px; object-fit: cover;
+      border-radius: 10px;
       border: 1px solid rgba(255,255,255,0.08);
+      display: block;
+    }
+    .news-detail-imgs .news-detail-img:only-child {
+      flex: none; width: 100%; height: auto;
+      max-height: 240px; object-fit: contain;
     }
     .news-detail-divider {
       width: 100%; height: 1px;
@@ -1267,6 +1272,7 @@
       function showList() {
         newsList.classList.remove('is-hidden');
         newsDetail.classList.remove('is-active');
+        newsDetailScroll.innerHTML = '';
       }
 
       function makeBodySafe(html) {
@@ -1274,20 +1280,28 @@
         return html.replace(/<a /gi, '<a target="_blank" rel="noopener noreferrer" ');
       }
 
-      function toggleCard(card, post) {
-        var isExpanded = card.classList.contains('is-expanded');
-        // Collapse all cards first
-        document.querySelectorAll('.news-card.is-expanded').forEach(function(c) {
-          c.classList.remove('is-expanded');
-        });
-        // If it wasn't expanded, expand it now
-        if (!isExpanded) {
-          card.classList.add('is-expanded');
-          // Scroll the card into view smoothly
-          setTimeout(function() {
-            card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-          }, 80);
+      function showDetail(post) {
+        var bodyHtml = post.body ? makeBodySafe(post.body) : ('<p>' + (post.summary || '') + '</p>');
+        var imagesHtml = '';
+        if (post.images && post.images.length > 0) {
+          imagesHtml = post.images.map(function(src) {
+            return '<img class="news-detail-img" src="' + src + '" alt="" loading="lazy">';
+          }).join('');
         }
+        var pinHtml = post.pinned ? '<span class="news-card-pin" style="margin-left:6px;">Important</span>' : '';
+        newsDetailScroll.innerHTML =
+          '<div class="news-detail-meta">' +
+            '<span class="news-detail-date">' + formatDate(post.date) + '</span>' +
+            pinHtml +
+            '<span class="news-detail-divider"></span>' +
+            '<span class="news-detail-author">' + (post.author || '') + '</span>' +
+          '</div>' +
+          '<h2 class="news-detail-title">' + (post.title || 'Untitled Post') + '</h2>' +
+          (imagesHtml ? '<div class="news-detail-imgs">' + imagesHtml + '</div>' : '') +
+          '<div class="news-detail-body">' + bodyHtml + '</div>';
+        newsDetailScroll.scrollTop = 0;
+        newsList.classList.add('is-hidden');
+        newsDetail.classList.add('is-active');
       }
 
       function formatDate(dateStr) {
@@ -1321,38 +1335,27 @@
         }
         newsFeed.innerHTML = data.posts.map(function(post, idx) {
           var pinHtml = post.pinned ? '<span class="news-card-pin">Important</span>' : '';
-          var bodyHtml = post.body ? makeBodySafe(post.body) : ('<p>' + (post.summary || '') + '</p>');
-          var imagesHtml = '';
-          if (post.images && post.images.length > 0) {
-            imagesHtml = post.images.map(function(src) {
-              return '<img class="news-card-img" src="' + src + '" alt="" loading="lazy">';
-            }).join('');
-          }
+          var hasImages = post.images && post.images.length > 0;
+          var thumbHtml = hasImages
+            ? '<img class="news-card-thumb" src="' + post.images[0] + '" alt="" loading="lazy">'
+            : '';
           return (
             '<div class="news-card" data-idx="' + idx + '">' +
               '<div class="news-card-top">' +
                 '<p class="news-card-date">' + formatDate(post.date) + '</p>' +
                 pinHtml +
               '</div>' +
-              '<div class="news-card-title-row">' +
-                '<p class="news-card-title">' + (post.title || 'Untitled Post') + '</p>' +
-                '<span class="news-card-chevron">▾</span>' +
-              '</div>' +
+              '<p class="news-card-title">' + (post.title || 'Untitled Post') + '</p>' +
               '<p class="news-card-summary">' + (post.summary || '') + '</p>' +
+              (thumbHtml ? '<div class="news-card-thumb-wrap">' + thumbHtml + '</div>' : '') +
               '<p class="news-card-author">' + (post.author || '') + '</p>' +
-              '<div class="news-card-expand">' +
-                imagesHtml +
-                '<div class="news-card-body">' + bodyHtml + '</div>' +
-              '</div>' +
             '</div>'
           );
         }).join('');
         newsFeed.querySelectorAll('.news-card').forEach(function(card) {
-          card.addEventListener('click', function(e) {
-            // Don't collapse when clicking links inside body
-            if (e.target.tagName === 'A') return;
+          card.addEventListener('click', function() {
             var idx = parseInt(card.getAttribute('data-idx'));
-            if (postsData[idx]) toggleCard(card, postsData[idx]);
+            if (postsData[idx]) showDetail(postsData[idx]);
           });
         });
       }
