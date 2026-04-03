@@ -472,7 +472,21 @@
       position: absolute; inset: 0; z-index: 20;
       display: flex; flex-direction: column;
       padding: 14px var(--app-spacing) var(--app-spacing) var(--app-spacing);
-      background: linear-gradient(168deg, rgba(6,28,28,0.97) 0%, rgba(4,24,24,0.95) 30%, rgba(0,72,72,0.92) 60%, rgba(0,100,100,0.96) 82%, rgba(4,30,30,0.97) 100%);
+      background: linear-gradient(168deg, #061c1c 0%, #041818 30%, #004848 60%, #006464 82%, #041e1e 100%);
+      isolation: isolate;
+    }
+    .news-modal::before {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(ellipse at 50% 20%, rgba(0,116,116,0.18) 0%, transparent 60%),
+                  radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 50%);
+      z-index: 0;
+    }
+    .news-modal > * { position: relative; z-index: 1; }
+    .news-ghost-logo {
+      position: absolute; top: 56%; left: 50%; width: 120%; opacity: 0.07;
+      transform: translate(-50%, -50%);
+      filter: grayscale(100%) contrast(108%) brightness(114%);
+      pointer-events: none; z-index: 0;
     }
     body.is-standalone .news-modal {
       padding-top: max(14px, env(safe-area-inset-top));
@@ -910,6 +924,7 @@
 
       <!-- NEWS FEED -->
       <div id="newsModal" class="news-modal" hidden>
+        <img src="PV_Logo.png" alt="" class="news-ghost-logo">
         <div class="news-top-row">
           <a href="index.html" class="nav-link" aria-label="Home"><img src="PV_Logo.png" alt="Logo" class="logo-clear"></a>
           <h1 class="news-page-title">News</h1>
