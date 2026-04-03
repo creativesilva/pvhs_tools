@@ -578,6 +578,26 @@
     .ath-empty-icon { font-size: 28px; opacity: 0.4; }
     .ath-empty-text { font-size: 11px; font-weight: 600; color: var(--muted); opacity: 0.6; }
 
+    /* ── News toggle bar ── */
+    .news-toggle {
+      display: flex; gap: 4px; width: 100%; flex-shrink: 0; margin-bottom: 6px;
+      background: rgba(255,255,255,0.04); border-radius: 12px; padding: 3px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .news-toggle-btn {
+      flex: 1; appearance: none; border: none; border-radius: 10px;
+      padding: 7px 0; font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; cursor: pointer;
+      background: transparent; color: rgba(255,255,255,0.45);
+      transition: background 0.2s, color 0.2s;
+    }
+    .news-toggle-btn.is-active {
+      background: rgba(0,180,180,0.18); color: #4be1e1;
+      border: 1px solid rgba(0,200,200,0.2);
+    }
+    .news-toggle-btn:not(.is-active) { border: 1px solid transparent; }
+    .news-toggle-btn:active { opacity: 0.7; }
+
     /* ── News top-row (mirrors .top-row exactly) ── */
     .news-top-row {
       display: flex; align-items: center; justify-content: space-between;
@@ -894,6 +914,10 @@
           <a href="index.html" class="nav-link" aria-label="Home"><img src="PV_Logo.png" alt="Logo" class="logo-clear"></a>
           <h1 class="news-page-title">News</h1>
           <button id="newsClose" class="news-close" type="button" aria-label="Close">✕</button>
+        </div>
+        <div class="news-toggle" id="newsToggle">
+          <button class="news-toggle-btn is-active" id="toggleEvents" type="button">📢 Current Events</button>
+          <button class="news-toggle-btn" id="toggleAthletics" type="button">🏆 Athletics</button>
         </div>
         <div class="news-list" id="newsList">
           <p class="news-updated" id="newsUpdated"></p>
@@ -1460,26 +1484,40 @@
         closeChooser();
         newsMode = mode;
         if (newsModal) newsModal.hidden = false;
+        updateToggle(mode);
         if (mode === 'athletics') {
           newsList.classList.add('is-hidden');
           newsDetail.classList.remove('is-active');
           athleticsView.classList.add('is-active');
-          document.querySelector('.news-page-title').textContent = 'Athletics';
           renderAthletics();
           checkAthGameDay();
         } else {
           athleticsView.classList.remove('is-active');
           showList();
           loadNews();
-          document.querySelector('.news-page-title').textContent = 'Current Events';
         }
+        document.getElementById('newsToggle').style.display = '';
       }
       function closeNews() {
         if (newsModal) newsModal.hidden = true;
         athleticsView.classList.remove('is-active');
         showList();
-        document.querySelector('.news-page-title').textContent = 'News';
       }
+
+      // Toggle bar inside news modal
+      const toggleEventsBtn = document.getElementById('toggleEvents');
+      const toggleAthleticsBtn = document.getElementById('toggleAthletics');
+      function updateToggle(mode) {
+        if (mode === 'athletics') {
+          toggleAthleticsBtn.classList.add('is-active');
+          toggleEventsBtn.classList.remove('is-active');
+        } else {
+          toggleEventsBtn.classList.add('is-active');
+          toggleAthleticsBtn.classList.remove('is-active');
+        }
+      }
+      toggleEventsBtn?.addEventListener('click', function() { openNewsModal('events'); });
+      toggleAthleticsBtn?.addEventListener('click', function() { openNewsModal('athletics'); });
 
       document.getElementById('newsChooserEvents')?.addEventListener('click', function() { openNewsModal('events'); });
       document.getElementById('newsChooserAthletics')?.addEventListener('click', function() { openNewsModal('athletics'); });
@@ -1490,6 +1528,7 @@
         newsList.classList.remove('is-hidden');
         newsDetail.classList.remove('is-active');
         newsDetailScroll.innerHTML = '';
+        document.getElementById('newsToggle').style.display = '';
       }
 
       /* ── IMAGE LIGHTBOX ── */
@@ -1530,6 +1569,7 @@
       }
 
       function showDetail(post) {
+        document.getElementById('newsToggle').style.display = 'none';
         var bodyHtml = post.body ? makeBodySafe(post.body) : ('<p>' + (post.summary || '') + '</p>');
         // Inject images inline within the body text for natural reading flow
         if (post.images && post.images.length > 0) {
