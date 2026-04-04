@@ -1254,6 +1254,26 @@
       // Hide "WAIT FOR THE BELL" when outside active class periods
       document.getElementById("waitBell").className = "wait-bell";
 
+      // ── SPRING / SUMMER BREAK ─────────────────────────────────────
+      const breakPeriods = [
+        { name: "Spring Break", start: "2026-04-03", end: "2026-04-13" },
+        { name: "Summer Break", start: "2026-06-11", end: "2026-08-14" }
+      ];
+      const activeBrk = breakPeriods.find(v => now.dateStr >= v.start && now.dateStr < v.end);
+      if (activeBrk) {
+        const brkStart   = new Date(`${activeBrk.start}T00:00:00`);
+        const brkEnd     = new Date(`${activeBrk.end}T00:00:00`);
+        const totalHrs   = Math.round((brkEnd - brkStart) / 3_600_000);
+        const elapsedSec = Math.max(0, Math.floor((Date.now() - brkStart) / 1000));
+        document.getElementById("blockLabel").textContent = `${activeBrk.name} 🌸`;
+        document.getElementById("timerText").textContent  = formatTime(elapsedSec, true);
+        document.getElementById("timerText").className    = "timer rest";
+        document.getElementById("subText").textContent    = `${Math.floor(elapsedSec / 3600)} of ${totalHrs} hrs into break`;
+        updatePeriodAlert("");
+        scheduleFitCountdownText();
+        return;
+      }
+
       const upcomingDay = isSchoolDay && now.totalSec < firstStart
         ? now.dateStr
         : (schoolDays.find(d => d > now.dateStr) || schoolDays[schoolDays.length - 1]);
