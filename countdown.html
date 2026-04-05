@@ -1189,12 +1189,43 @@
       const now = getNow();
       document.getElementById("todayText").textContent = new Intl.DateTimeFormat("en-US", {timeZone, weekday:"short", month:"short", day:"numeric"}).format(new Date());
 
-      let schedType = "REGULAR DAY", blocks = schedules.regular;
-      if (minimumDays.has(now.dateStr)) { schedType = "MINIMUM DAY"; blocks = schedules.minimum; }
-      else if (now.weekday === "Monday") { schedType = "COLLABORATION MONDAY"; blocks = schedules.monday; }
-      document.getElementById("scheduleText").textContent = `Schedule: ${schedType}`;
+      // Determine schedule type for any given date string
+      function getScheduleType(dStr) {
+        if (minimumDays.has(dStr)) return "MINIMUM DAY";
+        const d = new Date(dStr + 'T12:00:00');
+        const wd = new Intl.DateTimeFormat("en-US", {timeZone, weekday:"long"}).format(d);
+        if (wd === "Monday") return "COLLABORATION MONDAY";
+        return "REGULAR DAY";
+      }
+      function getScheduleBlocks(dStr) {
+        if (minimumDays.has(dStr)) return schedules.minimum;
+        const d = new Date(dStr + 'T12:00:00');
+        const wd = new Intl.DateTimeFormat("en-US", {timeZone, weekday:"long"}).format(d);
+        if (wd === "Monday") return schedules.monday;
+        return schedules.regular;
+      }
 
       const isSchoolDay = schoolDays.includes(now.dateStr);
+      let schedType, blocks;
+      const isAfterSchool = isSchoolDay && now.totalSec >= parseToSec(schedules.regular[schedules.regular.length - 1].e);
+      if (isSchoolDay && !isAfterSchool) {
+        schedType = getScheduleType(now.dateStr);
+        blocks = getScheduleBlocks(now.dateStr);
+        document.getElementById("scheduleText").textContent = `Schedule: ${schedType}`;
+      } else {
+        // Find next school day and show what schedule it will be
+        const nextSD = schoolDays.find(d => d > now.dateStr);
+        if (nextSD) {
+          const nextSchedType = getScheduleType(nextSD);
+          const nextD = new Date(nextSD + 'T12:00:00');
+          const nextDayName = new Intl.DateTimeFormat("en-US", {timeZone, weekday:"long"}).format(nextD);
+          const nextMonth = new Intl.DateTimeFormat("en-US", {timeZone, month:"short", day:"numeric"}).format(nextD);
+          document.getElementById("scheduleText").textContent = `Next: ${nextSchedType} · ${nextDayName} ${nextMonth}`;
+        } else {
+          document.getElementById("scheduleText").textContent = "School Year Complete!";
+        }
+        blocks = schedules.regular; // fallback for timer math
+      }
       const firstStart = parseToSec(blocks[0].s);
       const lastEnd = parseToSec(blocks[blocks.length - 1].e);
       // Today counts as a remaining school day until midnight
@@ -1253,26 +1284,6 @@
 
       // Hide "WAIT FOR THE BELL" when outside active class periods
       document.getElementById("waitBell").className = "wait-bell";
-
-      // ── SPRING / SUMMER BREAK ─────────────────────────────────────
-      const breakPeriods = [
-        { name: "Spring Break", start: "2026-04-03", end: "2026-04-13" },
-        { name: "Summer Break", start: "2026-06-11", end: "2026-08-14" }
-      ];
-      const activeBrk = breakPeriods.find(v => now.dateStr >= v.start && now.dateStr < v.end);
-      if (activeBrk) {
-        const brkStart   = new Date(`${activeBrk.start}T00:00:00`);
-        const brkEnd     = new Date(`${activeBrk.end}T00:00:00`);
-        const totalHrs   = Math.round((brkEnd - brkStart) / 3_600_000);
-        const elapsedSec = Math.max(0, Math.floor((Date.now() - brkStart) / 1000));
-        document.getElementById("blockLabel").textContent = `${activeBrk.name} 🌸`;
-        document.getElementById("timerText").textContent  = formatTime(elapsedSec, true);
-        document.getElementById("timerText").className    = "timer rest";
-        document.getElementById("subText").textContent    = `${Math.floor(elapsedSec / 3600)} of ${totalHrs} hrs into break`;
-        updatePeriodAlert("");
-        scheduleFitCountdownText();
-        return;
-      }
 
       const upcomingDay = isSchoolDay && now.totalSec < firstStart
         ? now.dateStr
