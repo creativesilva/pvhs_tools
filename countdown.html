@@ -1220,7 +1220,7 @@
           const nextD = new Date(nextSD + 'T12:00:00');
           const nextDayName = new Intl.DateTimeFormat("en-US", {timeZone, weekday:"long"}).format(nextD);
           const nextMonth = new Intl.DateTimeFormat("en-US", {timeZone, month:"short", day:"numeric"}).format(nextD);
-          document.getElementById("scheduleText").textContent = `Next: ${nextSchedType} · ${nextDayName} ${nextMonth}`;
+          document.getElementById("scheduleText").textContent = `Next Schedule: ${nextSchedType}`;
         } else {
           document.getElementById("scheduleText").textContent = "School Year Complete!";
         }
