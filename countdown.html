@@ -1615,30 +1615,24 @@
         { name: "Juneteenth Weekend",      start: "2026-06-19", end: "2026-06-21", emoji: "✊", stretchFrom: "2026-06-11" },
         { name: "4th of July Weekend",     start: "2026-07-03", end: "2026-07-05", emoji: "🎆", stretchFrom: "2026-06-22" }
       ];
-      // Find the next upcoming break (haven't passed its start yet)
-      const nextVac = allBreaks.find(v => dateStr <= v.start);
+      // Find the next upcoming break we should count down to.
+      // If we're currently IN a break, skip it and target the one after.
+      const currentlyInBreak = allBreaks.find(b => dateStr >= b.start && dateStr <= b.end);
+      const nextVac = currentlyInBreak
+        ? allBreaks.find(v => v.start > currentlyInBreak.end)
+        : allBreaks.find(v => dateStr < v.start);
       if (nextVac) {
-        const { name: vacName, start: vacStart, stretchFrom, emoji: vacEmoji } = nextVac;
-        const totalVacSDs  = schoolDays.filter(d => d >= stretchFrom && d < vacStart).length || 1;
-        const passedVacSDs = schoolDays.filter(d => d >= stretchFrom && d < dateStr).length;
-        // For post-school breaks (Juneteenth, July 4th), use calendar days instead
-        const isPostSchool = dateStr > schoolDays[schoolDays.length - 1];
-        let vacFrac, vacRemaining;
-        if (isPostSchool) {
-          const startD = new Date(stretchFrom + 'T00:00:00');
-          const endD = new Date(vacStart + 'T00:00:00');
-          const nowD = new Date(dateStr + 'T00:00:00');
-          const totalDays = Math.ceil((endD - startD) / 86400000);
-          const passedDays = Math.ceil((nowD - startD) / 86400000);
-          vacFrac = totalDays > 0 ? passedDays / totalDays : 0;
-          vacRemaining = Math.max(0, totalDays - passedDays);
-        } else {
-          vacFrac = totalVacSDs > 0 ? passedVacSDs / totalVacSDs : 0;
-          vacRemaining = totalVacSDs - passedVacSDs;
-        }
+        const { name: vacName, start: vacStart, emoji: vacEmoji } = nextVac;
+        // Count school days from today (or from when school resumes) to the break start
+        const schoolDaysRemaining = schoolDays.filter(d => d >= dateStr && d < vacStart).length;
+        // For the progress bar, count from the last break's end (or stretch start) to this break
+        const stretchStart = nextVac.stretchFrom;
+        const totalStretchSDs = schoolDays.filter(d => d >= stretchStart && d < vacStart).length || 1;
+        const passedStretchSDs = schoolDays.filter(d => d >= stretchStart && d < dateStr).length;
+        const vacFrac = totalStretchSDs > 0 ? passedStretchSDs / totalStretchSDs : 0;
         setFill('vacFill', vacFrac, 'prog-bar--vac');
         setTxt('vacLabel', `Till ${vacName} ${vacEmoji}`);
-        setTxt('vacPct', vacRemaining <= 0 ? '🎉' : vacRemaining === 1 ? '1 Day' : `${vacRemaining} School Days`);
+        setTxt('vacPct', schoolDaysRemaining <= 0 ? '🎉' : schoolDaysRemaining === 1 ? '1 School Day' : `${schoolDaysRemaining} School Days`);
       } else {
         setFill('vacFill', 1, 'prog-bar--vac');
         setTxt('vacLabel', 'Enjoy Summer! ☀️');
