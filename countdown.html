@@ -713,7 +713,7 @@
 
         <div class="card info-strip">
           <div class="info-cell">
-            <p class="info-label">Days Left</p>
+            <p class="info-label">School Days Left</p>
             <div class="info-number" id="daysLeft">--</div>
             <p class="info-sub">Last Day: Jun 10</p>
           </div>
@@ -1599,7 +1599,7 @@
       const passed     = total - grRemaining;
       const grFrac     = total > 0 ? passed / total : 0;
       setFill('gradFill', grFrac, 'prog-bar--grad');
-      setTxt('gradPct',   grRemaining === 0 ? '🎓' : grRemaining === 1 ? '1 Day' : `${grRemaining} Days`);
+      setTxt('gradPct',   grRemaining === 0 ? '🎓' : grRemaining === 1 ? '1 Day' : `${grRemaining} School Days`);
 
       // ── 4. NEXT BREAK (rolling countdown to every break/holiday) ──
       const allBreaks = [
@@ -1638,7 +1638,7 @@
         }
         setFill('vacFill', vacFrac, 'prog-bar--vac');
         setTxt('vacLabel', `Till ${vacName} ${vacEmoji}`);
-        setTxt('vacPct', vacRemaining <= 0 ? '🎉' : vacRemaining === 1 ? '1 Day' : `${vacRemaining} Days`);
+        setTxt('vacPct', vacRemaining <= 0 ? '🎉' : vacRemaining === 1 ? '1 Day' : `${vacRemaining} School Days`);
       } else {
         setFill('vacFill', 1, 'prog-bar--vac');
         setTxt('vacLabel', 'Enjoy Summer! ☀️');
@@ -1661,7 +1661,7 @@
           const passedPRSDs = schoolDays.filter(d => d >= stretch.from && d < dateStr).length;
           const prFrac = totalPRSDs > 0 ? passedPRSDs / totalPRSDs : 0;
           const dToPR = schoolDays.filter(d => d >= dateStr && d <= nextPR).length;
-          const prRight = dToPR === 0 ? '🎉 Today!' : dToPR === 1 ? '1 Day' : `${dToPR} Days`;
+          const prRight = dToPR === 0 ? '🎉 Today!' : dToPR === 1 ? '1 Day' : `${dToPR} School Days`;
           setFill('prFill', prFrac, 'prog-bar--pr');
           setTxt('prPct',   prRight);
           setTxt('prLabel', 'Till Progress Report');
