@@ -1281,20 +1281,53 @@
       const diff = Math.max(0, Math.floor((nextDate - new Date()) / 1000));
       const isWeekendRecharge = now.weekday === "Saturday" || now.weekday === "Sunday" || (now.weekday === "Friday" && isAfterSchool);
 
-      document.getElementById("blockLabel").textContent = isWeekendRecharge ? "Weekend Recharge" : "Time To Rest";
-      document.getElementById("timerText").textContent = formatTime(diff, true);
-      document.getElementById("timerText").className = "timer rest";
-      updatePeriodAlert("");
+      // Determine if we're currently IN a break
+      const currentBreaks = [
+        { name: "Labor Day Weekend",       start: "2025-08-30", end: "2025-09-01", emoji: "🇺🇸" },
+        { name: "Thanksgiving Break",      start: "2025-11-22", end: "2025-11-30", emoji: "🦃" },
+        { name: "Winter Break",            start: "2025-12-20", end: "2026-01-14", emoji: "❄️" },
+        { name: "MLK Day Weekend",         start: "2026-01-17", end: "2026-01-19", emoji: "✊" },
+        { name: "Lincoln's Birthday",      start: "2026-02-07", end: "2026-02-09", emoji: "🎩" },
+        { name: "Presidents' Day Weekend", start: "2026-02-14", end: "2026-02-16", emoji: "🇺🇸" },
+        { name: "Spring Break",            start: "2026-04-03", end: "2026-04-12", emoji: "🌸" },
+        { name: "Memorial Day Weekend",    start: "2026-05-23", end: "2026-05-25", emoji: "🇺🇸" },
+        { name: "Summer Break",            start: "2026-06-11", end: "2026-08-31", emoji: "☀️" }
+      ];
+      const activeBreak = currentBreaks.find(b => now.dateStr >= b.start && now.dateStr <= b.end);
 
-      if (isWeekendRecharge) {
+      if (activeBreak) {
+        // We're IN a break — show break name and countdown to next school day
+        const breakStartD = new Date(activeBreak.start + 'T00:00:00');
+        const breakEndD = new Date(activeBreak.end + 'T23:59:59');
+        const nowMs = new Date().getTime();
+        const breakTotalHrs = Math.round((breakEndD - breakStartD) / 3600000);
+        const breakElapsedHrs = Math.max(0, Math.round((nowMs - breakStartD.getTime()) / 3600000));
+        document.getElementById("blockLabel").textContent = `${activeBreak.name} ${activeBreak.emoji}`;
+        document.getElementById("timerText").textContent = formatTime(diff, true);
+        document.getElementById("timerText").className = "timer rest";
+        document.getElementById("subText").textContent = `${breakElapsedHrs} of ${breakTotalHrs} hrs into break`;
+      } else if (isWeekendRecharge) {
+        document.getElementById("blockLabel").textContent = "Weekend Recharge";
+        document.getElementById("timerText").textContent = formatTime(diff, true);
+        document.getElementById("timerText").className = "timer rest";
         document.getElementById("subText").textContent = "Enjoy your weekend!";
       } else if (!isSchoolDay) {
+        document.getElementById("blockLabel").textContent = "Day Off";
+        document.getElementById("timerText").textContent = formatTime(diff, true);
+        document.getElementById("timerText").className = "timer rest";
         document.getElementById("subText").textContent = "Enjoy your time off!";
       } else if (now.totalSec < firstStart) {
+        document.getElementById("blockLabel").textContent = "Time To Rest";
+        document.getElementById("timerText").textContent = formatTime(diff, true);
+        document.getElementById("timerText").className = "timer rest";
         document.getElementById("subText").textContent = "School starts at 8:30 AM";
       } else {
+        document.getElementById("blockLabel").textContent = "Time To Rest";
+        document.getElementById("timerText").textContent = formatTime(diff, true);
+        document.getElementById("timerText").className = "timer rest";
         document.getElementById("subText").textContent = "School's out, get some rest!";
       }
+      updatePeriodAlert("");
 
       scheduleFitCountdownText();
     }
@@ -1568,25 +1601,48 @@
       setFill('gradFill', grFrac, 'prog-bar--grad');
       setTxt('gradPct',   grRemaining === 0 ? '🎓' : grRemaining === 1 ? '1 Day' : `${grRemaining} Days`);
 
-      // ── 4. NEXT VACATION ────────────────────────────────────
-      const vacations = [
-        { name: "Spring Break", start: "2026-04-03", stretchFrom: "2026-01-15" },
-        { name: "Summer Break", start: "2026-06-11", stretchFrom: "2025-08-14" }
+      // ── 4. NEXT BREAK (rolling countdown to every break/holiday) ──
+      const allBreaks = [
+        { name: "Labor Day Weekend",       start: "2025-08-30", end: "2025-09-01", emoji: "🇺🇸", stretchFrom: "2025-08-14" },
+        { name: "Thanksgiving Break",      start: "2025-11-22", end: "2025-11-30", emoji: "🦃", stretchFrom: "2025-09-02" },
+        { name: "Winter Break",            start: "2025-12-20", end: "2026-01-14", emoji: "❄️", stretchFrom: "2025-12-01" },
+        { name: "MLK Day Weekend",         start: "2026-01-17", end: "2026-01-19", emoji: "✊", stretchFrom: "2026-01-15" },
+        { name: "Lincoln's Birthday",      start: "2026-02-07", end: "2026-02-09", emoji: "🎩", stretchFrom: "2026-01-20" },
+        { name: "Presidents' Day Weekend", start: "2026-02-14", end: "2026-02-16", emoji: "🇺🇸", stretchFrom: "2026-02-10" },
+        { name: "Spring Break",            start: "2026-04-03", end: "2026-04-12", emoji: "🌸", stretchFrom: "2026-02-17" },
+        { name: "Memorial Day Weekend",    start: "2026-05-23", end: "2026-05-25", emoji: "🇺🇸", stretchFrom: "2026-04-13" },
+        { name: "Summer Break",            start: "2026-06-11", end: "2026-08-31", emoji: "☀️", stretchFrom: "2026-05-26" },
+        { name: "Juneteenth Weekend",      start: "2026-06-19", end: "2026-06-21", emoji: "✊", stretchFrom: "2026-06-11" },
+        { name: "4th of July Weekend",     start: "2026-07-03", end: "2026-07-05", emoji: "🎆", stretchFrom: "2026-06-22" }
       ];
-      const nextVac = vacations.find(v => dateStr <= v.start);
+      // Find the next upcoming break (haven't passed its start yet)
+      const nextVac = allBreaks.find(v => dateStr <= v.start);
       if (nextVac) {
-        const { name: vacName, start: vacStart, stretchFrom } = nextVac;
-        const totalVacSDs  = schoolDays.filter(d => d >= stretchFrom && d < vacStart).length;
+        const { name: vacName, start: vacStart, stretchFrom, emoji: vacEmoji } = nextVac;
+        const totalVacSDs  = schoolDays.filter(d => d >= stretchFrom && d < vacStart).length || 1;
         const passedVacSDs = schoolDays.filter(d => d >= stretchFrom && d < dateStr).length;
-        const vacFrac = totalVacSDs > 0 ? passedVacSDs / totalVacSDs : 0;
-        const vacRemaining = totalVacSDs - passedVacSDs;
+        // For post-school breaks (Juneteenth, July 4th), use calendar days instead
+        const isPostSchool = dateStr > schoolDays[schoolDays.length - 1];
+        let vacFrac, vacRemaining;
+        if (isPostSchool) {
+          const startD = new Date(stretchFrom + 'T00:00:00');
+          const endD = new Date(vacStart + 'T00:00:00');
+          const nowD = new Date(dateStr + 'T00:00:00');
+          const totalDays = Math.ceil((endD - startD) / 86400000);
+          const passedDays = Math.ceil((nowD - startD) / 86400000);
+          vacFrac = totalDays > 0 ? passedDays / totalDays : 0;
+          vacRemaining = Math.max(0, totalDays - passedDays);
+        } else {
+          vacFrac = totalVacSDs > 0 ? passedVacSDs / totalVacSDs : 0;
+          vacRemaining = totalVacSDs - passedVacSDs;
+        }
         setFill('vacFill', vacFrac, 'prog-bar--vac');
-        setTxt('vacLabel', `Till ${vacName}`);
-        setTxt('vacPct', vacRemaining === 0 ? '🎉' : vacRemaining === 1 ? '1 Day' : `${vacRemaining} Days`);
+        setTxt('vacLabel', `Till ${vacName} ${vacEmoji}`);
+        setTxt('vacPct', vacRemaining <= 0 ? '🎉' : vacRemaining === 1 ? '1 Day' : `${vacRemaining} Days`);
       } else {
         setFill('vacFill', 1, 'prog-bar--vac');
-        setTxt('vacLabel', 'Summer Break! 🌴');
-        setTxt('vacPct', '100%');
+        setTxt('vacLabel', 'Enjoy Summer! ☀️');
+        setTxt('vacPct', '🎉');
       }
 
       // ── 5. PROGRESS REPORTS ─────────────────────────────
