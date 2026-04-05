@@ -1191,11 +1191,11 @@
 
       // Determine schedule type for any given date string
       function getScheduleType(dStr) {
-        if (minimumDays.has(dStr)) return "MINIMUM DAY";
+        if (minimumDays.has(dStr)) return "MINIMUM DAY SCHEDULE";
         const d = new Date(dStr + 'T12:00:00');
         const wd = new Intl.DateTimeFormat("en-US", {timeZone, weekday:"long"}).format(d);
-        if (wd === "Monday") return "COLLABORATION MONDAY";
-        return "REGULAR DAY";
+        if (wd === "Monday") return "COLLABORATION SCHEDULE";
+        return "REGULAR SCHEDULE";
       }
       function getScheduleBlocks(dStr) {
         if (minimumDays.has(dStr)) return schedules.minimum;
