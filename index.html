@@ -60,7 +60,8 @@
     .ghost-logo { position: absolute; top: 56%; left: 50%; width: 120%; opacity: 0.07; transform: translate(-50%, -50%); filter: grayscale(100%) contrast(108%) brightness(114%); pointer-events: none; z-index: 0; }
     
     .content {
-      position: relative; z-index: 1; width: 100%; height: 100%;
+      position: relative; z-index: 1; width: 100%;
+      flex: 1; min-height: 0;
       display: flex; flex-direction: column; align-items: center;
       overflow-y: auto; -webkit-overflow-scrolling: touch;
     }
@@ -819,12 +820,12 @@
   <div class="frame">
     <div class="app">
       <img src="PV_Logo.png" alt="" class="ghost-logo">
+      <div class="top-row">
+        <a href="index.html" class="nav-link" aria-label="Home"><img src="PV_Logo.png" alt="Logo" class="logo-clear"></a>
+        <h1 class="page-title">Tools</h1>
+        <button id="navMenuBtn" class="nav-menu-btn" type="button" aria-label="Menu" aria-expanded="false">···</button>
+      </div>
       <div class="content">
-        <div class="top-row">
-          <a href="index.html" class="nav-link" aria-label="Home"><img src="PV_Logo.png" alt="Logo" class="logo-clear"></a>
-          <h1 class="page-title">Tools</h1>
-          <button id="navMenuBtn" class="nav-menu-btn" type="button" aria-label="Menu" aria-expanded="false">···</button>
-        </div>
         <div class="header">
           <p class="greeting" id="greetingText">Welcome</p>
         </div>
