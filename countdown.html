@@ -708,7 +708,7 @@
           <p class="subtext" id="subText">Syncing Calendar...</p>
           <p class="wait-bell" id="waitBell">WAIT FOR THE BELL</p>
           <p class="access-row" id="accessText">No Restroom Access</p>
-          <p class="status-row" id="scheduleText">Schedule: --</p>
+          <p class="status-row" id="scheduleText" style="text-align:center">Schedule: --</p>
         </div>
 
         <div class="card info-strip">
@@ -1191,11 +1191,11 @@
 
       // Determine schedule type for any given date string
       function getScheduleType(dStr) {
-        if (minimumDays.has(dStr)) return "MINIMUM DAY SCHEDULE";
+        if (minimumDays.has(dStr)) return "MINIMUM DAY";
         const d = new Date(dStr + 'T12:00:00');
         const wd = new Intl.DateTimeFormat("en-US", {timeZone, weekday:"long"}).format(d);
-        if (wd === "Monday") return "COLLABORATION SCHEDULE";
-        return "REGULAR SCHEDULE";
+        if (wd === "Monday") return "COLLABORATION";
+        return "REGULAR";
       }
       function getScheduleBlocks(dStr) {
         if (minimumDays.has(dStr)) return schedules.minimum;
@@ -1211,7 +1211,7 @@
       if (isSchoolDay && !isAfterSchool) {
         schedType = getScheduleType(now.dateStr);
         blocks = getScheduleBlocks(now.dateStr);
-        document.getElementById("scheduleText").textContent = `Schedule: ${schedType}`;
+        document.getElementById("scheduleText").textContent = `NEXT SCHEDULE: ${schedType}`;
       } else {
         // Find next school day and show what schedule it will be
         const nextSD = schoolDays.find(d => d > now.dateStr);
@@ -1220,7 +1220,7 @@
           const nextD = new Date(nextSD + 'T12:00:00');
           const nextDayName = new Intl.DateTimeFormat("en-US", {timeZone, weekday:"long"}).format(nextD);
           const nextMonth = new Intl.DateTimeFormat("en-US", {timeZone, month:"short", day:"numeric"}).format(nextD);
-          document.getElementById("scheduleText").textContent = `Next Schedule: ${nextSchedType}`;
+          document.getElementById("scheduleText").textContent = `NEXT SCHEDULE: ${nextSchedType}`;
         } else {
           document.getElementById("scheduleText").textContent = "School Year Complete!";
         }
