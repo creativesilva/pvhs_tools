@@ -446,6 +446,55 @@
     .feedback-submit:active { opacity: 0.85; }
     .feedback-note { font-size: 9px; color: var(--muted); text-align: center; opacity: 0.65; margin: 0; }
 
+    /* ── CALENDAR ANNOUNCEMENT SHEET ─────────────────────── */
+    .cal-announce-backdrop {
+      position: absolute; inset: 0; z-index: 30;
+      background: rgba(1,12,12,0.7);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    }
+    .cal-announce-backdrop[hidden] { display: none; }
+    .cal-announce-sheet {
+      position: absolute; bottom: 0; left: 0; right: 0; z-index: 31;
+      background: rgba(6,26,26,0.96);
+      border-top: 1px solid rgba(255,255,255,0.12);
+      border-radius: 24px 24px 0 0;
+      padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
+      display: flex; flex-direction: column; gap: 14px;
+      transform: translateY(110%);
+      transition: transform 0.45s cubic-bezier(0.34,1.2,0.64,1);
+    }
+    .cal-announce-sheet.is-visible { transform: translateY(0); }
+    .cal-announce-sheet[hidden] { display: none; }
+    .cal-announce-top { display: flex; align-items: center; justify-content: space-between; }
+    .cal-announce-pill {
+      font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em;
+      background: rgba(0,116,116,0.28); color: #4bd4d4;
+      border: 1px solid rgba(0,116,116,0.4); border-radius: 99px; padding: 3px 10px;
+    }
+    .cal-announce-close {
+      appearance: none; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.6); border-radius: 99px; width: 28px; height: 28px;
+      font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .cal-announce-body { display: flex; flex-direction: column; gap: 6px; }
+    .cal-announce-emoji { font-size: 32px; line-height: 1; }
+    .cal-announce-title { font-size: 18px; font-weight: 800; color: #fff; margin: 0; }
+    .cal-announce-desc { font-size: 13px; color: var(--muted); margin: 0; line-height: 1.45; }
+    .cal-announce-cta {
+      appearance: none; width: 100%;
+      background: linear-gradient(135deg, #007474 0%, #009898 100%);
+      border: none; border-radius: 14px; padding: 14px;
+      color: #fff; font-size: 12px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.12em; cursor: pointer; text-decoration: none;
+      display: block; text-align: center;
+    }
+    .cal-announce-cta:active { opacity: 0.85; }
+    .cal-announce-later {
+      appearance: none; background: none; border: none;
+      color: rgba(255,255,255,0.4); font-size: 12px; cursor: pointer;
+      text-align: center; padding: 4px;
+    }
+
     /* ── NEWS CHOOSER MODAL (like Maintenance) ───────────── */
     .news-chooser[hidden] { display: none; }
     .news-chooser {
@@ -972,6 +1021,22 @@
       <div id="newsLightbox" class="news-lightbox">
         <img class="news-lightbox-img" id="newsLightboxImg" src="" alt="">
         <button class="news-lightbox-close" id="newsLightboxClose" type="button">✕</button>
+      </div>
+
+      <!-- CALENDAR ANNOUNCEMENT SHEET -->
+      <div id="calAnnounceBackdrop" class="cal-announce-backdrop" hidden></div>
+      <div id="calAnnounceSheet" class="cal-announce-sheet" hidden>
+        <div class="cal-announce-top">
+          <span class="cal-announce-pill">New Feature</span>
+          <button class="cal-announce-close" id="calAnnounceClose" type="button">✕</button>
+        </div>
+        <div class="cal-announce-body">
+          <div class="cal-announce-emoji">📅</div>
+          <p class="cal-announce-title">School Calendar</p>
+          <p class="cal-announce-desc">Browse the full 2025–26 school year with month, week, and day views. Collaboration Mondays, finals, breaks, and key dates — all in one place.</p>
+        </div>
+        <a href="calendar.html" class="cal-announce-cta">Open Calendar</a>
+        <button class="cal-announce-later" id="calAnnounceLater" type="button">Maybe later</button>
       </div>
 
       <!-- FEEDBACK MODAL -->
@@ -2125,6 +2190,27 @@
         {q:"You are enough, just as you are.", a:"Meghan Markle"},
         {q:"Life is short. Smile while you still have teeth.", a:"Unknown"}
       ];
+
+      // ── CALENDAR ANNOUNCEMENT ──────────────────────────────
+      (function() {
+        if (localStorage.getItem('pvhs_calAnnounced')) return;
+        const backdrop = document.getElementById('calAnnounceBackdrop');
+        const sheet    = document.getElementById('calAnnounceSheet');
+        function dismiss() {
+          sheet.classList.remove('is-visible');
+          setTimeout(() => { sheet.hidden = true; backdrop.hidden = true; }, 460);
+          localStorage.setItem('pvhs_calAnnounced', '1');
+        }
+        setTimeout(() => {
+          backdrop.hidden = false;
+          sheet.hidden = false;
+          requestAnimationFrame(() => requestAnimationFrame(() => sheet.classList.add('is-visible')));
+        }, 900);
+        backdrop.addEventListener('click', dismiss);
+        document.getElementById('calAnnounceClose').addEventListener('click', dismiss);
+        document.getElementById('calAnnounceLater').addEventListener('click', dismiss);
+        document.querySelector('.cal-announce-cta').addEventListener('click', dismiss);
+      })();
 
       const idx = schoolDays.indexOf(today);
       let quote;
