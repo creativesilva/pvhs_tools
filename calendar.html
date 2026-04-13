@@ -436,6 +436,8 @@
     function dotTypesForDate(ds) {
       const types = new Set();
       eventsForDate(ds).forEach(e => types.add(e.type));
+      const sched = getScheduleInfo(ds);
+      if (sched.type === 'collaboration') types.add('collaboration');
       return [...types];
     }
 
