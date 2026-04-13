@@ -1,0 +1,42 @@
+{
+  "last_updated": "2026-04-11T16:00:41Z",
+  "source": "ParentSquare",
+  "events": [
+    {
+      "start": "2026-04-13",
+      "end": "2026-04-13",
+      "label": "Motivational Keynote — Erica Alfaro @ PVHS Library 6PM",
+      "type": "event",
+      "emoji": "🎤",
+      "newsId": "76530862",
+      "url": "https://www.parentsquare.com/feeds/76530862"
+    },
+    {
+      "start": "2026-04-16",
+      "end": "2026-04-16",
+      "label": "CAASPP Testing Begins — Science (CAST)",
+      "type": "notable",
+      "emoji": "📝",
+      "newsId": "76706811",
+      "url": "https://www.parentsquare.com/feeds/76706811"
+    },
+    {
+      "start": "2026-04-21",
+      "end": "2026-04-21",
+      "label": "Allan Hancock College Counselor @ PVHS",
+      "type": "event",
+      "emoji": "🎓",
+      "newsId": "76577512",
+      "url": "https://www.parentsquare.com/feeds/76577512"
+    },
+    {
+      "start": "2026-04-30",
+      "end": "2026-04-30",
+      "label": "Rotary Essay Contest Reading — Zaira Nacar",
+      "type": "notable",
+      "emoji": "🏆",
+      "newsId": "76706811",
+      "url": "https://www.parentsquare.com/feeds/76706811"
+    }
+  ]
+}
