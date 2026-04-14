@@ -318,12 +318,9 @@
       border-radius: 34px;
       border: 1px solid rgba(255,255,255,0.12);
       box-shadow: 0 24px 46px rgba(0,0,0,0.22);
-    }
-
-    body.is-standalone .content {
       padding-top: max(10px, env(safe-area-inset-top));
       padding-right: max(var(--app-spacing), env(safe-area-inset-right));
-      padding-bottom: 14px;
+      padding-bottom: 18px;
       padding-left: max(var(--app-spacing), env(safe-area-inset-left));
     }
 
@@ -1546,27 +1543,6 @@
       document.getElementById('newsChooserClose')?.addEventListener('click', closeChooser);
       document.getElementById('newsChooserBackdrop')?.addEventListener('click', closeChooser);
 
-      // Auto-open news when arriving via #news or #news-<id> hash
-      const _hash = window.location.hash;
-      if (_hash === '#news' || _hash.startsWith('#news-')) {
-        const _newsId = _hash.startsWith('#news-') ? _hash.slice(6) : null;
-        openNewsModal('events');
-        history.replaceState(null, '', window.location.pathname + window.location.search);
-        if (_newsId) {
-          // Wait for news to load, then open that post's detail
-          var _deepLinkId = _newsId;
-          var _deepLinkInterval = setInterval(function() {
-            var post = postsData.find(function(p) { return p.id === _deepLinkId; });
-            if (post) {
-              clearInterval(_deepLinkInterval);
-              showDetail(post);
-            }
-          }, 100);
-          // Give up after 5 seconds
-          setTimeout(function() { clearInterval(_deepLinkInterval); }, 5000);
-        }
-      }
-
       // ── NEWS FEED ──
       const newsModal   = document.getElementById('newsModal');
       const newsFeed    = document.getElementById('newsFeed');
@@ -1765,7 +1741,16 @@
             if (postsData[idx]) showDetail(postsData[idx]);
           });
         });
+        // If deep-link pending, open that post's detail now
+        if (_pendingNewsId) {
+          var post = postsData.find(function(p) { return p.id === _pendingNewsId; });
+          if (post) showDetail(post);
+          _pendingNewsId = null;
+        }
       }
+
+      // Deep-link support: #news-<id> from calendar
+      var _pendingNewsId = null;
 
       function loadNews() {
         newsFeed.innerHTML =
@@ -2112,6 +2097,15 @@
 
       // Also check on page load for background alerts
       checkAthGameDay();
+
+      // ── DEEP-LINK: #news or #news-<id> ────────────────────────
+      var _dlHash = window.location.hash;
+      if (_dlHash === '#news' || _dlHash.startsWith('#news-')) {
+        var _dlNewsId = _dlHash.startsWith('#news-') ? _dlHash.slice(6) : null;
+        if (_dlNewsId) _pendingNewsId = _dlNewsId;
+        openNewsModal('events');
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
 
     })();
 
