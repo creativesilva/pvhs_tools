@@ -133,6 +133,9 @@
     .cal-event-row.type-notable   { border-left-color: rgba(255,255,255,0.25); }
     .cal-event-emoji { font-size: 13px; flex-shrink: 0; line-height: 1.5; }
     .cal-event-label { font-size: 11px; font-weight: 600; color: #b5d4d4; line-height: 1.45; }
+    .cal-event-row.has-link       { cursor: pointer; }
+    .cal-event-row.has-link:active { background: rgba(255,255,255,0.07); border-radius: 6px; }
+    .cal-event-link-badge { font-size: 9px; color: rgba(75,212,212,0.6); flex-shrink: 0; line-height: 1.5; padding-left: 4px; }
 
     /* ── WEEK VIEW ── */
     .cal-week-list { display: flex; flex-direction: column; gap: 5px; width: 100%; flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
@@ -181,6 +184,9 @@
     .cal-day-event-text { flex: 1; }
     .cal-day-event-name { font-size: 12px; font-weight: 700; color: #dff7f7; line-height: 1.35; margin: 0; }
     .cal-day-event-type { font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.38); margin: 2px 0 0; }
+    .cal-day-event-card.has-link { cursor: pointer; }
+    .cal-day-event-card.has-link:active { filter: brightness(1.15); }
+    .cal-day-event-tap { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(75,212,212,0.55); margin-top: 2px; }
     .cal-day-no-events { text-align: center; padding: 20px 0; color: rgba(255,255,255,0.25); font-size: 11px; font-style: italic; flex-shrink: 0; }
 
     /* ── LEGEND ── */
@@ -324,6 +330,8 @@
     }
 
     // ── CALENDAR DATA ─────────────────────────────────────────
+    let dynEvents = []; // Loaded from events.json (ParentSquare events)
+
     const EVENTS = [
       // School Year Anchors
       {start:'2025-08-14',end:'2025-08-14',label:'First Day of School',type:'event',emoji:'\u{1F392}'},
@@ -430,7 +438,17 @@
     }
 
     function eventsForDate(ds) {
-      return EVENTS.filter(e => ds >= e.start && ds <= e.end);
+      const base = EVENTS.filter(e => ds >= e.start && ds <= e.end);
+      const dyn  = dynEvents.filter(e => ds >= e.start && ds <= e.end);
+      return [...base, ...dyn];
+    }
+
+    function openEventUrl(url, newsId) {
+      if (newsId) {
+        window.location.href = 'index.html#news-' + newsId;
+      } else if (url) {
+        window.open(url, '_blank');
+      }
     }
 
     function dotTypesForDate(ds) {
@@ -581,11 +599,19 @@
         html += `<p class="cal-panel-empty">No events</p>`;
       } else {
         events.forEach(e=>{
-          html += `<div class="cal-event-row type-${e.type}"><span class="cal-event-emoji">${e.emoji}</span><span class="cal-event-label">${e.label}</span></div>`;
+          const hasLink = e.newsId || e.url;
+          const linkClass = hasLink ? ' has-link' : '';
+          const newsAttr  = e.newsId ? ` data-newsid="${e.newsId}"` : '';
+          const urlAttr   = e.url ? ` data-url="${e.url}"` : '';
+          const linkBadge = hasLink ? `<span class="cal-event-link-badge">↗</span>` : '';
+          html += `<div class="cal-event-row type-${e.type}${linkClass}"${newsAttr}${urlAttr}><span class="cal-event-emoji">${e.emoji}</span><span class="cal-event-label">${e.label}</span>${linkBadge}</div>`;
         });
       }
       html += `</div>`;
       panel.innerHTML = html;
+      panel.querySelectorAll('.has-link').forEach(el => {
+        el.addEventListener('click', () => openEventUrl(el.dataset.url, el.dataset.newsid));
+      });
     }
 
     // ── WEEK RENDER ───────────────────────────────────────────
@@ -661,14 +687,28 @@
         </div>
         ${events.length?`<p class="cal-day-events-label">Events & Dates</p>`:''}
         ${events.length===0?`<p class="cal-day-no-events">No scheduled events</p>`:''}
-        ${events.map(e=>`
-          <div class="cal-day-event-card type-${e.type}">
+        ${events.map(e=>{
+          const hasLink  = e.newsId || e.url;
+          const linkClass = hasLink ? ' has-link' : '';
+          const newsAttr  = e.newsId ? ` data-newsid="${e.newsId}"` : '';
+          const urlAttr   = e.url ? ` data-url="${e.url}"` : '';
+          const tapLabel  = hasLink ? `<span class="cal-day-event-tap">Tap for details ↗</span>` : '';
+          return `
+          <div class="cal-day-event-card type-${e.type}${linkClass}"${newsAttr}${urlAttr}>
             <span class="cal-day-event-icon">${e.emoji}</span>
             <div class="cal-day-event-text">
               <p class="cal-day-event-name">${e.label}</p>
-              <p class="cal-day-event-type">${typeLabel[e.type]||e.type}</p>
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px;">
+                <span class="cal-day-event-type">${typeLabel[e.type]||e.type}</span>
+                ${tapLabel}
+              </div>
             </div>
-          </div>`).join('')}`;
+          </div>`;
+        }).join('')}`;
+
+      body.querySelectorAll('.has-link').forEach(el => {
+        el.addEventListener('click', () => openEventUrl(el.dataset.url, el.dataset.newsid));
+      });
     }
 
     // ── MASTER RENDER ─────────────────────────────────────────
@@ -731,6 +771,19 @@
 
     // ── INIT ──────────────────────────────────────────────────
     render();
+
+    // ── LOAD PARENTSQUARE EVENTS ──────────────────────────────
+    // events.json is written by the parentsquare-news-sync skill.
+    // These merge on top of the static EVENTS array above.
+    fetch('src/data/events.json?t=' + Date.now())
+      .then(r => r.json())
+      .then(data => {
+        if (data && Array.isArray(data.events) && data.events.length) {
+          dynEvents = data.events;
+          render();
+        }
+      })
+      .catch(() => {});
   </script>
 </body>
 </html>
