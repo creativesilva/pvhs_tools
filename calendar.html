@@ -768,6 +768,15 @@
     // ── SERVICE WORKER ────────────────────────────────────────
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
+    // ── LOGO HOME LINK (PWA standalone fix) ─────────────────
+    (function() {
+      var logo = document.querySelector('.top-row a[aria-label="Home"]');
+      if (logo) logo.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = 'index.html';
+      });
+    })();
+
     // ── INIT ──────────────────────────────────────────────────
     render();
 

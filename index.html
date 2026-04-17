@@ -285,6 +285,23 @@
     }
     .install-modal-cta:active { opacity: 0.85; }
     .install-modal-note { font-size: 9.5px; color: var(--muted); text-align: center; opacity: 0.7; margin: 0; }
+    .install-os-pick { display: flex; gap: 8px; width: 100%; }
+    .install-os-btn {
+      flex: 1; appearance: none; border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.05); border-radius: 16px; padding: 14px 10px;
+      cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px;
+      transition: all 0.18s;
+    }
+    .install-os-btn:hover { background: rgba(0,160,160,0.18); border-color: rgba(0,220,220,0.3); }
+    .install-os-btn:active { background: rgba(0,160,160,0.28); }
+    .install-os-icon { font-size: 28px; line-height: 1; }
+    .install-os-label { font-size: 11px; font-weight: 700; color: #d0f0f0; text-transform: uppercase; letter-spacing: 0.1em; }
+    .install-back-btn {
+      appearance: none; background: none; border: none; color: rgba(255,255,255,0.5);
+      font-size: 11px; font-weight: 600; cursor: pointer; padding: 4px 0;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .install-back-btn:hover { color: #4be1e1; }
 
     body.is-standalone {
       background: #021414;
@@ -492,6 +509,36 @@
       text-align: center; padding: 4px;
     }
 
+    /* ── VERSION UPDATE SHEET ──────────────────────────────── */
+    .ver-announce-backdrop {
+      position: absolute; inset: 0; z-index: 32;
+      background: rgba(1,12,12,0.7);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    }
+    .ver-announce-backdrop[hidden] { display: none; }
+    .ver-announce-sheet {
+      position: absolute; bottom: 0; left: 0; right: 0; z-index: 33;
+      background: rgba(6,26,26,0.96);
+      border-top: 1px solid rgba(255,255,255,0.12);
+      border-radius: 24px 24px 0 0;
+      padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
+      display: flex; flex-direction: column; gap: 14px;
+      transform: translateY(110%);
+      transition: transform 0.45s cubic-bezier(0.34,1.2,0.64,1);
+    }
+    .ver-announce-sheet.is-visible { transform: translateY(0); }
+    .ver-announce-sheet[hidden] { display: none; }
+    .ver-announce-list {
+      list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;
+    }
+    .ver-announce-list li {
+      font-size: 12.5px; color: var(--muted); line-height: 1.4;
+      padding-left: 18px; position: relative;
+    }
+    .ver-announce-list li::before {
+      content: attr(data-icon); position: absolute; left: 0; top: 0; font-size: 12px;
+    }
+
     /* ── NEWS CHOOSER MODAL (like Maintenance) ───────────── */
     .news-chooser[hidden] { display: none; }
     .news-chooser {
@@ -544,10 +591,26 @@
     .athletics-view.is-active { display: flex; }
 
     /* Sport filter tabs */
+    .ath-tabs-wrap {
+      display: flex; align-items: center; gap: 0; flex-shrink: 0;
+      position: relative; width: 100%;
+    }
+    .ath-scroll-btn {
+      display: none; appearance: none; border: none;
+      background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6);
+      width: 26px; height: 26px; border-radius: 50%; font-size: 14px;
+      cursor: pointer; flex-shrink: 0; align-items: center; justify-content: center;
+      transition: background 0.15s, color 0.15s;
+    }
+    .ath-scroll-btn:hover { background: rgba(0,160,160,0.25); color: #4be1e1; }
+    .ath-scroll-btn:active { background: rgba(0,160,160,0.35); }
+    @media (min-width: 431px) {
+      .ath-scroll-btn { display: flex; }
+    }
     .ath-tabs {
-      display: flex; gap: 6px; overflow-x: auto; flex-shrink: 0;
+      display: flex; gap: 6px; overflow-x: auto; flex-shrink: 0; flex: 1;
       padding: 2px 0 8px 0; -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
+      scrollbar-width: none; scroll-behavior: smooth;
     }
     .ath-tabs::-webkit-scrollbar { display: none; }
     .ath-tab {
@@ -888,7 +951,7 @@
           <a class="quick-link-btn" href="https://santamariajuhsd.aeries.net/teacher/Login.aspx?page=100000" target="_blank"><span class="quick-link-icon">🎓</span><p class="quick-link-label">Aeries</p></a>
           <button class="quick-link-btn" id="newsBtn" type="button" style="cursor:pointer"><span class="quick-link-icon">📰</span><p class="quick-link-label">News</p></button>
           <a class="quick-link-btn" href="https://m365.cloud.microsoft/apps/" target="_blank"><span class="quick-link-icon">📧</span><p class="quick-link-label">Outlook</p></a>
-          <a class="quick-link-btn" href="https://pvhs.smjuhsd.org/link-two/forms-and-files" target="_blank"><span class="quick-link-icon">📄</span><p class="quick-link-label">Forms</p></a>
+          <button class="quick-link-btn" id="athBtn" type="button" style="cursor:pointer"><span class="quick-link-icon">🏆</span><p class="quick-link-label">Athletics</p></button>
           <a class="quick-link-btn" href="calendar.html"><span class="quick-link-icon">📅</span><p class="quick-link-label">Calendar</p></a>
           <a class="quick-link-btn" href="https://scratchcafepvhs.wixsite.com/scratchcafe" target="_blank"><span class="quick-link-icon">☕</span><p class="quick-link-label">Scratch Cafe</p></a>
         </div>
@@ -1000,15 +1063,19 @@
 
         <!-- ATHLETICS DASHBOARD -->
         <div class="athletics-view" id="athleticsView">
-          <div class="ath-tabs" id="athTabs">
-            <button class="ath-tab is-active" data-sport="all" type="button">All</button>
-            <button class="ath-tab" data-sport="baseball" type="button"><span class="ath-tab-emoji">⚾</span> Baseball</button>
-            <button class="ath-tab" data-sport="softball" type="button"><span class="ath-tab-emoji">🥎</span> Softball</button>
-            <button class="ath-tab" data-sport="volleyball" type="button"><span class="ath-tab-emoji">🏐</span> Volleyball</button>
-            <button class="ath-tab" data-sport="tennis" type="button"><span class="ath-tab-emoji">🎾</span> Tennis</button>
-            <button class="ath-tab" data-sport="golf" type="button"><span class="ath-tab-emoji">⛳</span> Golf</button>
-            <button class="ath-tab" data-sport="swim" type="button"><span class="ath-tab-emoji">🏊</span> Swim</button>
-            <button class="ath-tab" data-sport="track" type="button"><span class="ath-tab-emoji">🏃</span> Track</button>
+          <div class="ath-tabs-wrap">
+            <button class="ath-scroll-btn" id="athScrollL" type="button" aria-label="Scroll left">&#8249;</button>
+            <div class="ath-tabs" id="athTabs">
+              <button class="ath-tab is-active" data-sport="all" type="button">All</button>
+              <button class="ath-tab" data-sport="baseball" type="button"><span class="ath-tab-emoji">⚾</span> Baseball</button>
+              <button class="ath-tab" data-sport="softball" type="button"><span class="ath-tab-emoji">🥎</span> Softball</button>
+              <button class="ath-tab" data-sport="volleyball" type="button"><span class="ath-tab-emoji">🏐</span> Volleyball</button>
+              <button class="ath-tab" data-sport="tennis" type="button"><span class="ath-tab-emoji">🎾</span> Tennis</button>
+              <button class="ath-tab" data-sport="golf" type="button"><span class="ath-tab-emoji">⛳</span> Golf</button>
+              <button class="ath-tab" data-sport="swim" type="button"><span class="ath-tab-emoji">🏊</span> Swim</button>
+              <button class="ath-tab" data-sport="track" type="button"><span class="ath-tab-emoji">🏃</span> Track</button>
+            </div>
+            <button class="ath-scroll-btn" id="athScrollR" type="button" aria-label="Scroll right">&#8250;</button>
           </div>
           <div class="ath-list" id="athList"></div>
         </div>
@@ -1034,6 +1101,27 @@
         </div>
         <a href="calendar.html" class="cal-announce-cta">Open Calendar</a>
         <button class="cal-announce-later" id="calAnnounceLater" type="button">Maybe later</button>
+      </div>
+
+      <!-- VERSION UPDATE SHEET -->
+      <div id="verAnnounceBackdrop" class="ver-announce-backdrop" hidden></div>
+      <div id="verAnnounceSheet" class="ver-announce-sheet" hidden>
+        <div class="cal-announce-top">
+          <span class="cal-announce-pill">What's New</span>
+          <button class="cal-announce-close" id="verAnnounceClose" type="button">&#x2715;</button>
+        </div>
+        <div class="cal-announce-body">
+          <div class="cal-announce-emoji">&#x1F680;</div>
+          <p class="cal-announce-title">Version 17 Update</p>
+          <ul class="ver-announce-list">
+            <li data-icon="&#x1F4C5;">School Calendar with month, week, and day views</li>
+            <li data-icon="&#x1F4F0;">ParentSquare events now sync to the calendar</li>
+            <li data-icon="&#x1F517;">Tap calendar events to view full news articles</li>
+            <li data-icon="&#x1F3C8;">Athletics dashboard with sport filters</li>
+            <li data-icon="&#x2705;">Consistent header across all pages</li>
+          </ul>
+        </div>
+        <button class="cal-announce-cta" id="verAnnounceDismiss" type="button">Got It</button>
       </div>
 
       <!-- FEEDBACK MODAL -->
@@ -1106,13 +1194,25 @@
             <img src="PV_AppIcon.png" alt="" class="install-modal-appicon">
             <div class="install-modal-titles">
               <p class="install-modal-title">PVHS Tools</p>
-              <p class="install-modal-sub">Install as Desktop App</p>
+              <p class="install-modal-sub" id="installModalSub">Install as Desktop App</p>
             </div>
-            <button id="installModalClose" class="install-modal-close" type="button">✕</button>
+            <button id="installModalClose" class="install-modal-close" type="button">&#x2715;</button>
           </div>
-          <div id="installModalSteps" class="install-modal-steps"></div>
+          <!-- OS Picker (shown first) -->
+          <div id="installOsPick" class="install-os-pick">
+            <button class="install-os-btn" id="installPickMac" type="button">
+              <span class="install-os-icon">&#x1F34E;</span>
+              <span class="install-os-label">Mac</span>
+            </button>
+            <button class="install-os-btn" id="installPickWin" type="button">
+              <span class="install-os-icon">&#x1FA9F;</span>
+              <span class="install-os-label">Windows</span>
+            </button>
+          </div>
+          <!-- Steps (shown after OS choice) -->
+          <div id="installModalSteps" class="install-modal-steps" style="display:none"></div>
           <button id="installModalCta" class="install-modal-cta" type="button" style="display:none">Install Now</button>
-          <p class="install-modal-note">Once installed, PVHS Tools opens in its own window — no browser chrome, no tabs. Just the app.</p>
+          <p class="install-modal-note">Once installed, PVHS Tools opens in its own window — no browser needed. Just the app.</p>
         </div>
       </div>
 
@@ -1372,60 +1472,88 @@
         if (installLabel) installLabel.textContent = isMacOS ? 'Add to Dock' : 'Add to Taskbar';
       }
 
-      // Step definitions per browser
-      function getSteps() {
+      // Step definitions per OS + browser (simple language for teachers)
+      function getSteps(os) {
+        if (os === 'mac') {
+          if (isSafari) {
+            return [
+              { n:1, html: `At the very top of your screen, click the word <strong>File</strong> in the menu bar` },
+              { n:2, html: `Click <strong>"Add to Dock..."</strong> from the dropdown list` },
+              { n:3, html: `Click <strong>Add</strong> — you'll see the PVHS icon appear in your Dock at the bottom of your screen` },
+              { n:4, html: `<em style="color:#88c8c8">Note: This requires macOS Sonoma (14) or later</em>` }
+            ];
+          }
+          return [
+            { n:1, html: `Look at the top right of your browser — find the small <strong>install icon ⊕</strong> in the address bar` },
+            { n:2, html: `Click it, then click <strong>"Install"</strong> in the popup that appears` },
+            { n:3, html: `That's it! PVHS Tools will now appear in your <strong>Dock</strong> at the bottom of your screen, just like any other app` }
+          ];
+        }
+        // Windows
         if (isChrome || isEdge) {
           return [
-            { n:1, html: `Click the <strong>install icon ⊕</strong> in your browser's address bar (top right)` },
-            { n:2, html: `Click <strong>"Install"</strong> in the popup — that's it!` },
-            { n:3, html: `PVHS Tools will open in its own window and appear in your <strong>${isMacOS ? 'Dock & Applications' : 'Taskbar & Start Menu'}</strong>` }
-          ];
-        }
-        if (isSafari && isMacOS) {
-          return [
-            { n:1, html: `In the Safari menu bar, click <strong>File</strong>` },
-            { n:2, html: `Choose <strong>"Add to Dock…"</strong>` },
-            { n:3, html: `Click <strong>Add</strong> — PVHS Tools will appear in your Dock like a real app` },
-            { n:4, html: `<em style="color:#88c8c8">Requires macOS Sonoma (14) or later</em>` }
-          ];
-        }
-        if (isFirefox) {
-          return [
-            { n:1, html: `Firefox doesn't support app installation` },
-            { n:2, html: `For the best experience, open this page in <strong>Chrome</strong> or <strong>Edge</strong>` },
-            { n:3, html: `Then click the install icon in the address bar` }
+            { n:1, html: `Look at the top right of your browser — find the small <strong>install icon ⊕</strong> in the address bar` },
+            { n:2, html: `Click it, then click <strong>"Install"</strong> in the popup that appears` },
+            { n:3, html: `That's it! PVHS Tools will now appear in your <strong>Taskbar</strong> and <strong>Start Menu</strong>, just like any other app` }
           ];
         }
         return [
-          { n:1, html: `Open PVHS Tools in <strong>Chrome</strong> or <strong>Edge</strong>` },
-          { n:2, html: `Click the <strong>install icon ⊕</strong> in the address bar` },
-          { n:3, html: `Click <strong>Install</strong> to add it to your ${isMacOS ? 'Dock' : 'Taskbar'}` }
+          { n:1, html: `For the best experience, open this page in <strong>Google Chrome</strong> or <strong>Microsoft Edge</strong>` },
+          { n:2, html: `Look for the <strong>install icon ⊕</strong> in the address bar at the top right` },
+          { n:3, html: `Click it, then click <strong>"Install"</strong> — PVHS Tools will appear in your <strong>Taskbar</strong>` }
         ];
       }
 
-      function buildModal() {
-        const container = document.getElementById('installModalSteps');
-        const cta = document.getElementById('installModalCta');
+      var osPick = document.getElementById('installOsPick');
+      var stepsEl = document.getElementById('installModalSteps');
+      var subEl   = document.getElementById('installModalSub');
+
+      function showSteps(os) {
+        var container = stepsEl;
+        var cta = document.getElementById('installModalCta');
         if (!container) return;
         container.innerHTML = '';
-        getSteps().forEach(s => {
-          const div = document.createElement('div');
+        getSteps(os).forEach(function(s) {
+          var div = document.createElement('div');
           div.className = 'install-step';
-          div.innerHTML = `<span class="install-step-num">${s.n}</span><p class="install-step-text">${s.html}</p>`;
+          div.innerHTML = '<span class="install-step-num">' + s.n + '</span><p class="install-step-text">' + s.html + '</p>';
           container.appendChild(div);
         });
+        // Add back button
+        var back = document.createElement('button');
+        back.className = 'install-back-btn';
+        back.type = 'button';
+        back.innerHTML = '&#8592; Choose again';
+        back.addEventListener('click', function() {
+          stepsEl.style.display = 'none';
+          if (cta) cta.style.display = 'none';
+          osPick.style.display = 'flex';
+          if (subEl) subEl.textContent = 'What type of computer do you have?';
+        });
+        container.appendChild(back);
+        osPick.style.display = 'none';
+        container.style.display = 'flex';
+        if (subEl) subEl.textContent = (os === 'mac' ? 'Mac' : 'Windows') + ' Instructions';
         if ((isChrome || isEdge) && deferredPrompt && cta) {
           cta.style.display = 'block';
         }
       }
 
+      document.getElementById('installPickMac')?.addEventListener('click', function() { showSteps('mac'); });
+      document.getElementById('installPickWin')?.addEventListener('click', function() { showSteps('windows'); });
+
       function openModal() {
-        buildModal();
-        const modal = document.getElementById('installModal');
+        // Reset to OS picker view
+        if (osPick) osPick.style.display = 'flex';
+        if (stepsEl) stepsEl.style.display = 'none';
+        var cta = document.getElementById('installModalCta');
+        if (cta) cta.style.display = 'none';
+        if (subEl) subEl.textContent = 'What type of computer do you have?';
+        var modal = document.getElementById('installModal');
         if (modal) modal.hidden = false;
       }
       function closeModal() {
-        const modal = document.getElementById('installModal');
+        var modal = document.getElementById('installModal');
         if (modal) modal.hidden = true;
       }
 
@@ -1535,6 +1663,7 @@
       function closeChooser() { if (newsChooser) newsChooser.hidden = true; }
       // News button goes straight to Current Events (toggle inside modal handles switching)
       document.getElementById('newsBtn')?.addEventListener('click', function() { openNewsModal('events'); });
+      document.getElementById('athBtn')?.addEventListener('click', function() { openNewsModal('athletics'); });
       document.getElementById('newsMenuBtn')?.addEventListener('click', function() {
         navMenu?.classList.remove('is-open');
         navMenuBtn?.classList.remove('is-open');
@@ -2069,6 +2198,17 @@
         renderAthletics();
       });
 
+      // Athletics tab scroll arrows (desktop)
+      (function() {
+        var tabs = document.getElementById('athTabs');
+        var btnL = document.getElementById('athScrollL');
+        var btnR = document.getElementById('athScrollR');
+        if (!tabs || !btnL || !btnR) return;
+        var step = 120;
+        btnL.addEventListener('click', function() { tabs.scrollBy({left: -step, behavior: 'smooth'}); });
+        btnR.addEventListener('click', function() { tabs.scrollBy({left:  step, behavior: 'smooth'}); });
+      })();
+
       // Game day notifications
       function athFireNotif(title, body) {
         if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
@@ -2219,6 +2359,34 @@
         document.getElementById('calAnnounceClose').addEventListener('click', dismiss);
         document.getElementById('calAnnounceLater').addEventListener('click', dismiss);
         document.querySelector('.cal-announce-cta').addEventListener('click', dismiss);
+      })();
+
+      // ── VERSION UPDATE ANNOUNCEMENT ────────────────────────
+      (function() {
+        var VER_KEY = 'pvhs_v17_announced';
+        if (localStorage.getItem(VER_KEY)) return;
+        // Don't stack on top of calendar announcement — wait until it's been dismissed
+        var calAlreadyDone = !!localStorage.getItem('pvhs_calAnnounced');
+        var delay = calAlreadyDone ? 900 : 2400;
+        var backdrop = document.getElementById('verAnnounceBackdrop');
+        var sheet    = document.getElementById('verAnnounceSheet');
+        if (!backdrop || !sheet) return;
+        function dismiss() {
+          sheet.classList.remove('is-visible');
+          setTimeout(function() { sheet.hidden = true; backdrop.hidden = true; }, 460);
+          localStorage.setItem(VER_KEY, '1');
+        }
+        setTimeout(function() {
+          // Only show if calendar popup is not currently visible
+          var calSheet = document.getElementById('calAnnounceSheet');
+          if (calSheet && !calSheet.hidden) return;
+          backdrop.hidden = false;
+          sheet.hidden = false;
+          requestAnimationFrame(function() { requestAnimationFrame(function() { sheet.classList.add('is-visible'); }); });
+        }, delay);
+        backdrop.addEventListener('click', dismiss);
+        document.getElementById('verAnnounceClose').addEventListener('click', dismiss);
+        document.getElementById('verAnnounceDismiss').addEventListener('click', dismiss);
       })();
 
       const idx = schoolDays.indexOf(today);
