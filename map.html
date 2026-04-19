@@ -124,10 +124,17 @@
     .m-parking { fill: rgba(255,255,255,0.04); stroke: rgba(255,255,255,0.18); stroke-width: 1; stroke-dasharray: 4 3; }
     .m-building { fill: rgba(0,140,140,0.28); stroke: rgba(75,225,225,0.5); stroke-width: 1.2; cursor: pointer; transition: fill 0.18s; }
     .m-building:hover, .m-building.is-active { fill: rgba(0,180,180,0.48); }
-    .m-block { fill: rgba(0,116,116,0.22); stroke: rgba(75,225,225,0.45); stroke-width: 1.2; cursor: pointer; transition: fill 0.18s; }
-    .m-block:hover, .m-block.is-active { fill: rgba(0,180,180,0.42); }
-    .m-room { fill: rgba(0,180,180,0.12); stroke: rgba(120,240,240,0.35); stroke-width: 0.5; cursor: pointer; transition: fill 0.15s; }
-    .m-room:hover, .m-room.is-active { fill: rgba(0,220,220,0.42); }
+    .m-block-shell { fill: rgba(0,80,80,0.35); stroke: rgba(75,225,225,0.65); stroke-width: 2; cursor: pointer; transition: fill 0.18s; }
+    .m-block-shell:hover, .m-block-shell.is-active { fill: rgba(0,140,140,0.45); }
+    .m-hallway { fill: rgba(255,255,255,0.06); stroke: none; pointer-events: none; }
+    .m-door {
+      fill: rgba(255,200,80,0.85);
+      stroke: rgba(255,220,120,0.95);
+      stroke-width: 0.4;
+      pointer-events: none;
+    }
+    .m-room { fill: rgba(0,180,180,0.20); stroke: rgba(120,240,240,0.5); stroke-width: 0.6; cursor: pointer; transition: fill 0.15s; }
+    .m-room:hover, .m-room.is-active { fill: rgba(0,220,220,0.55); }
     .m-room.is-highlight {
       fill: rgba(255,200,40,0.65) !important;
       stroke: #ffd84b; stroke-width: 1.2;
@@ -296,64 +303,186 @@
     // Rough positions in viewBox 1400x940. Positions approximate PDF layout.
     // Classroom blocks get room-level detail. Other structures get shaped outlines + labels.
 
-    // Helper: build a grid of rooms inside a block
-    function gridRooms(numbers, bx, by, bw, bh, cols) {
-      const rows = Math.ceil(numbers.length / cols);
-      const pad = 3;
-      const roomW = (bw - pad*2) / cols;
-      const roomH = (bh - pad*2) / rows;
-      return numbers.map((n, i) => ({
-        n: String(n),
-        x: bx + pad + (i % cols) * roomW,
-        y: by + pad + Math.floor(i / cols) * roomH,
-        w: roomW - 1,
-        h: roomH - 1
-      }));
+    // Helper to build a column of rooms with even spacing
+    // dir: 'down' = first room at top, 'up' = first room at bottom
+    function colRooms(start, count, x, y, w, h, dir) {
+      const rooms = [];
+      const cellH = h / count;
+      for (let i = 0; i < count; i++) {
+        const n = start + i;
+        const yPos = y + (dir === 'up' ? (count - 1 - i) * cellH : i * cellH);
+        rooms.push({ n: String(n), x: x + 1, y: yPos + 1, w: w - 2, h: cellH - 2 });
+      }
+      return rooms;
+    }
+    // Build grid rooms by columns array. Each col: {nums:[...], x, y, w, h}
+    function customLayout(cols) {
+      const rooms = [];
+      cols.forEach(col => {
+        const cellH = col.h / col.nums.length;
+        col.nums.forEach((n, i) => {
+          rooms.push({
+            n: String(n), x: col.x + 1, y: col.y + i * cellH + 1,
+            w: col.w - 2, h: cellH - 2
+          });
+        });
+      });
+      return rooms;
     }
 
-    // Room numbers per block (based on PDF analysis)
     const rng = (s,e) => { const a=[]; for (let i=s;i<=e;i++) a.push(i); return a; };
 
+    // BLOCKS now have explicit room layouts that match PDF building floor plans.
+    // outline: [x,y,w,h] for the building shell (drawn with thick wall)
+    // hallways: array of {x,y,w,h} drawn as lighter color for hallway space
+    // doors: array of {x,y,side} entry markers
     const BLOCKS = [
       {
         id:'100', label:'100s Block', desc:'Between 500s and 700s',
-        x:630, y:680, w:180, h:85, cols:3,
-        rooms: [100, 103, 109]
+        outline:{x:625, y:670, w:200, h:100},
+        rooms: customLayout([
+          { x:632, y:680, w:60, h:80, nums:[100] },
+          { x:702, y:680, w:55, h:80, nums:[103] },
+          { x:762, y:680, w:55, h:80, nums:[109] }
+        ]),
+        hallways: [],
+        doors: [{x:725, y:770, side:'s'}]
       },
       {
         id:'200', label:'200s Block', desc:'Buildings G & J · East side',
-        x:1230, y:340, w:120, h:270, cols:2,
-        rooms: rng(201, 218)
+        outline:{x:1228, y:335, w:115, h:280},
+        rooms: customLayout([
+          { x:1232, y:345, w:50, h:265, nums:[218,217,216,215,214,213,212,211,210,209] },
+          { x:1289, y:345, w:50, h:265, nums:[201,202,203,204,205,206,207,208] }
+        ]),
+        // Vertical hallway down the middle
+        hallways: [{x:1282, y:345, w:7, h:265}],
+        doors: [{x:1285, y:610, side:'s'}, {x:1285, y:340, side:'n'}]
       },
       {
-        id:'300', label:'300s Block', desc:'Building E · East of central campus',
-        x:1070, y:380, w:160, h:220, cols:5,
-        rooms: [301,302,303,304,305, 311,312,313,314,315, 321,322,323,324,325, 331,332,333,334,335]
+        id:'300', label:'300s Block', desc:'Building E · 4 columns + central hallway',
+        outline:{x:1058, y:378, w:178, h:240},
+        rooms: customLayout([
+          // Far-left column: 304-301 (4 rooms, top to bottom)
+          { x:1062, y:392, w:38, h:220, nums:[304,303,302,301] },
+          // Middle-left column: 314-311 (4 rooms)
+          { x:1102, y:392, w:34, h:220, nums:[314,313,312,311] },
+          // Middle-right column: 325-321 (5 rooms)
+          { x:1148, y:386, w:34, h:226, nums:[325,324,323,322,321] },
+          // Far-right column: 335-331 (5 rooms)
+          { x:1188, y:386, w:42, h:226, nums:[335,334,333,332,331] }
+        ]),
+        // Central vertical hallway between col 1 and col 2
+        hallways: [{x:1136, y:384, w:12, h:230}],
+        doors: [
+          {x:1142, y:378, side:'n'}, // top entrance
+          {x:1142, y:618, side:'s'}, // bottom entrance
+          {x:1058, y:498, side:'w'}, // west entrance
+          {x:1236, y:498, side:'e'}  // east entrance
+        ]
       },
       {
         id:'400-f1', label:'400s Block', desc:'First floor · Central campus',
-        x:830, y:300, w:240, h:250, cols:5,
-        rooms: [401,402,403,404,405, 411,412,413,414,415, 421,422,423,424,425, 431,432,433,434,435]
+        outline:{x:818, y:288, w:262, h:280},
+        // 400s arranged as 4 rows × 5 columns with central hallway
+        rooms: customLayout([
+          // Row layout: each "column" here is actually a vertical slice
+          { x:822, y:296, w:48, h:264, nums:[401,411,421,431] },
+          { x:872, y:296, w:48, h:264, nums:[402,412,422,432] },
+          { x:922, y:296, w:48, h:264, nums:[403,413,423,433] },
+          { x:982, y:296, w:48, h:264, nums:[404,414,424,434] },
+          { x:1032, y:296, w:46, h:264, nums:[405,415,425,435] }
+        ]),
+        // Two horizontal hallways between row groups
+        hallways: [{x:818, y:421, w:262, h:14}],
+        doors: [
+          {x:818, y:430, side:'w'},
+          {x:1080, y:430, side:'e'},
+          {x:950, y:288, side:'n'},
+          {x:950, y:568, side:'s'}
+        ]
       },
       {
         id:'400-h2', label:'Bldg H · 400s 2nd Floor', desc:'Upper-floor rooms above 400s',
-        x:690, y:130, w:250, h:80, cols:6,
-        rooms: [461,462,463,464,465,466, 451,452,453,454,455,456]
+        outline:{x:680, y:120, w:270, h:100},
+        rooms: customLayout([
+          { x:686, y:128, w:42, h:42, nums:[461] },
+          { x:730, y:128, w:42, h:42, nums:[462] },
+          { x:774, y:128, w:42, h:42, nums:[463] },
+          { x:818, y:128, w:42, h:42, nums:[464] },
+          { x:862, y:128, w:42, h:42, nums:[465] },
+          { x:906, y:128, w:42, h:42, nums:[466] },
+          { x:686, y:172, w:42, h:42, nums:[451] },
+          { x:730, y:172, w:42, h:42, nums:[452] },
+          { x:774, y:172, w:42, h:42, nums:[453] },
+          { x:818, y:172, w:42, h:42, nums:[454] },
+          { x:862, y:172, w:42, h:42, nums:[455] },
+          { x:906, y:172, w:42, h:42, nums:[456] }
+        ]),
+        hallways: [{x:680, y:168, w:270, h:6}],
+        doors: [{x:815, y:120, side:'n'}]
       },
       {
         id:'500', label:'500s Block', desc:'Near cafeteria',
-        x:620, y:430, w:200, h:240, cols:4,
-        rooms: [501,502,503,504, 505,506,507,508, 509,516,551,552, 553,554,555,556, 557]
+        outline:{x:615, y:425, w:215, h:250},
+        rooms: customLayout([
+          // Row 1 across top: 501-504
+          { x:620, y:432, w:50, h:55, nums:[501] },
+          { x:672, y:432, w:50, h:55, nums:[502] },
+          { x:724, y:432, w:50, h:55, nums:[503] },
+          { x:776, y:432, w:50, h:55, nums:[504] },
+          // Row 2: 505-508
+          { x:620, y:490, w:50, h:55, nums:[505] },
+          { x:672, y:490, w:50, h:55, nums:[506] },
+          { x:724, y:490, w:50, h:55, nums:[507] },
+          { x:776, y:490, w:50, h:55, nums:[508] },
+          // Row 3: 509, 516, 551, 552
+          { x:620, y:548, w:50, h:55, nums:[509] },
+          { x:672, y:548, w:50, h:55, nums:[516] },
+          { x:724, y:548, w:50, h:55, nums:[551] },
+          { x:776, y:548, w:50, h:55, nums:[552] },
+          // Row 4: 553-557
+          { x:620, y:606, w:40, h:65, nums:[553] },
+          { x:662, y:606, w:40, h:65, nums:[554] },
+          { x:704, y:606, w:40, h:65, nums:[555] },
+          { x:746, y:606, w:40, h:65, nums:[556] },
+          { x:788, y:606, w:40, h:65, nums:[557] }
+        ]),
+        hallways: [{x:615, y:543, w:215, h:6}],
+        doors: [{x:615, y:550, side:'w'}, {x:830, y:550, side:'e'}]
       },
       {
         id:'600', label:'600s Block', desc:'North campus · Largest classroom block',
-        x:490, y:210, w:330, h:210, cols:8,
-        rooms: rng(601, 640)
+        outline:{x:485, y:205, w:340, h:220},
+        rooms: customLayout([
+          // 5 columns × 8 rooms each = 40 rooms
+          { x:490, y:212, w:64, h:208, nums:[601,602,603,604,605,606,607,608] },
+          { x:556, y:212, w:64, h:208, nums:[609,610,611,612,613,614,615,616] },
+          { x:622, y:212, w:64, h:208, nums:[617,618,619,620,621,622,623,624] },
+          { x:688, y:212, w:64, h:208, nums:[625,626,627,628,629,630,631,632] },
+          { x:754, y:212, w:64, h:208, nums:[633,634,635,636,637,638,639,640] }
+        ]),
+        // Two horizontal hallways for navigation
+        hallways: [{x:485, y:316, w:340, h:8}],
+        doors: [
+          {x:485, y:320, side:'w'},
+          {x:825, y:320, side:'e'},
+          {x:655, y:205, side:'n'},
+          {x:655, y:425, side:'s'}
+        ]
       },
       {
         id:'700', label:'700s Block', desc:'Administration & main office',
-        x:830, y:620, w:210, h:160, cols:4,
-        rooms: [700,701,702,703, 709,731,732,733, 739]
+        outline:{x:825, y:615, w:215, h:170},
+        rooms: customLayout([
+          { x:830, y:622, w:50, h:75, nums:[700,703] },
+          { x:884, y:622, w:50, h:75, nums:[701,709] },
+          { x:938, y:622, w:50, h:75, nums:[702,731] },
+          { x:992, y:622, w:46, h:75, nums:[732,733] },
+          { x:830, y:702, w:50, h:78, nums:[739] }
+        ]),
+        hallways: [{x:825, y:697, w:215, h:7}],
+        doors: [{x:825, y:702, side:'w'}, {x:1040, y:702, side:'e'}]
       }
     ];
 
@@ -406,14 +535,14 @@
       {n:20, x:1045, y:710}
     ];
 
-    // Build ROOMS array for search
+    // Build ROOMS array for search (rooms are pre-positioned in customLayout)
     const ROOMS = [];
     BLOCKS.forEach(block => {
-      const grid = gridRooms(block.rooms, block.x, block.y, block.w, block.h, block.cols);
-      block._roomGeom = grid;
-      grid.forEach(r => {
-        ROOMS.push({ n: r.n, blockId: block.id, blockLabel: block.label,
-                     x: r.x + r.w/2, y: r.y + r.h/2, rect: r });
+      block.rooms.forEach(r => {
+        ROOMS.push({
+          n: r.n, blockId: block.id, blockLabel: block.label,
+          x: r.x + r.w/2, y: r.y + r.h/2, rect: r
+        });
       });
     });
 
@@ -478,24 +607,45 @@
       target.appendChild(el('text', {class:labelClass, x:cx, y:cy}, s.label));
     });
 
-    // Blocks (classrooms)
+    // Blocks (classrooms) — render as floor plans: outline, hallways, rooms, doors
     BLOCKS.forEach(block => {
-      const rect = el('rect', {x:block.x, y:block.y, width:block.w, height:block.h, rx:8,
-                               class:'m-block', 'data-id':block.id, 'data-type':'block'});
-      gBuildings.appendChild(rect);
+      const o = block.outline;
+
+      // Outer building wall (clickable shell)
+      const shell = el('rect', {x:o.x, y:o.y, width:o.w, height:o.h, rx:4,
+                                class:'m-block-shell', 'data-id':block.id, 'data-type':'block'});
+      gBuildings.appendChild(shell);
+
+      // Hallways (lighter background showing walking paths)
+      (block.hallways || []).forEach(h => {
+        gBuildings.appendChild(el('rect', {x:h.x, y:h.y, width:h.w, height:h.h,
+                                            class:'m-hallway'}));
+      });
 
       // Individual rooms
-      block._roomGeom.forEach(r => {
-        const room = el('rect', {x:r.x, y:r.y, width:r.w, height:r.h, rx:2,
+      block.rooms.forEach(r => {
+        const room = el('rect', {x:r.x, y:r.y, width:r.w, height:r.h, rx:1.5,
                                  class:'m-room', 'data-room':r.n, 'data-block':block.id});
         gRooms.appendChild(room);
         // Number label (hidden until zoom)
         gRoomNums.appendChild(el('text', {class:'m-room-num', x:r.x + r.w/2, y:r.y + r.h/2,
                                           'data-room':r.n}, r.n));
       });
-      // Block label (shown at low zoom)
+
+      // Doors — small triangles pointing inward
+      (block.doors || []).forEach(d => {
+        const size = 8;
+        let pts;
+        if (d.side === 'n') pts = `${d.x-size},${d.y} ${d.x+size},${d.y} ${d.x},${d.y+size}`;
+        else if (d.side === 's') pts = `${d.x-size},${d.y} ${d.x+size},${d.y} ${d.x},${d.y-size}`;
+        else if (d.side === 'w') pts = `${d.x},${d.y-size} ${d.x},${d.y+size} ${d.x+size},${d.y}`;
+        else pts = `${d.x},${d.y-size} ${d.x},${d.y+size} ${d.x-size},${d.y}`;
+        gBuildings.appendChild(el('polygon', {points:pts, class:'m-door'}));
+      });
+
+      // Block label (shown above building)
       gLabels.appendChild(el('text', {class:'m-label-block',
-        x:block.x + block.w/2, y:block.y - 8, 'data-block-label':block.id}, block.label.toUpperCase()));
+        x:o.x + o.w/2, y:o.y - 12, 'data-block-label':block.id}, block.label.toUpperCase()));
     });
 
     // Gates
@@ -595,51 +745,77 @@
     });
     window.addEventListener('mouseup', () => { dragging = false; svg.classList.remove('is-grabbing'); });
 
-    // Touch events
-    let touchMode = null, touchStart = null, touchVbStart = null, touchDistStart = 0;
+    // Touch events — proper pinch with midpoint anchoring
+    let touchState = null;
+    function _mid(a, b) { return {x: (a.clientX + b.clientX)/2, y: (a.clientY + b.clientY)/2}; }
+    function _dist(a, b) { const dx = a.clientX - b.clientX, dy = a.clientY - b.clientY; return Math.sqrt(dx*dx + dy*dy); }
+
+    function startGesture(touches) {
+      const startVb = {...vb};
+      if (touches.length === 1) {
+        touchState = {mode:'pan', startVb, startTouch: {x: touches[0].clientX, y: touches[0].clientY}};
+      } else if (touches.length >= 2) {
+        const m = _mid(touches[0], touches[1]);
+        touchState = {mode:'pinch', startVb, startMid: m, startDist: _dist(touches[0], touches[1])};
+      }
+    }
+
     svg.addEventListener('touchstart', e => {
-      if (e.touches.length === 1) {
-        touchMode = 'pan';
-        touchStart = {x:e.touches[0].clientX, y:e.touches[0].clientY};
-        touchVbStart = {...vb};
-      } else if (e.touches.length === 2) {
-        touchMode = 'pinch';
-        const dx = e.touches[0].clientX - e.touches[1].clientX;
-        const dy = e.touches[0].clientY - e.touches[1].clientY;
-        touchDistStart = Math.sqrt(dx*dx + dy*dy);
-        touchStart = {
-          x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
-          y: (e.touches[0].clientY + e.touches[1].clientY) / 2
-        };
-        touchVbStart = {...vb};
-      }
-    }, {passive:true});
+      startGesture(e.touches);
+    }, {passive: true});
+
     svg.addEventListener('touchmove', e => {
-      if (touchMode === 'pan' && e.touches.length === 1) {
-        e.preventDefault();
-        const rect = svg.getBoundingClientRect();
-        const dx = (e.touches[0].clientX - touchStart.x) / rect.width  * touchVbStart.w;
-        const dy = (e.touches[0].clientY - touchStart.y) / rect.height * touchVbStart.h;
-        vb.x = touchVbStart.x - dx;
-        vb.y = touchVbStart.y - dy;
+      if (!touchState) return;
+      e.preventDefault();
+      const rect = svg.getBoundingClientRect();
+      if (rect.width === 0) return;
+
+      if (touchState.mode === 'pan' && e.touches.length === 1) {
+        const dx = (e.touches[0].clientX - touchState.startTouch.x) / rect.width  * touchState.startVb.w;
+        const dy = (e.touches[0].clientY - touchState.startTouch.y) / rect.height * touchState.startVb.h;
+        vb.x = touchState.startVb.x - dx;
+        vb.y = touchState.startVb.y - dy;
+        vb.w = touchState.startVb.w; vb.h = touchState.startVb.h;
         clamp(); applyVB();
-      } else if (touchMode === 'pinch' && e.touches.length === 2) {
-        e.preventDefault();
-        const dx = e.touches[0].clientX - e.touches[1].clientX;
-        const dy = e.touches[0].clientY - e.touches[1].clientY;
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        const factor = dist / touchDistStart;
-        vb = {...touchVbStart};
-        zoomAt(touchStart.x, touchStart.y, factor);
+      } else if (touchState.mode === 'pinch' && e.touches.length >= 2) {
+        const curMid = _mid(e.touches[0], e.touches[1]);
+        const curDist = _dist(e.touches[0], e.touches[1]);
+        if (curDist < 1) return;
+        const factor = curDist / touchState.startDist;
+        // SVG point under the original midpoint (using start vb)
+        const spx = (touchState.startMid.x - rect.left) / rect.width;
+        const spy = (touchState.startMid.y - rect.top)  / rect.height;
+        const anchorSvgX = touchState.startVb.x + touchState.startVb.w * spx;
+        const anchorSvgY = touchState.startVb.y + touchState.startVb.h * spy;
+        // New size
+        let newW = touchState.startVb.w / factor;
+        newW = Math.max(MIN_W, Math.min(MAX_W, newW));
+        const newH = newW * (BASE_VB.h / BASE_VB.w);
+        // Place anchor SVG point under current midpoint
+        const cpx = (curMid.x - rect.left) / rect.width;
+        const cpy = (curMid.y - rect.top)  / rect.height;
+        vb.w = newW; vb.h = newH;
+        vb.x = anchorSvgX - newW * cpx;
+        vb.y = anchorSvgY - newH * cpy;
+        clamp(); applyVB();
       }
-    }, {passive:false});
-    svg.addEventListener('touchend', () => { touchMode = null; }, {passive:true});
+    }, {passive: false});
+
+    svg.addEventListener('touchend', e => {
+      if (e.touches.length === 0) {
+        touchState = null;
+      } else {
+        // Re-anchor remaining touches
+        startGesture(e.touches);
+      }
+    }, {passive: true});
+    svg.addEventListener('touchcancel', () => { touchState = null; }, {passive: true});
 
     // Double-tap zoom
     let lastTap = 0;
     svg.addEventListener('touchend', e => {
       const now = Date.now();
-      if (now - lastTap < 280 && e.changedTouches.length === 1) {
+      if (now - lastTap < 280 && e.changedTouches.length === 1 && e.touches.length === 0) {
         const t = e.changedTouches[0];
         zoomAt(t.clientX, t.clientY, vb.w > 500 ? 2.2 : 0.6);
       }
@@ -780,7 +956,7 @@
     // Click on block/building opens info
     svg.addEventListener('click', e => {
       // Block
-      const block = e.target.closest('.m-block');
+      const block = e.target.closest('.m-block-shell');
       if (block) {
         const bid = block.dataset.id;
         const b = BLOCKS.find(x => x.id === bid);
