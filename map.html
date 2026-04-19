@@ -841,17 +841,18 @@
     // ── DEEP LINK: #room-415 ──────────────────────────────
     (function() {
       const hash = window.location.hash;
-      if (hash.startsWith('#room-')) {
-        const rn = hash.slice(6);
-        const r = ROOMS.find(x => x.n === rn);
-        if (r) {
-          setTimeout(() => {
-            focusRoom(r);
-            searchInput.value = rn;
-          }, 200);
-        }
-        history.replaceState(null, '', window.location.pathname);
-      }
+      if (!hash.startsWith('#room-')) return;
+      const rn = hash.slice(6);
+      const r = ROOMS.find(x => x.n === rn);
+      if (!r) return;
+      // Wait for initial fit (two frames after load) before focusing
+      window.addEventListener('load', () => {
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          focusRoom(r);
+          searchInput.value = rn;
+        }));
+      });
+      history.replaceState(null, '', window.location.pathname);
     })();
   </script>
 </body>
