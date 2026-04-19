@@ -1,42 +1,96 @@
 {
-  "last_updated": "2026-04-11T16:00:41Z",
+  "last_updated": "2026-04-19T07:21:50Z",
   "source": "ParentSquare",
   "events": [
     {
       "start": "2026-04-13",
       "end": "2026-04-13",
-      "label": "Motivational Keynote — Erica Alfaro @ PVHS Library 6PM",
+      "label": "Allan Hancock Enrollment Workshop (Lunch, Library)",
+      "type": "event",
+      "emoji": "🎓",
+      "newsId": "76694594",
+      "url": "https://www.parentsquare.com/feeds/76694594"
+    },
+    {
+      "start": "2026-04-13",
+      "end": "2026-04-13",
+      "label": "Erica Alfaro Keynote Presentation — 6PM, PVHS Library",
       "type": "event",
       "emoji": "🎤",
-      "newsId": "76530862",
-      "url": "https://www.parentsquare.com/feeds/76530862"
+      "newsId": "76530945",
+      "url": "https://www.parentsquare.com/feeds/76530945"
     },
     {
       "start": "2026-04-16",
       "end": "2026-04-16",
-      "label": "CAASPP Testing Begins — Science (CAST)",
+      "label": "CAASPP State Testing Begins (Juniors)",
       "type": "notable",
       "emoji": "📝",
-      "newsId": "76706811",
-      "url": "https://www.parentsquare.com/feeds/76706811"
+      "newsId": "77666990",
+      "url": "https://www.parentsquare.com/feeds/77666990"
     },
     {
       "start": "2026-04-21",
       "end": "2026-04-21",
-      "label": "Allan Hancock College Counselor @ PVHS",
+      "label": "Allan Hancock College Counselor Visit at PVHS",
       "type": "event",
       "emoji": "🎓",
       "newsId": "76577512",
       "url": "https://www.parentsquare.com/feeds/76577512"
     },
     {
+      "start": "2026-04-28",
+      "end": "2026-04-28",
+      "label": "Josten's on Campus — Final Cap & Gown Orders (Lunch Only, $65)",
+      "type": "notable",
+      "emoji": "🎓",
+      "newsId": "77740917",
+      "url": "https://www.parentsquare.com/feeds/77740917"
+    },
+    {
+      "start": "2026-04-28",
+      "end": "2026-04-28",
+      "label": "Cap & Gown Exchange Day",
+      "type": "event",
+      "emoji": "🎓",
+      "newsId": "77740917",
+      "url": "https://www.parentsquare.com/feeds/77740917"
+    },
+    {
       "start": "2026-04-30",
       "end": "2026-04-30",
-      "label": "Rotary Essay Contest Reading — Zaira Nacar",
+      "label": "Prom Ticket Sales Deadline ($65, contract required)",
       "type": "notable",
-      "emoji": "🏆",
-      "newsId": "76706811",
-      "url": "https://www.parentsquare.com/feeds/76706811"
+      "emoji": "🏫",
+      "newsId": "77740917",
+      "url": "https://www.parentsquare.com/feeds/77740917"
+    },
+    {
+      "start": "2026-05-27",
+      "end": "2026-05-27",
+      "label": "Yearbook Sales & Distribution Begins",
+      "type": "notable",
+      "emoji": "🎓",
+      "newsId": "77926831",
+      "url": "https://www.parentsquare.com/feeds/77926831"
+    },
+    {
+      "start": "2026-06-03",
+      "end": "2026-06-03",
+      "label": "Grad Nite (Buses depart 5:30am from student parking lot)",
+      "type": "event",
+      "emoji": "🎓",
+      "newsId": "77740917",
+      "url": "https://www.parentsquare.com/feeds/77740917"
+    },
+    {
+      "start": "2026-06-10",
+      "end": "2026-06-10",
+      "label": "Graduation Practice — 1PM in Gym",
+      "type": "event",
+      "emoji": "🎓",
+      "newsId": "77740917",
+      "url": "https://www.parentsquare.com/feeds/77740917"
     }
   ]
 }
