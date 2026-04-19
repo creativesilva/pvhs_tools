@@ -1,0 +1,834 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PVHS Tools">
+  <meta name="theme-color" content="#007474">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-TileColor" content="#021414">
+  <meta name="msapplication-navbutton-color" content="#007474">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="PV_AppIcon.png">
+  <link rel="icon" type="image/png" href="PV_AppIcon.png">
+  <title>Campus Map</title>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>emailjs.init('68UkiTjqHIKZMkeCC');</script>
+
+  <style>
+    :root {
+      --teal: #007474; --white: #f7fbfb; --muted: #cfe3e3;
+      --panel: rgba(255,255,255,0.02); --panel-border: rgba(255,255,255,0.05);
+      --shadow: 0 20px 46px rgba(0,0,0,0.30); --soft-shadow: 0 12px 24px rgba(0,0,0,0.22);
+      --card-hover: rgba(255,255,255,0.12); --app-spacing: 16px; --radius: 34px;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+    html { height: -webkit-fill-available; }
+    html, body { width: 100%; height: 100%; min-height: 100%; background: #021414; overflow: hidden; }
+    body { min-height: 100vh; min-height: 100dvh; min-height: -webkit-fill-available; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; color: var(--white); touch-action: none; user-select: none; -webkit-user-select: none; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+    .frame { width: 100%; height: 100dvh; min-height: 100vh; min-height: -webkit-fill-available; display: flex; align-items: center; justify-content: center; padding: 10px; }
+
+    .app {
+      width: 430px; height: 880px; max-width: 100%; max-height: 100%;
+      border-radius: var(--radius); overflow: hidden; position: relative;
+      box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,0.12); border-top-color: rgba(255,255,255,0.04);
+      background: linear-gradient(168deg, rgba(6,28,28,0.97) 0%, rgba(4,24,24,0.95) 30%, rgba(0,72,72,0.92) 60%, rgba(0,100,100,0.96) 82%, rgba(4,30,30,0.97) 100%);
+      display: flex; flex-direction: column; padding: 14px var(--app-spacing) var(--app-spacing) var(--app-spacing); isolation: isolate;
+    }
+
+    .app::before {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(ellipse at 50% 20%, rgba(0,116,116,0.18) 0%, transparent 60%),
+                  radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 50%);
+      z-index: 0;
+    }
+
+    .ghost-logo { position: absolute; top: 56%; left: 50%; width: 120%; opacity: 0.07; transform: translate(-50%, -50%); filter: grayscale(100%) contrast(108%) brightness(114%); pointer-events: none; z-index: 0; }
+
+    .content { position: relative; z-index: 1; width: 100%; flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: stretch; overflow: hidden; }
+
+    /* ── TOP ROW ── */
+    .top-row { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 10px; height: 44px; flex-shrink: 0; margin-bottom: 4px; position: relative; }
+    .logo-clear { width: 38px; height: 38px; object-fit: contain; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); flex-shrink: 0; }
+    .page-title { position: absolute; left: 0; right: 0; text-align: center; font-size: 15px; font-weight: 700; color: #dff7f7; text-transform: uppercase; margin: 0; letter-spacing: 0.14em; pointer-events: none; }
+
+    /* ── NAV DROPDOWN ── */
+    .nav-menu-btn { appearance: none; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.13); border-radius: 12px; color: rgba(255,255,255,0.92); width: 34px; height: 34px; font-size: 14px; font-weight: 900; letter-spacing: 0.08em; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: background 0.16s, border-color 0.16s; }
+    .nav-menu-btn.is-open, .nav-menu-btn:active { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.26); }
+    .nav-menu { position: fixed; z-index: 9999; min-width: 172px; background: rgba(3,20,20,0.58); border: 1px solid rgba(255,255,255,0.16); border-radius: 16px; padding: 5px; box-shadow: 0 14px 44px rgba(0,0,0,0.52); backdrop-filter: blur(26px); -webkit-backdrop-filter: blur(26px); transform-origin: top right; transform: scale(0.88) translateY(-8px); opacity: 0; pointer-events: none; transition: opacity 0.17s ease, transform 0.19s cubic-bezier(0.34,1.4,0.64,1); }
+    .nav-menu.is-open { opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; }
+    .nav-menu-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 11px; text-decoration: none; color: #eaf8f8; background: transparent; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; border: none; cursor: pointer; width: 100%; transition: background 0.13s; }
+    .nav-menu-item:active { background: rgba(255,255,255,0.1); }
+    .nav-menu-icon { font-size: 14px; flex-shrink: 0; }
+    .nav-menu-sep { height: 1px; background: rgba(255,255,255,0.09); margin: 3px 6px; }
+
+    /* ── SEARCH BAR ── */
+    .map-search-row {
+      display: flex; gap: 6px; width: 100%; flex-shrink: 0; margin-bottom: 6px;
+      position: relative; z-index: 5;
+    }
+    .map-search-input {
+      flex: 1; appearance: none; background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12); border-radius: 12px;
+      color: #f7fbfb; font-size: 13px; padding: 9px 12px;
+      outline: none; font-family: inherit;
+    }
+    .map-search-input:focus { border-color: rgba(0,220,220,0.4); background: rgba(255,255,255,0.12); }
+    .map-search-input::placeholder { color: rgba(255,255,255,0.38); }
+    .map-icon-btn {
+      appearance: none; width: 36px; height: 36px; flex-shrink: 0;
+      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px; color: #dff7f7; font-size: 16px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .map-icon-btn:active { background: rgba(255,255,255,0.14); }
+
+    /* ── SEARCH RESULTS DROPDOWN ── */
+    .map-search-results {
+      position: absolute; top: 42px; left: 0; right: 42px; z-index: 12;
+      background: rgba(6,26,26,0.98); border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 12px; padding: 4px;
+      max-height: 220px; overflow-y: auto;
+      box-shadow: 0 16px 32px rgba(0,0,0,0.5);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    }
+    .map-search-results[hidden] { display: none; }
+    .map-search-item {
+      padding: 8px 10px; border-radius: 8px; cursor: pointer;
+      display: flex; align-items: center; gap: 8px;
+      color: #f7fbfb; font-size: 12.5px;
+    }
+    .map-search-item:hover, .map-search-item.is-active { background: rgba(0,160,160,0.2); }
+    .map-search-item-num { font-weight: 800; color: #4be1e1; min-width: 40px; }
+    .map-search-item-sub { color: var(--muted); font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase; }
+    .map-search-empty { padding: 10px; color: var(--muted); font-size: 11px; text-align: center; }
+
+    /* ── MAP CANVAS ── */
+    .map-wrap {
+      flex: 1; min-height: 0; position: relative;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px; overflow: hidden;
+      touch-action: none;
+    }
+    #mapSvg { width: 100%; height: 100%; display: block; cursor: grab; }
+    #mapSvg.is-grabbing { cursor: grabbing; }
+
+    /* SVG element styles */
+    .m-field { fill: rgba(100,180,110,0.16); stroke: rgba(100,180,110,0.35); stroke-width: 1.2; }
+    .m-parking { fill: rgba(255,255,255,0.04); stroke: rgba(255,255,255,0.18); stroke-width: 1; stroke-dasharray: 4 3; }
+    .m-building { fill: rgba(0,140,140,0.28); stroke: rgba(75,225,225,0.5); stroke-width: 1.2; cursor: pointer; transition: fill 0.18s; }
+    .m-building:hover, .m-building.is-active { fill: rgba(0,180,180,0.48); }
+    .m-block { fill: rgba(0,116,116,0.22); stroke: rgba(75,225,225,0.45); stroke-width: 1.2; cursor: pointer; transition: fill 0.18s; }
+    .m-block:hover, .m-block.is-active { fill: rgba(0,180,180,0.42); }
+    .m-room { fill: rgba(0,180,180,0.12); stroke: rgba(120,240,240,0.35); stroke-width: 0.5; cursor: pointer; transition: fill 0.15s; }
+    .m-room:hover, .m-room.is-active { fill: rgba(0,220,220,0.42); }
+    .m-room.is-highlight {
+      fill: rgba(255,200,40,0.65) !important;
+      stroke: #ffd84b; stroke-width: 1.2;
+      animation: roomPulse 1s ease-in-out infinite alternate;
+    }
+    @keyframes roomPulse {
+      from { fill: rgba(255,200,40,0.65); stroke-width: 1.2; }
+      to   { fill: rgba(255,230,80,0.95); stroke-width: 2; }
+    }
+    .m-gate { fill: rgba(255,180,40,0.7); stroke: rgba(255,220,80,0.9); stroke-width: 0.8; }
+    .m-gate-num { fill: #021414; font-size: 10px; font-weight: 800; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+
+    /* SVG labels */
+    .m-label-bldg { fill: #ffffff; font-size: 11px; font-weight: 800; text-anchor: middle; dominant-baseline: central; text-transform: uppercase; letter-spacing: 0.08em; pointer-events: none; }
+    .m-label-block { fill: #ffffff; font-size: 13px; font-weight: 900; text-anchor: middle; dominant-baseline: central; text-transform: uppercase; letter-spacing: 0.1em; pointer-events: none; }
+    .m-label-small { fill: rgba(255,255,255,0.6); font-size: 8px; font-weight: 700; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+    .m-label-field { fill: rgba(200,240,200,0.85); font-size: 10px; font-weight: 700; text-anchor: middle; dominant-baseline: central; text-transform: uppercase; letter-spacing: 0.1em; pointer-events: none; }
+    .m-room-num { fill: #f7fbfb; font-size: 6.5px; font-weight: 700; text-anchor: middle; dominant-baseline: central; pointer-events: none; opacity: 0; transition: opacity 0.2s; }
+    .m-room-num.is-visible { opacity: 1; }
+    .m-street { fill: rgba(255,255,255,0.4); font-size: 11px; font-weight: 700; text-anchor: middle; letter-spacing: 0.15em; }
+
+    /* Compass */
+    .m-compass { pointer-events: none; }
+
+    /* ── ZOOM CONTROLS ── */
+    .map-controls {
+      position: absolute; right: 10px; bottom: 10px; z-index: 6;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .map-control-btn {
+      appearance: none; width: 36px; height: 36px;
+      background: rgba(6,26,26,0.82); border: 1px solid rgba(255,255,255,0.18);
+      color: #dff7f7; border-radius: 10px; font-size: 17px; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.35);
+    }
+    .map-control-btn:active { background: rgba(0,160,160,0.35); }
+
+    /* ── BOTTOM INFO SHEET ── */
+    .map-info-backdrop {
+      position: absolute; inset: 0; z-index: 30;
+      background: rgba(1,12,12,0.55);
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    }
+    .map-info-backdrop[hidden] { display: none; }
+    .map-info-sheet {
+      position: absolute; bottom: 0; left: 0; right: 0; z-index: 31;
+      background: rgba(6,26,26,0.98);
+      border-top: 1px solid rgba(255,255,255,0.14);
+      border-radius: 22px 22px 0 0;
+      padding: 18px 18px calc(18px + env(safe-area-inset-bottom));
+      display: flex; flex-direction: column; gap: 10px;
+      transform: translateY(110%);
+      transition: transform 0.42s cubic-bezier(0.34,1.25,0.64,1);
+    }
+    .map-info-sheet.is-visible { transform: translateY(0); }
+    .map-info-sheet[hidden] { display: none; }
+    .map-info-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .map-info-pill {
+      font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.11em;
+      background: rgba(0,116,116,0.3); color: #4bd4d4;
+      border: 1px solid rgba(0,116,116,0.45); border-radius: 99px; padding: 3px 9px;
+    }
+    .map-info-close {
+      appearance: none; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.6); border-radius: 99px; width: 28px; height: 28px;
+      font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .map-info-title { font-size: 18px; font-weight: 800; color: #fff; margin: 0; }
+    .map-info-sub { font-size: 12px; color: var(--muted); margin: 0; line-height: 1.45; }
+    .map-info-rooms {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;
+      max-height: 180px; overflow-y: auto; padding: 4px 0;
+    }
+    .map-info-room-chip {
+      appearance: none; border: 1px solid rgba(0,220,220,0.35);
+      background: rgba(0,160,160,0.18); color: #4be1e1;
+      border-radius: 99px; padding: 5px 10px;
+      font-size: 11px; font-weight: 800; cursor: pointer;
+    }
+    .map-info-room-chip:active { background: rgba(0,180,180,0.35); }
+
+    .footer-note { text-align: center; font-size: 9px; color: #b5d4d4; font-weight: 600; padding: 4px 0 0; margin-top: 4px; flex-shrink: 0; opacity: 0.75; }
+
+    /* ── STANDALONE ── */
+    body.is-standalone { background: #021414; }
+    body.is-standalone::before { content: ""; position: fixed; inset: 0; background: #021414; pointer-events: none; z-index: 0; }
+    body.is-standalone .frame { position: fixed; inset: 0; width: 100%; height: 100%; min-height: -webkit-fill-available; padding: 0 8px max(24px,calc(env(safe-area-inset-bottom) + 8px)) 8px; z-index: 1; }
+    body.is-standalone .app { position: relative; width: 100%; height: 100%; max-width: 100%; max-height: 100%; border-radius: 34px; border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 24px 46px rgba(0,0,0,0.22); padding-top: max(10px,env(safe-area-inset-top)); padding-right: max(var(--app-spacing),env(safe-area-inset-right)); padding-bottom: 18px; padding-left: max(var(--app-spacing),env(safe-area-inset-left)); }
+
+    @media (max-width: 430px) {
+      body:not(.is-standalone) .frame { padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom) 12px; }
+      body:not(.is-standalone) .app { width: 100%; height: 100%; max-height: 100%; border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.12); }
+      body { touch-action: pan-y; }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <div class="app">
+      <img class="ghost-logo" src="PV_Logo.png" alt="">
+      <div class="content">
+
+        <!-- Top Row -->
+        <div class="top-row">
+          <a href="index.html" class="nav-link" aria-label="Home"><img src="PV_Logo.png" class="logo-clear" alt="PVHS"></a>
+          <h1 class="page-title">Campus Map</h1>
+          <button class="nav-menu-btn" id="navMenuBtn" type="button" aria-label="Menu">···</button>
+        </div>
+
+        <!-- Search -->
+        <div class="map-search-row">
+          <input type="text" class="map-search-input" id="mapSearchInput" placeholder="Find a room (e.g. 415)" autocomplete="off" inputmode="search">
+          <button id="mapSearchClear" class="map-icon-btn" type="button" aria-label="Clear">✕</button>
+          <div id="mapSearchResults" class="map-search-results" hidden></div>
+        </div>
+
+        <!-- Map -->
+        <div class="map-wrap">
+          <svg id="mapSvg" viewBox="0 0 1400 940" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+            <!-- Generated by JS -->
+          </svg>
+
+          <!-- Zoom controls -->
+          <div class="map-controls">
+            <button id="mapZoomIn" class="map-control-btn" type="button" aria-label="Zoom in">+</button>
+            <button id="mapZoomOut" class="map-control-btn" type="button" aria-label="Zoom out">−</button>
+            <button id="mapReset" class="map-control-btn" type="button" aria-label="Reset view" style="font-size:14px">⟲</button>
+          </div>
+        </div>
+
+        <div class="footer-note">Tap a building for details · Pinch to zoom</div>
+      </div><!-- /content -->
+    </div><!-- /app -->
+  </div><!-- /frame -->
+
+  <!-- Nav Dropdown -->
+  <nav class="nav-menu" id="navMenu" role="menu" aria-hidden="true">
+    <a href="index.html" class="nav-menu-item nav-link"><span class="nav-menu-icon">&#x1F3E0;</span> Home</a>
+    <a href="countdown.html" class="nav-menu-item nav-link"><span class="nav-menu-icon">&#x23F1;</span> Countdown</a>
+    <a href="extension_search.html" class="nav-menu-item nav-link"><span class="nav-menu-icon">&#x1F50D;</span> Staff Search</a>
+    <a href="map.html" class="nav-menu-item nav-link"><span class="nav-menu-icon">&#x1F5FA;</span> Campus Map</a>
+    <a href="calendar.html" class="nav-menu-item nav-link"><span class="nav-menu-icon">&#x1F4C5;</span> Calendar</a>
+  </nav>
+
+  <!-- Bottom Info Sheet -->
+  <div id="mapInfoBackdrop" class="map-info-backdrop" hidden></div>
+  <div id="mapInfoSheet" class="map-info-sheet" hidden>
+    <div class="map-info-top">
+      <span class="map-info-pill" id="mapInfoType">Building</span>
+      <button id="mapInfoClose" class="map-info-close" type="button" aria-label="Close">&#x2715;</button>
+    </div>
+    <p class="map-info-title" id="mapInfoTitle">—</p>
+    <p class="map-info-sub" id="mapInfoSub"></p>
+    <div class="map-info-rooms" id="mapInfoRooms" hidden></div>
+  </div>
+
+  <script>
+    // ── STANDALONE DETECTION ──
+    if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+      document.body.classList.add('is-standalone');
+    }
+
+    // ── CAMPUS DATA ────────────────────────────────────────
+    // Rough positions in viewBox 1400x940. Positions approximate PDF layout.
+    // Classroom blocks get room-level detail. Other structures get shaped outlines + labels.
+
+    // Helper: build a grid of rooms inside a block
+    function gridRooms(numbers, bx, by, bw, bh, cols) {
+      const rows = Math.ceil(numbers.length / cols);
+      const pad = 3;
+      const roomW = (bw - pad*2) / cols;
+      const roomH = (bh - pad*2) / rows;
+      return numbers.map((n, i) => ({
+        n: String(n),
+        x: bx + pad + (i % cols) * roomW,
+        y: by + pad + Math.floor(i / cols) * roomH,
+        w: roomW - 1,
+        h: roomH - 1
+      }));
+    }
+
+    // Room numbers per block (based on PDF analysis)
+    const rng = (s,e) => { const a=[]; for (let i=s;i<=e;i++) a.push(i); return a; };
+
+    const BLOCKS = [
+      {
+        id:'100', label:'100s Block', desc:'Main entrance area',
+        x:620, y:650, w:210, h:110, cols:3,
+        rooms: [100, 103, 109]
+      },
+      {
+        id:'200', label:'200s Block', desc:'Buildings G & J',
+        x:1240, y:340, w:110, h:270, cols:3,
+        rooms: rng(201, 219)
+      },
+      {
+        id:'300', label:'300s Block', desc:'Building E',
+        x:1080, y:390, w:160, h:190, cols:5,
+        rooms: [301,302,303,304,305, 311,312,313,314,315, 321,322,323,324,325, 331,332,333,334,335]
+      },
+      {
+        id:'400-f1', label:'400s Block', desc:'First floor · Central campus',
+        x:820, y:290, w:260, h:215, cols:5,
+        rooms: [401,402,403,404,405, 411,412,413,414,415, 421,422,423,424,425, 431,432,433,434,435]
+      },
+      {
+        id:'400-h2', label:'Bldg H · 400s Block 2nd Floor', desc:'Upper-floor rooms',
+        x:700, y:130, w:230, h:70, cols:6,
+        rooms: [461,462,463,464,465,466, 451,452,453,454,455,456]
+      },
+      {
+        id:'500', label:'500s Block', desc:'Near cafeteria',
+        x:620, y:440, w:210, h:225, cols:4,
+        rooms: [501,502,503,504, 505,506,507,508, 509,516,551,552, 553,554,555,556, 557]
+      },
+      {
+        id:'600', label:'600s Block', desc:'North campus',
+        x:500, y:210, w:200, h:210, cols:5,
+        rooms: rng(601, 640)
+      },
+      {
+        id:'700', label:'700s Block', desc:'Administration',
+        x:830, y:620, w:190, h:180, cols:4,
+        rooms: [703,709,731,732, 733,739,301,302]
+          // Lean set — refine with real numbers from site
+          .slice(0,6)
+      }
+    ];
+
+    // Non-classroom structures (shaped & labeled only)
+    const STRUCTURES = [
+      // Fields (irregular-ish)
+      { id:'baseball', type:'field', label:'Baseball Field',
+        shape:'poly', points:'20,20 270,20 270,260 180,290 60,290 20,220' },
+      { id:'football', type:'field', label:'Football Field & Track',
+        shape:'oval', cx:290, cy:745, rx:260, ry:140 },
+      { id:'tennis', type:'field', label:'Tennis Courts',
+        shape:'rect', x:500, y:600, w:110, h:110 },
+
+      // Non-classroom buildings (blocked out)
+      { id:'bldg-n', type:'building', label:'Bldg N · Pool',
+        shape:'rect', x:270, y:200, w:150, h:120 },
+      { id:'bldg-800', type:'building', label:'Bldg A (800s)',
+        shape:'rect', x:435, y:220, w:65, h:180 },
+      { id:'bldg-f', type:'building', label:'Bldg F · Gym',
+        shape:'rect', x:270, y:340, w:200, h:190 },
+      { id:'bldg-c', type:'building', label:'Bldg C · Cafeteria',
+        shape:'rect', x:500, y:510, w:85, h:180 },
+      { id:'bldg-l', type:'building', label:'Bldg L',
+        shape:'rect', x:50, y:690, w:220, h:60 },
+      { id:'bldg-k', type:'building', label:'Bldg K',
+        shape:'rect', x:280, y:690, w:180, h:60 },
+      { id:'bldg-m', type:'building', label:'Bldg M · Visitor Bleachers',
+        shape:'rect', x:130, y:800, w:280, h:40 },
+      { id:'pac', type:'building', label:'PAC · Performing Arts',
+        shape:'rect', x:1140, y:660, w:240, h:150 },
+
+      // Parking
+      { id:'park-1', type:'parking', label:'Student Parking',
+        shape:'rect', x:30, y:370, w:520, h:150 },
+      { id:'park-2', type:'parking', label:'Staff Parking',
+        shape:'rect', x:1370, y:540, w:20, h:260 }
+    ];
+
+    // Gates (just visual markers for now)
+    const GATES = [
+      {n:1,  x:630, y:810}, {n:2,  x:640, y:720}, {n:3,  x:560, y:700},
+      {n:4,  x:485, y:545}, {n:9,  x:490, y:455}, {n:10, x:700, y:250},
+      {n:11, x:810, y:250}, {n:12, x:950, y:250}, {n:13, x:1120, y:350},
+      {n:14, x:1240, y:420}, {n:15, x:1240, y:560}, {n:16, x:1260, y:620},
+      {n:18, x:1380, y:810}, {n:19, x:1380, y:600}, {n:20, x:1040, y:710}
+    ];
+
+    // Build ROOMS array for search
+    const ROOMS = [];
+    BLOCKS.forEach(block => {
+      const grid = gridRooms(block.rooms, block.x, block.y, block.w, block.h, block.cols);
+      block._roomGeom = grid;
+      grid.forEach(r => {
+        ROOMS.push({ n: r.n, blockId: block.id, blockLabel: block.label,
+                     x: r.x + r.w/2, y: r.y + r.h/2, rect: r });
+      });
+    });
+
+    // ── SVG RENDERING ──────────────────────────────────────
+    const svg = document.getElementById('mapSvg');
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+
+    function el(tag, attrs, text) {
+      const e = document.createElementNS(SVG_NS, tag);
+      for (const k in attrs) e.setAttribute(k, attrs[k]);
+      if (text !== undefined) e.textContent = text;
+      return e;
+    }
+
+    // Layer groups
+    const gFields    = el('g', {id:'gFields'});
+    const gParking   = el('g', {id:'gParking'});
+    const gBuildings = el('g', {id:'gBuildings'});
+    const gRooms     = el('g', {id:'gRooms'});
+    const gRoomNums  = el('g', {id:'gRoomNums'});
+    const gGates     = el('g', {id:'gGates'});
+    const gLabels    = el('g', {id:'gLabels'});
+    const gOverlay   = el('g', {id:'gOverlay'});
+    svg.appendChild(gFields); svg.appendChild(gParking);
+    svg.appendChild(gBuildings); svg.appendChild(gRooms);
+    svg.appendChild(gRoomNums); svg.appendChild(gGates);
+    svg.appendChild(gLabels); svg.appendChild(gOverlay);
+
+    // Street labels (Fremont St along the bottom)
+    gLabels.appendChild(el('line', {x1:0,y1:905,x2:1400,y2:905,
+      stroke:'rgba(255,255,255,0.18)',  'stroke-width':'2'}));
+    gLabels.appendChild(el('text', {class:'m-street', x:700, y:925},
+      'FREMONT STREET'));
+
+    // Structures (fields, buildings, parking)
+    STRUCTURES.forEach(s => {
+      let shape, cx, cy, isField = s.type === 'field', isParking = s.type === 'parking';
+      const cls = isField ? 'm-field' : isParking ? 'm-parking' : 'm-building';
+      const target = isField ? gFields : isParking ? gParking : gBuildings;
+
+      if (s.shape === 'rect') {
+        shape = el('rect', {x:s.x, y:s.y, width:s.w, height:s.h, rx:6,
+                            class:cls, 'data-id':s.id, 'data-type':s.type});
+        cx = s.x + s.w/2; cy = s.y + s.h/2;
+      } else if (s.shape === 'poly') {
+        shape = el('polygon', {points:s.points, class:cls, 'data-id':s.id, 'data-type':s.type});
+        const pts = s.points.split(' ').map(p => p.split(',').map(Number));
+        cx = pts.reduce((a,p)=>a+p[0],0)/pts.length;
+        cy = pts.reduce((a,p)=>a+p[1],0)/pts.length;
+      } else if (s.shape === 'oval') {
+        shape = el('ellipse', {cx:s.cx, cy:s.cy, rx:s.rx, ry:s.ry,
+                               class:cls, 'data-id':s.id, 'data-type':s.type});
+        // Add inner track
+        target.appendChild(el('ellipse', {cx:s.cx, cy:s.cy, rx:s.rx*0.78, ry:s.ry*0.72,
+          fill:'rgba(100,170,110,0.25)', stroke:'rgba(180,230,180,0.25)', 'stroke-width':'0.8'}));
+        cx = s.cx; cy = s.cy;
+      }
+      target.appendChild(shape);
+
+      // Label
+      const labelClass = isField ? 'm-label-field' : 'm-label-bldg';
+      target.appendChild(el('text', {class:labelClass, x:cx, y:cy}, s.label));
+    });
+
+    // Blocks (classrooms)
+    BLOCKS.forEach(block => {
+      const rect = el('rect', {x:block.x, y:block.y, width:block.w, height:block.h, rx:8,
+                               class:'m-block', 'data-id':block.id, 'data-type':'block'});
+      gBuildings.appendChild(rect);
+
+      // Individual rooms
+      block._roomGeom.forEach(r => {
+        const room = el('rect', {x:r.x, y:r.y, width:r.w, height:r.h, rx:2,
+                                 class:'m-room', 'data-room':r.n, 'data-block':block.id});
+        gRooms.appendChild(room);
+        // Number label (hidden until zoom)
+        gRoomNums.appendChild(el('text', {class:'m-room-num', x:r.x + r.w/2, y:r.y + r.h/2,
+                                          'data-room':r.n}, r.n));
+      });
+      // Block label (shown at low zoom)
+      gLabels.appendChild(el('text', {class:'m-label-block',
+        x:block.x + block.w/2, y:block.y - 8, 'data-block-label':block.id}, block.label.toUpperCase()));
+    });
+
+    // Gates
+    GATES.forEach(g => {
+      gGates.appendChild(el('circle', {cx:g.x, cy:g.y, r:7, class:'m-gate'}));
+      gGates.appendChild(el('text', {class:'m-gate-num', x:g.x, y:g.y}, g.n));
+    });
+
+    // ── PAN & ZOOM ────────────────────────────────────────
+    const BASE_VB = {x:0, y:0, w:1400, h:940};
+    let vb = {...BASE_VB};
+    const MIN_W = 180, MAX_W = 1600;
+
+    function applyVB() {
+      svg.setAttribute('viewBox', `${vb.x} ${vb.y} ${vb.w} ${vb.h}`);
+      // Show room numbers only when zoomed in
+      const visible = vb.w < 700;
+      gRoomNums.querySelectorAll('.m-room-num').forEach(t => t.classList.toggle('is-visible', visible));
+    }
+    applyVB();
+
+    function clamp() {
+      vb.w = Math.max(MIN_W, Math.min(MAX_W, vb.w));
+      vb.h = vb.w * (BASE_VB.h / BASE_VB.w);
+      const maxX = BASE_VB.w + 100 - vb.w;
+      const maxY = BASE_VB.h + 100 - vb.h;
+      vb.x = Math.max(-100, Math.min(maxX, vb.x));
+      vb.y = Math.max(-100, Math.min(maxY, vb.y));
+    }
+
+    function zoomAt(clientX, clientY, factor) {
+      const rect = svg.getBoundingClientRect();
+      const px = (clientX - rect.left) / rect.width;
+      const py = (clientY - rect.top)  / rect.height;
+      const svgX = vb.x + vb.w * px;
+      const svgY = vb.y + vb.h * py;
+      vb.w = vb.w / factor;
+      clamp();
+      vb.x = svgX - vb.w * px;
+      vb.y = svgY - vb.h * py;
+      clamp();
+      applyVB();
+    }
+
+    function zoomCenter(factor) {
+      const rect = svg.getBoundingClientRect();
+      zoomAt(rect.left + rect.width/2, rect.top + rect.height/2, factor);
+    }
+
+    function resetView() {
+      vb = {...BASE_VB};
+      applyVB();
+    }
+
+    // Desktop: wheel zoom
+    svg.addEventListener('wheel', e => {
+      e.preventDefault();
+      zoomAt(e.clientX, e.clientY, e.deltaY < 0 ? 1.15 : 1/1.15);
+    }, {passive:false});
+
+    // Mouse drag
+    let dragging = false, dragStart = null, vbStart = null;
+    svg.addEventListener('mousedown', e => {
+      dragging = true; svg.classList.add('is-grabbing');
+      dragStart = {x:e.clientX, y:e.clientY};
+      vbStart = {...vb};
+    });
+    window.addEventListener('mousemove', e => {
+      if (!dragging) return;
+      const rect = svg.getBoundingClientRect();
+      const dx = (e.clientX - dragStart.x) / rect.width  * vbStart.w;
+      const dy = (e.clientY - dragStart.y) / rect.height * vbStart.h;
+      vb.x = vbStart.x - dx;
+      vb.y = vbStart.y - dy;
+      clamp();
+      applyVB();
+    });
+    window.addEventListener('mouseup', () => { dragging = false; svg.classList.remove('is-grabbing'); });
+
+    // Touch events
+    let touchMode = null, touchStart = null, touchVbStart = null, touchDistStart = 0;
+    svg.addEventListener('touchstart', e => {
+      if (e.touches.length === 1) {
+        touchMode = 'pan';
+        touchStart = {x:e.touches[0].clientX, y:e.touches[0].clientY};
+        touchVbStart = {...vb};
+      } else if (e.touches.length === 2) {
+        touchMode = 'pinch';
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        touchDistStart = Math.sqrt(dx*dx + dy*dy);
+        touchStart = {
+          x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
+          y: (e.touches[0].clientY + e.touches[1].clientY) / 2
+        };
+        touchVbStart = {...vb};
+      }
+    }, {passive:true});
+    svg.addEventListener('touchmove', e => {
+      if (touchMode === 'pan' && e.touches.length === 1) {
+        e.preventDefault();
+        const rect = svg.getBoundingClientRect();
+        const dx = (e.touches[0].clientX - touchStart.x) / rect.width  * touchVbStart.w;
+        const dy = (e.touches[0].clientY - touchStart.y) / rect.height * touchVbStart.h;
+        vb.x = touchVbStart.x - dx;
+        vb.y = touchVbStart.y - dy;
+        clamp(); applyVB();
+      } else if (touchMode === 'pinch' && e.touches.length === 2) {
+        e.preventDefault();
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        const factor = dist / touchDistStart;
+        vb = {...touchVbStart};
+        zoomAt(touchStart.x, touchStart.y, factor);
+      }
+    }, {passive:false});
+    svg.addEventListener('touchend', () => { touchMode = null; }, {passive:true});
+
+    // Double-tap zoom
+    let lastTap = 0;
+    svg.addEventListener('touchend', e => {
+      const now = Date.now();
+      if (now - lastTap < 280 && e.changedTouches.length === 1) {
+        const t = e.changedTouches[0];
+        zoomAt(t.clientX, t.clientY, vb.w > 500 ? 2.2 : 0.6);
+      }
+      lastTap = now;
+    });
+
+    // Zoom buttons
+    document.getElementById('mapZoomIn').addEventListener('click', () => zoomCenter(1.4));
+    document.getElementById('mapZoomOut').addEventListener('click', () => zoomCenter(1/1.4));
+    document.getElementById('mapReset').addEventListener('click', resetView);
+
+    // ── SEARCH ────────────────────────────────────────────
+    const searchInput = document.getElementById('mapSearchInput');
+    const searchResults = document.getElementById('mapSearchResults');
+    const searchClear = document.getElementById('mapSearchClear');
+
+    function renderResults(list, query) {
+      if (!list.length) {
+        searchResults.innerHTML = '<div class="map-search-empty">No rooms match "' + query + '"</div>';
+        searchResults.hidden = false;
+        return;
+      }
+      searchResults.innerHTML = '';
+      list.slice(0, 20).forEach(r => {
+        const item = document.createElement('div');
+        item.className = 'map-search-item';
+        item.innerHTML = '<span class="map-search-item-num">' + r.n + '</span>' +
+                         '<span class="map-search-item-sub">' + r.blockLabel + '</span>';
+        item.addEventListener('click', () => {
+          focusRoom(r);
+          searchResults.hidden = true;
+          searchInput.value = r.n;
+          searchInput.blur();
+        });
+        searchResults.appendChild(item);
+      });
+      searchResults.hidden = false;
+    }
+
+    function doSearch(q) {
+      q = q.trim().toLowerCase();
+      if (!q) { searchResults.hidden = true; return; }
+      const matches = ROOMS.filter(r => r.n.toLowerCase().startsWith(q) || r.n.toLowerCase().includes(q));
+      renderResults(matches, q);
+    }
+
+    searchInput.addEventListener('input', e => doSearch(e.target.value));
+    searchInput.addEventListener('focus', e => { if (e.target.value) doSearch(e.target.value); });
+    searchClear.addEventListener('click', () => {
+      searchInput.value = '';
+      searchResults.hidden = true;
+      clearHighlight();
+      resetView();
+    });
+
+    // Submit on enter
+    searchInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const q = searchInput.value.trim();
+        const exact = ROOMS.find(r => r.n === q);
+        if (exact) {
+          focusRoom(exact);
+          searchResults.hidden = true;
+          searchInput.blur();
+        }
+      } else if (e.key === 'Escape') {
+        searchResults.hidden = true;
+        searchInput.blur();
+      }
+    });
+
+    // Close results when clicking outside
+    document.addEventListener('click', e => {
+      if (!searchResults.contains(e.target) && e.target !== searchInput) {
+        searchResults.hidden = true;
+      }
+    });
+
+    function clearHighlight() {
+      document.querySelectorAll('.m-room.is-highlight').forEach(r => r.classList.remove('is-highlight'));
+    }
+
+    function focusRoom(room) {
+      clearHighlight();
+      const svgRoom = document.querySelector(`[data-room="${room.n}"]`);
+      if (svgRoom && svgRoom.classList.contains('m-room')) svgRoom.classList.add('is-highlight');
+      // Pan/zoom to room
+      const targetW = 400, targetH = targetW * (BASE_VB.h / BASE_VB.w);
+      vb.x = room.x - targetW/2;
+      vb.y = room.y - targetH/2;
+      vb.w = targetW; vb.h = targetH;
+      clamp();
+      applyVB();
+    }
+
+    // ── BUILDING TAP SHEET ────────────────────────────────
+    const infoSheet = document.getElementById('mapInfoSheet');
+    const infoBackdrop = document.getElementById('mapInfoBackdrop');
+    const infoTitle = document.getElementById('mapInfoTitle');
+    const infoSub = document.getElementById('mapInfoSub');
+    const infoPill = document.getElementById('mapInfoType');
+    const infoRooms = document.getElementById('mapInfoRooms');
+
+    function openInfo(title, sub, pill, rooms) {
+      infoTitle.textContent = title;
+      infoSub.textContent = sub || '';
+      infoPill.textContent = pill || 'Info';
+      if (rooms && rooms.length) {
+        infoRooms.innerHTML = '';
+        infoRooms.hidden = false;
+        rooms.forEach(n => {
+          const chip = document.createElement('button');
+          chip.className = 'map-info-room-chip';
+          chip.type = 'button';
+          chip.textContent = n;
+          chip.addEventListener('click', () => {
+            closeInfo();
+            const r = ROOMS.find(x => x.n === n);
+            if (r) focusRoom(r);
+          });
+          infoRooms.appendChild(chip);
+        });
+      } else {
+        infoRooms.hidden = true;
+      }
+      infoBackdrop.hidden = false;
+      infoSheet.hidden = false;
+      requestAnimationFrame(() => requestAnimationFrame(() => infoSheet.classList.add('is-visible')));
+    }
+    function closeInfo() {
+      infoSheet.classList.remove('is-visible');
+      setTimeout(() => { infoSheet.hidden = true; infoBackdrop.hidden = true; }, 420);
+    }
+    infoBackdrop.addEventListener('click', closeInfo);
+    document.getElementById('mapInfoClose').addEventListener('click', closeInfo);
+
+    // Click on block/building opens info
+    svg.addEventListener('click', e => {
+      // Block
+      const block = e.target.closest('.m-block');
+      if (block) {
+        const bid = block.dataset.id;
+        const b = BLOCKS.find(x => x.id === bid);
+        if (b) openInfo(b.label, b.desc, 'Classroom Block', b.rooms.map(String));
+        return;
+      }
+      // Room
+      const room = e.target.closest('.m-room');
+      if (room) {
+        const rn = room.dataset.room;
+        const r = ROOMS.find(x => x.n === rn);
+        if (r) { focusRoom(r); return; }
+      }
+      // Building/field/parking
+      const building = e.target.closest('.m-building, .m-field, .m-parking');
+      if (building) {
+        const bid = building.dataset.id;
+        const s = STRUCTURES.find(x => x.id === bid);
+        if (s) openInfo(s.label, '', s.type === 'field' ? 'Field' : s.type === 'parking' ? 'Parking' : 'Building');
+      }
+    });
+
+    // ── NAV MENU ──────────────────────────────────────────
+    const navMenuBtn = document.getElementById('navMenuBtn');
+    const navMenu = document.getElementById('navMenu');
+    function positionMenu() {
+      const r = navMenuBtn.getBoundingClientRect();
+      navMenu.style.top  = (r.bottom+6)+'px';
+      navMenu.style.right= (window.innerWidth-r.right)+'px';
+    }
+    navMenuBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      positionMenu();
+      const open = navMenu.classList.toggle('is-open');
+      navMenuBtn.classList.toggle('is-open', open);
+      navMenu.setAttribute('aria-hidden', String(!open));
+    });
+    document.addEventListener('click', e => {
+      if (!navMenu.contains(e.target) && e.target !== navMenuBtn) {
+        navMenu.classList.remove('is-open');
+        navMenuBtn.classList.remove('is-open');
+        navMenu.setAttribute('aria-hidden', 'true');
+      }
+    });
+
+    // ── LOGO HOME LINK (PWA standalone fix) ───────────────
+    (function() {
+      var logo = document.querySelector('.top-row a[aria-label="Home"]');
+      if (logo) logo.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = 'index.html';
+      });
+    })();
+
+    // ── SERVICE WORKER ────────────────────────────────────
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+
+    // ── DEEP LINK: #room-415 ──────────────────────────────
+    (function() {
+      const hash = window.location.hash;
+      if (hash.startsWith('#room-')) {
+        const rn = hash.slice(6);
+        const r = ROOMS.find(x => x.n === rn);
+        if (r) {
+          setTimeout(() => {
+            focusRoom(r);
+            searchInput.value = rn;
+          }, 200);
+        }
+        history.replaceState(null, '', window.location.pathname);
+      }
+    })();
+  </script>
+</body>
+</html>

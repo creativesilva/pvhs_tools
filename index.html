@@ -940,7 +940,7 @@
         </div>
         <div class="primary-nav">
           <a class="primary-btn nav-link" href="countdown.html"><span class="quick-link-icon">⏱</span><p class="quick-link-label">Countdown</p></a>
-          <a class="primary-btn nav-link" href="extension_search.html"><span class="quick-link-icon">🔍</span><p class="quick-link-label">Directory</p></a>
+          <button class="primary-btn" id="directoryBtn" type="button" style="cursor:pointer"><span class="quick-link-icon">🔍</span><p class="quick-link-label">Directory</p></button>
         </div>
         <p class="section-label">Quick Links</p>
         <div class="quick-links-grid">
@@ -1028,6 +1028,41 @@
               </div>
               <span class="maint-option-arrow">›</span>
             </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- DIRECTORY CHOOSER (Staff Search / Campus Map) -->
+      <div id="directoryChooser" class="news-chooser" hidden>
+        <div class="news-chooser-backdrop" id="directoryChooserBackdrop"></div>
+        <div class="news-chooser-dialog">
+          <div class="maint-header">
+            <div class="maint-title-row">
+              <span class="maint-title-icon">&#x1F50D;</span>
+              <div>
+                <p class="maint-title">Directory</p>
+                <p class="maint-subtitle">Choose an option</p>
+              </div>
+            </div>
+            <button id="directoryChooserClose" class="maint-close" type="button">&#x2715;</button>
+          </div>
+          <div class="maint-options">
+            <a class="maint-option" href="extension_search.html">
+              <div class="maint-option-icon news-chooser-icon--events">&#x1F464;</div>
+              <div class="maint-option-text">
+                <p class="maint-option-label">Search Staff</p>
+                <p class="maint-option-desc">Find a teacher or staff member by name or extension.</p>
+              </div>
+              <span class="maint-option-arrow">&#8250;</span>
+            </a>
+            <a class="maint-option" href="map.html">
+              <div class="maint-option-icon news-chooser-icon--athletics">&#x1F5FA;&#xFE0F;</div>
+              <div class="maint-option-text">
+                <p class="maint-option-label">Campus Map</p>
+                <p class="maint-option-desc">Find a classroom. Pinch to zoom, tap a building for details.</p>
+              </div>
+              <span class="maint-option-arrow">&#8250;</span>
+            </a>
           </div>
         </div>
       </div>
@@ -1163,7 +1198,8 @@
       <div id="navMenu" class="nav-menu" role="menu">
         <a href="calendar.html"         class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">📅</span>Calendar</a>
         <a href="countdown.html"       class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">⏱</span>Countdown</a>
-        <a href="extension_search.html" class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">🔍</span>Directory</a>
+        <a href="extension_search.html" class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">🔍</span>Staff Search</a>
+        <a href="map.html"              class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">🗺️</span>Campus Map</a>
         <button id="newsMenuBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon">📰</span>News</button>
         <div id="popoutMenuSep" class="nav-menu-sep"></div>
         <button id="popoutBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon">🪟</span>Pop Out</button>
@@ -1671,6 +1707,14 @@
       });
       document.getElementById('newsChooserClose')?.addEventListener('click', closeChooser);
       document.getElementById('newsChooserBackdrop')?.addEventListener('click', closeChooser);
+
+      // Directory chooser (Staff Search vs Campus Map)
+      var directoryChooser = document.getElementById('directoryChooser');
+      function openDirectoryChooser() { if (directoryChooser) directoryChooser.hidden = false; }
+      function closeDirectoryChooser() { if (directoryChooser) directoryChooser.hidden = true; }
+      document.getElementById('directoryBtn')?.addEventListener('click', openDirectoryChooser);
+      document.getElementById('directoryChooserClose')?.addEventListener('click', closeDirectoryChooser);
+      document.getElementById('directoryChooserBackdrop')?.addEventListener('click', closeDirectoryChooser);
 
       // ── NEWS FEED ──
       const newsModal   = document.getElementById('newsModal');
