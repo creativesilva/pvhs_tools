@@ -1306,8 +1306,7 @@
       const now = getNow();
       document.getElementById("todayText").textContent = new Intl.DateTimeFormat("en-US", {timeZone, weekday:"short", month:"short", day:"numeric"}).format(new Date());
 
-      // (getScheduleType / getScheduleBlocks are hoisted to outer scope below)
-      }
+      // (getScheduleType / getScheduleBlocks are hoisted to outer scope)
 
       const isSchoolDay = schoolDays.includes(now.dateStr);
       let schedType, blocks;
