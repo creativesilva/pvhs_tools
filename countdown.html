@@ -1601,6 +1601,19 @@
     checkReschedule();
     updateNotifBtn();
 
+    // ── ONE-SHOT ANNOUNCEMENT ───────────────────────────────────────────────
+    // Fire once per device when the user next opens the app after this deploy.
+    const ANNOUNCE_KEY = 'pvhs_announce_schedule_cards_v1';
+    if (_notifGranted() && !localStorage.getItem(ANNOUNCE_KEY)) {
+      localStorage.setItem(ANNOUNCE_KEY, '1');
+      setTimeout(() => fireNotif(
+        '📅 New: Quick Schedule View',
+        'Tap Finals, Weekly, or Today on the countdown screen to see the day\'s schedule at a glance — requested by security. Your feedback shapes what\'s next! 💬',
+        'pvhs-announce-schedule-cards'
+      ), 2500);
+    }
+    // ───────────────────────────────────────────────────────────────────────
+
     function updateProgressBars() {
       const now = getNow();
       const { totalSec, dateStr, weekday } = now;
