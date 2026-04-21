@@ -1,11 +1,20 @@
 {
-  "last_updated": "2026-04-19T07:21:50Z",
+  "last_updated": "2026-04-21T19:48:33Z",
   "source": "ParentSquare",
   "events": [
     {
+      "start": "2026-04-03",
+      "end": "2026-04-10",
+      "label": "Spring Break",
+      "type": "holiday",
+      "emoji": "🏫",
+      "newsId": "76706811",
+      "url": "https://www.parentsquare.com/feeds/76706811"
+    },
+    {
       "start": "2026-04-13",
       "end": "2026-04-13",
-      "label": "Allan Hancock Enrollment Workshop (Lunch, Library)",
+      "label": "AHC Summer Enrollment Workshop",
       "type": "event",
       "emoji": "🎓",
       "newsId": "76694594",
@@ -14,7 +23,7 @@
     {
       "start": "2026-04-13",
       "end": "2026-04-13",
-      "label": "Erica Alfaro Keynote Presentation — 6PM, PVHS Library",
+      "label": "Erica Alfaro Motivational Keynote",
       "type": "event",
       "emoji": "🎤",
       "newsId": "76530945",
@@ -23,35 +32,71 @@
     {
       "start": "2026-04-16",
       "end": "2026-04-16",
-      "label": "CAASPP State Testing Begins (Juniors)",
+      "label": "CAASPP Science Testing Begins",
       "type": "notable",
       "emoji": "📝",
       "newsId": "77666990",
       "url": "https://www.parentsquare.com/feeds/77666990"
     },
     {
+      "start": "2026-04-17",
+      "end": "2026-04-18",
+      "label": "Fiddler on the Roof at PVHS",
+      "type": "event",
+      "emoji": "🎪",
+      "newsId": "77772624",
+      "url": "https://www.parentsquare.com/feeds/77772624"
+    },
+    {
       "start": "2026-04-21",
       "end": "2026-04-21",
-      "label": "Allan Hancock College Counselor Visit at PVHS",
+      "label": "Allan Hancock Launch to College Day",
+      "type": "event",
+      "emoji": "🎓",
+      "newsId": "77772624",
+      "url": "https://www.parentsquare.com/feeds/77772624"
+    },
+    {
+      "start": "2026-04-21",
+      "end": "2026-04-21",
+      "label": "AHC Counselor Appointments at PVHS",
       "type": "event",
       "emoji": "🎓",
       "newsId": "76577512",
       "url": "https://www.parentsquare.com/feeds/76577512"
     },
     {
-      "start": "2026-04-28",
-      "end": "2026-04-28",
-      "label": "Josten's on Campus — Final Cap & Gown Orders (Lunch Only, $65)",
+      "start": "2026-04-21",
+      "end": "2026-04-23",
+      "label": "CAASPP Science Testing Continues",
       "type": "notable",
-      "emoji": "🎓",
-      "newsId": "77740917",
-      "url": "https://www.parentsquare.com/feeds/77740917"
+      "emoji": "📝",
+      "newsId": "77772624",
+      "url": "https://www.parentsquare.com/feeds/77772624"
+    },
+    {
+      "start": "2026-04-22",
+      "end": "2026-04-22",
+      "label": "PSAT for Sophomores (7:30am check-in)",
+      "type": "notable",
+      "emoji": "📝",
+      "newsId": "77772624",
+      "url": "https://www.parentsquare.com/feeds/77772624"
+    },
+    {
+      "start": "2026-04-24",
+      "end": "2026-04-24",
+      "label": "Progress 2 Ends (Minimum Day)",
+      "type": "notable",
+      "emoji": "📅",
+      "newsId": "77772624",
+      "url": "https://www.parentsquare.com/feeds/77772624"
     },
     {
       "start": "2026-04-28",
       "end": "2026-04-28",
-      "label": "Cap & Gown Exchange Day",
-      "type": "event",
+      "label": "Josten's Cap & Gown Orders (During Lunch)",
+      "type": "notable",
       "emoji": "🎓",
       "newsId": "77740917",
       "url": "https://www.parentsquare.com/feeds/77740917"
@@ -59,25 +104,34 @@
     {
       "start": "2026-04-30",
       "end": "2026-04-30",
-      "label": "Prom Ticket Sales Deadline ($65, contract required)",
+      "label": "Prom Tickets Deadline",
       "type": "notable",
-      "emoji": "🏫",
+      "emoji": "📅",
       "newsId": "77740917",
       "url": "https://www.parentsquare.com/feeds/77740917"
     },
     {
+      "start": "2026-04-30",
+      "end": "2026-04-30",
+      "label": "Zaira Nacar Reads Winning Essay at Rotary",
+      "type": "notable",
+      "emoji": "🏆",
+      "newsId": "76706811",
+      "url": "https://www.parentsquare.com/feeds/76706811"
+    },
+    {
       "start": "2026-05-27",
       "end": "2026-05-27",
-      "label": "Yearbook Sales & Distribution Begins",
+      "label": "Yearbook Sales & Distribution Begin",
       "type": "notable",
-      "emoji": "🎓",
+      "emoji": "📅",
       "newsId": "77926831",
       "url": "https://www.parentsquare.com/feeds/77926831"
     },
     {
       "start": "2026-06-03",
       "end": "2026-06-03",
-      "label": "Grad Nite (Buses depart 5:30am from student parking lot)",
+      "label": "Grad Nite",
       "type": "event",
       "emoji": "🎓",
       "newsId": "77740917",
@@ -86,8 +140,8 @@
     {
       "start": "2026-06-10",
       "end": "2026-06-10",
-      "label": "Graduation Practice — 1PM in Gym",
-      "type": "event",
+      "label": "Graduation Practice (1pm in Gym)",
+      "type": "notable",
       "emoji": "🎓",
       "newsId": "77740917",
       "url": "https://www.parentsquare.com/feeds/77740917"
