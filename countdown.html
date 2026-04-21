@@ -1471,6 +1471,7 @@
       navigator.serviceWorker.register('./sw.js', { scope: './' })
         .then(() => { if (_notifGranted()) scheduleNotifications(); })
         .catch(() => { if (_notifGranted()) scheduleNotifications(); });
+      navigator.serviceWorker.addEventListener('controllerchange', () => location.reload());
     } else if (_notifGranted()) {
       scheduleNotifications();
     }

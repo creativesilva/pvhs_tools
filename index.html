@@ -2450,6 +2450,7 @@
       if (textEl && quote) textEl.textContent = '\u201C' + quote.q + '\u201D';
       if (authEl && quote) authEl.textContent = '\u2014 ' + quote.a;
     })();
+    if ("serviceWorker" in navigator) navigator.serviceWorker.addEventListener("controllerchange", () => location.reload());
   </script>
 </body>
 </html>

@@ -1154,7 +1154,10 @@
     })();
 
     // ── SERVICE WORKER ────────────────────────────────────
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(()=>{});
+      navigator.serviceWorker.addEventListener('controllerchange', () => location.reload());
+    }
 
     // ── DEEP LINK: #room-415 ──────────────────────────────
     (function() {
