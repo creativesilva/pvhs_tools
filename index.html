@@ -793,11 +793,17 @@
     .news-card-author {
       font-size: 9px; font-weight: 600; color: var(--muted); opacity: 0.55; margin: 0;
     }
-    .news-card-thumb-wrap { margin: 4px 0 2px 0; }
+    .news-card-body { display: block; }
+    .news-card-body::after { content: ''; display: block; clear: both; }
+    .news-card-body .news-card-title,
+    .news-card-body .news-card-summary,
+    .news-card-body .news-card-author { margin: 0 0 4px 0; }
     .news-card-thumb {
-      width: 100%; max-height: 160px; object-fit: cover;
-      border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);
+      float: right;
+      width: 72px; height: 72px; object-fit: cover;
+      border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);
       display: block; cursor: pointer; transition: opacity 0.15s;
+      margin: 2px 0 6px 10px;
     }
     .news-card-thumb:active { opacity: 0.7; }
     .news-card::after {
@@ -940,7 +946,11 @@
         </div>
         <div class="primary-nav">
           <a class="primary-btn nav-link" href="countdown.html"><span class="quick-link-icon">⏱</span><p class="quick-link-label">Countdown</p></a>
+<<<<<<< Updated upstream
           <a class="primary-btn nav-link" id="directoryBtn" href="extension_search.html"><span class="quick-link-icon">🔍</span><p class="quick-link-label">Directory</p></a>
+=======
+          <button class="primary-btn" id="directoryBtn" type="button" style="cursor:pointer"><span class="quick-link-icon">🔍</span><p class="quick-link-label">Directory</p></button>
+>>>>>>> Stashed changes
         </div>
         <p class="section-label">Quick Links</p>
         <div class="quick-links-grid">
@@ -1709,6 +1719,7 @@
       document.getElementById('newsChooserBackdrop')?.addEventListener('click', closeChooser);
 
       // Directory chooser (Staff Search vs Campus Map)
+<<<<<<< Updated upstream
       // DIRECTORY CHOOSER — shelved until campus map is complete; restore when ready
       // var directoryChooser = document.getElementById('directoryChooser');
       // function openDirectoryChooser() { if (directoryChooser) directoryChooser.hidden = false; }
@@ -1716,6 +1727,14 @@
       // document.getElementById('directoryBtn')?.addEventListener('click', openDirectoryChooser);
       // document.getElementById('directoryChooserClose')?.addEventListener('click', closeDirectoryChooser);
       // document.getElementById('directoryChooserBackdrop')?.addEventListener('click', closeDirectoryChooser);
+=======
+      var directoryChooser = document.getElementById('directoryChooser');
+      function openDirectoryChooser() { if (directoryChooser) directoryChooser.hidden = false; }
+      function closeDirectoryChooser() { if (directoryChooser) directoryChooser.hidden = true; }
+      document.getElementById('directoryBtn')?.addEventListener('click', openDirectoryChooser);
+      document.getElementById('directoryChooserClose')?.addEventListener('click', closeDirectoryChooser);
+      document.getElementById('directoryChooserBackdrop')?.addEventListener('click', closeDirectoryChooser);
+>>>>>>> Stashed changes
 
       // ── NEWS FEED ──
       const newsModal   = document.getElementById('newsModal');
@@ -1902,10 +1921,12 @@
                 '<p class="news-card-date">' + formatDate(post.date) + '</p>' +
                 pinHtml +
               '</div>' +
-              '<p class="news-card-title">' + (post.title || 'Untitled Post') + '</p>' +
-              '<p class="news-card-summary">' + (post.summary || '') + '</p>' +
-              (thumbHtml ? '<div class="news-card-thumb-wrap">' + thumbHtml + '</div>' : '') +
-              '<p class="news-card-author">' + (post.author || '') + '</p>' +
+              '<div class="news-card-body">' +
+                thumbHtml +
+                '<p class="news-card-title">' + (post.title || 'Untitled Post') + '</p>' +
+                '<p class="news-card-summary">' + (post.summary || '') + '</p>' +
+                '<p class="news-card-author">' + (post.author || '') + '</p>' +
+              '</div>' +
             '</div>'
           );
         }).join('');
