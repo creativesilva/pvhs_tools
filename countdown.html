@@ -684,6 +684,65 @@
     }
     .feedback-submit:active { opacity: 0.85; }
     .feedback-note { font-size: 9px; color: var(--muted); text-align: center; opacity: 0.65; margin: 0; }
+
+    /* ── SCHEDULE BUTTONS ─────────────────────────────────────── */
+    .sched-btn-row { display: flex; gap: 6px; width: 100%; margin-bottom: 5px; flex-shrink: 0; }
+    .sched-btn {
+      flex: 1; padding: 9px 4px; border-radius: 16px;
+      background: var(--panel); border: 1px solid var(--panel-border);
+      color: #c8efef; font-size: 7.5px; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.10em;
+      cursor: pointer; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 3px;
+      transition: background 0.15s, border-color 0.15s;
+      backdrop-filter: blur(10px); box-shadow: var(--soft-shadow);
+    }
+    .sched-btn-icon { font-size: 15px; line-height: 1; }
+    .sched-btn:active { background: rgba(0,180,180,0.2); border-color: rgba(0,220,220,0.35); }
+
+    /* ── SCHEDULE SHEET ───────────────────────────────────────── */
+    .sched-sheet[hidden] { display: none; }
+    .sched-sheet { position: absolute; inset: 0; z-index: 25; display: flex; align-items: flex-end; }
+    .sched-sheet-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(1,10,10,0.78);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    }
+    .sched-sheet-card {
+      position: relative; width: 100%;
+      background: linear-gradient(180deg, rgba(5,22,22,0.99) 0%, rgba(2,14,14,1) 100%);
+      border: 1px solid rgba(255,255,255,0.11); border-bottom: none;
+      border-radius: 24px 24px 0 0;
+      max-height: 80%; display: flex; flex-direction: column; overflow: hidden;
+      transform: translateY(100%);
+      transition: transform 0.42s cubic-bezier(0.34, 1.18, 0.64, 1);
+    }
+    .sched-sheet-card.is-open { transform: translateY(0); }
+    .sched-sheet-handle { width: 36px; height: 4px; border-radius: 99px; background: rgba(255,255,255,0.16); margin: 10px auto 0; flex-shrink: 0; }
+    .sched-sheet-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px 10px; flex-shrink: 0;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .sched-sheet-title { font-size: 11px; font-weight: 800; color: #40dede; text-transform: uppercase; letter-spacing: 0.14em; margin: 0; }
+    .sched-sheet-close {
+      appearance: none; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 99px; color: rgba(255,255,255,0.6); width: 26px; height: 26px;
+      font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .sched-sheet-body { overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 12px 14px 20px; display: flex; flex-direction: column; gap: 14px; }
+    .sched-section { display: flex; flex-direction: column; gap: 2px; }
+    .sched-section-title { font-size: 8.5px; font-weight: 800; color: #40dede; text-transform: uppercase; letter-spacing: 0.18em; margin: 0 0 6px; padding: 0 2px; }
+    .sched-table { width: 100%; border-collapse: collapse; }
+    .sched-table tr { border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .sched-table tr:last-child { border-bottom: none; }
+    .sched-table td { padding: 5px 4px; font-size: 10.5px; font-weight: 600; color: rgba(255,255,255,0.88); vertical-align: middle; }
+    .sched-table td:first-child { color: rgba(255,255,255,0.48); font-size: 9px; letter-spacing: 0.05em; text-transform: uppercase; }
+    .sched-table td:last-child { text-align: right; color: #d4f4f4; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .sched-row-minor td { opacity: 0.48; font-size: 8.5px !important; }
+    .sched-finals-day { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 10px 12px; }
+    .sched-finals-day-title { font-size: 8.5px; font-weight: 800; color: #40dede; text-transform: uppercase; letter-spacing: 0.15em; margin: 0 0 6px; }
+    .sched-no-school { color: var(--muted); font-size: 11px; text-align: center; padding: 24px 0; opacity: 0.7; }
   </style>
 </head>
 <body>
@@ -708,6 +767,19 @@
           <p class="wait-bell" id="waitBell">WAIT FOR THE BELL</p>
           <p class="access-row" id="accessText">No Restroom Access</p>
           <p class="status-row" id="scheduleText" style="text-align:center">Schedule: --</p>
+        </div>
+
+        <!-- SCHEDULE QUICK-VIEW BUTTONS -->
+        <div class="sched-btn-row">
+          <button class="sched-btn" id="schedBtnFinals" type="button">
+            <span class="sched-btn-icon">📋</span>Finals
+          </button>
+          <button class="sched-btn" id="schedBtnWeekly" type="button">
+            <span class="sched-btn-icon">📅</span>Weekly
+          </button>
+          <button class="sched-btn" id="schedBtnToday" type="button">
+            <span class="sched-btn-icon">⏰</span>Today
+          </button>
         </div>
 
         <div class="card info-strip">
@@ -769,6 +841,19 @@
       </div>
 
       <!-- FEEDBACK MODAL -->
+      <!-- SCHEDULE SHEET -->
+      <div id="schedSheet" class="sched-sheet" hidden>
+        <div class="sched-sheet-backdrop" id="schedSheetBackdrop"></div>
+        <div class="sched-sheet-card" id="schedSheetCard">
+          <div class="sched-sheet-handle"></div>
+          <div class="sched-sheet-header">
+            <p class="sched-sheet-title" id="schedSheetTitle">Schedule</p>
+            <button class="sched-sheet-close" id="schedSheetClose" type="button">✕</button>
+          </div>
+          <div class="sched-sheet-body" id="schedSheetBody"></div>
+        </div>
+      </div>
+
       <div id="feedbackModal" class="feedback-modal" hidden>
         <div class="feedback-modal-backdrop" id="feedbackBackdrop"></div>
         <div class="feedback-dialog">
@@ -1200,26 +1285,28 @@
       accessTextEl.textContent = message;
     }
 
+    function getScheduleType(dStr) {
+      if (finalsDays.has(dStr)) return "FINALS SCHEDULE";
+      if (minimumDays.has(dStr)) return "MINIMUM DAY";
+      const d = new Date(dStr + 'T12:00:00');
+      const wd = new Intl.DateTimeFormat("en-US", {timeZone, weekday:"long"}).format(d);
+      if (wd === "Monday") return "COLLABORATION";
+      return "REGULAR";
+    }
+    function getScheduleBlocks(dStr) {
+      if (finalsMap[dStr]) return schedules[finalsMap[dStr]];
+      if (minimumDays.has(dStr)) return schedules.minimum;
+      const d = new Date(dStr + 'T12:00:00');
+      const wd = new Intl.DateTimeFormat("en-US", {timeZone, weekday:"long"}).format(d);
+      if (wd === "Monday") return schedules.monday;
+      return schedules.regular;
+    }
+
     function updateApp() {
       const now = getNow();
       document.getElementById("todayText").textContent = new Intl.DateTimeFormat("en-US", {timeZone, weekday:"short", month:"short", day:"numeric"}).format(new Date());
 
-      // Determine schedule type for any given date string
-      function getScheduleType(dStr) {
-        if (finalsDays.has(dStr)) return "FINALS SCHEDULE";
-        if (minimumDays.has(dStr)) return "MINIMUM DAY SCHEDULE";
-        const d = new Date(dStr + 'T12:00:00');
-        const wd = new Intl.DateTimeFormat("en-US", {timeZone, weekday:"long"}).format(d);
-        if (wd === "Monday") return "COLLABORATION SCHEDULE";
-        return "REGULAR SCHEDULE";
-      }
-      function getScheduleBlocks(dStr) {
-        if (finalsMap[dStr]) return schedules[finalsMap[dStr]];
-        if (minimumDays.has(dStr)) return schedules.minimum;
-        const d = new Date(dStr + 'T12:00:00');
-        const wd = new Intl.DateTimeFormat("en-US", {timeZone, weekday:"long"}).format(d);
-        if (wd === "Monday") return schedules.monday;
-        return schedules.regular;
+      // (getScheduleType / getScheduleBlocks are hoisted to outer scope below)
       }
 
       const isSchoolDay = schoolDays.includes(now.dateStr);
@@ -2010,6 +2097,119 @@
           }, 3000);
         });
       });
+    })();
+
+    // ── SCHEDULE SHEET ─────────────────────────────────────────────────────
+    (function() {
+      const sheet = document.getElementById('schedSheet');
+      const card  = document.getElementById('schedSheetCard');
+      const body  = document.getElementById('schedSheetBody');
+      const titleEl = document.getElementById('schedSheetTitle');
+
+      function fmt12(t) {
+        const [h, m] = t.split(':').map(Number);
+        return `${h % 12 || 12}:${String(m).padStart(2,'0')} ${h >= 12 ? 'PM' : 'AM'}`;
+      }
+
+      function renderTable(blocks) {
+        const rows = blocks.map(b => {
+          const isMinor = /PASSING|NUTRITION/i.test(b.l);
+          return `<tr class="${isMinor ? 'sched-row-minor' : ''}">
+            <td>${b.l}</td>
+            <td>${fmt12(b.s)}&nbsp;–&nbsp;${fmt12(b.e)}</td>
+          </tr>`;
+        }).join('');
+        return `<table class="sched-table">${rows}</table>`;
+      }
+
+      function renderWeekly() {
+        titleEl.textContent = 'Weekly Schedule';
+        body.innerHTML = `
+          <div class="sched-section">
+            <p class="sched-section-title">Tue – Fri &middot; Regular Day</p>
+            ${renderTable(schedules.regular)}
+          </div>
+          <div class="sched-section">
+            <p class="sched-section-title">Monday &middot; Collaboration</p>
+            ${renderTable(schedules.monday)}
+          </div>
+          <div class="sched-section">
+            <p class="sched-section-title">Minimum Day</p>
+            ${renderTable(schedules.minimum)}
+          </div>`;
+      }
+
+      function renderToday() {
+        titleEl.textContent = "Today’s Schedule";
+        const now        = getNow();
+        const isSchool   = schoolDays.includes(now.dateStr);
+        const srcDate    = isSchool ? now.dateStr : (schoolDays.find(d => d > now.dateStr) || null);
+
+        if (!srcDate) {
+          body.innerHTML = `<p class="sched-no-school">School year complete! 🎓</p>`;
+          return;
+        }
+
+        const type   = getScheduleType(srcDate);
+        const blocks = getScheduleBlocks(srcDate);
+        const d      = new Date(srcDate + 'T12:00:00');
+        const dayStr = new Intl.DateTimeFormat('en-US', {timeZone, weekday:'long', month:'short', day:'numeric'}).format(d);
+        const prefix = isSchool ? '' : `<p style="font-size:9px;color:var(--muted);text-align:center;margin:0 0 10px;opacity:.7;text-transform:uppercase;letter-spacing:.1em">No school today &mdash; showing next school day</p>`;
+
+        body.innerHTML = `${prefix}
+          <div class="sched-section">
+            <p class="sched-section-title">${dayStr} &middot; ${type}</p>
+            ${renderTable(blocks)}
+          </div>`;
+      }
+
+      function renderFinals() {
+        titleEl.textContent = 'Finals Schedule';
+        const now = getNow();
+        const allFinals = [
+          { label: 'Semester 1 &middot; Dec 17–19, 2025', dates: ['2025-12-17','2025-12-18','2025-12-19'] },
+          { label: 'Semester 2 &middot; Jun 8–10, 2026',  dates: ['2026-06-08','2026-06-09','2026-06-10'] }
+        ];
+        const dayNames = ['Day 1','Day 2','Day 3'];
+        const dayKeys  = ['finals_1','finals_2','finals_3'];
+
+        const sections = allFinals.map(sem => {
+          const isPast = sem.dates[sem.dates.length - 1] < now.dateStr;
+          const days = sem.dates.map((date, i) => {
+            const d      = new Date(date + 'T12:00:00');
+            const dayStr = new Intl.DateTimeFormat('en-US', {timeZone, weekday:'short', month:'short', day:'numeric'}).format(d);
+            return `<div class="sched-finals-day">
+              <p class="sched-finals-day-title">${dayNames[i]} &middot; ${dayStr}</p>
+              ${renderTable(schedules[dayKeys[i]])}
+            </div>`;
+          }).join('');
+          return `<div class="sched-section">
+            <p class="sched-section-title" style="${isPast ? 'opacity:.45' : ''}">${sem.label}${isPast ? ' &middot; Complete' : ''}</p>
+            <div style="display:flex;flex-direction:column;gap:8px">${days}</div>
+          </div>`;
+        }).join('');
+
+        body.innerHTML = sections;
+      }
+
+      function openSheet(type) {
+        if (type === 'weekly') renderWeekly();
+        else if (type === 'today') renderToday();
+        else renderFinals();
+        sheet.hidden = false;
+        requestAnimationFrame(() => requestAnimationFrame(() => card.classList.add('is-open')));
+      }
+
+      function closeSheet() {
+        card.classList.remove('is-open');
+        card.addEventListener('transitionend', () => { sheet.hidden = true; }, { once: true });
+      }
+
+      document.getElementById('schedBtnWeekly')?.addEventListener('click', () => openSheet('weekly'));
+      document.getElementById('schedBtnToday')?.addEventListener('click',  () => openSheet('today'));
+      document.getElementById('schedBtnFinals')?.addEventListener('click', () => openSheet('finals'));
+      document.getElementById('schedSheetClose')?.addEventListener('click', closeSheet);
+      document.getElementById('schedSheetBackdrop')?.addEventListener('click', closeSheet);
     })();
   </script>
 </body>
