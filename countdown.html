@@ -732,16 +732,15 @@
     }
     .sched-sheet-body { overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 12px 14px 20px; display: flex; flex-direction: column; gap: 14px; }
     .sched-section { display: flex; flex-direction: column; gap: 2px; }
-    .sched-section-title { font-size: 8.5px; font-weight: 800; color: #40dede; text-transform: uppercase; letter-spacing: 0.18em; margin: 0 0 6px; padding: 0 2px; }
+    .sched-section-title { font-size: 9.5px; font-weight: 800; color: #40dede; text-transform: uppercase; letter-spacing: 0.18em; margin: 0 0 6px; padding: 0 2px; }
     .sched-table { width: 100%; border-collapse: collapse; }
     .sched-table tr { border-bottom: 1px solid rgba(255,255,255,0.05); }
     .sched-table tr:last-child { border-bottom: none; }
-    .sched-table td { padding: 5px 4px; font-size: 10.5px; font-weight: 600; color: rgba(255,255,255,0.88); vertical-align: middle; }
-    .sched-table td:first-child { color: rgba(255,255,255,0.48); font-size: 9px; letter-spacing: 0.05em; text-transform: uppercase; }
-    .sched-table td:last-child { text-align: right; color: #d4f4f4; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
-    .sched-row-minor td { opacity: 0.48; font-size: 8.5px !important; }
+    .sched-table td { padding: 5px 4px; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.88); vertical-align: middle; }
+    .sched-table td:first-child { color: rgba(255,255,255,0.92); font-size: 11.5px; letter-spacing: 0.05em; text-transform: uppercase; }
+    .sched-table td:last-child { text-align: right; color: #d4f4f4; font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
     .sched-finals-day { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 10px 12px; }
-    .sched-finals-day-title { font-size: 8.5px; font-weight: 800; color: #40dede; text-transform: uppercase; letter-spacing: 0.15em; margin: 0 0 6px; }
+    .sched-finals-day-title { font-size: 9.5px; font-weight: 800; color: #40dede; text-transform: uppercase; letter-spacing: 0.15em; margin: 0 0 6px; }
     .sched-no-school { color: var(--muted); font-size: 11px; text-align: center; padding: 24px 0; opacity: 0.7; }
   </style>
 </head>
@@ -2111,13 +2110,12 @@
       }
 
       function renderTable(blocks) {
-        const rows = blocks.map(b => {
-          const isMinor = /PASSING|NUTRITION/i.test(b.l);
-          return `<tr class="${isMinor ? 'sched-row-minor' : ''}">
+        const rows = blocks
+          .filter(b => !/PASSING/i.test(b.l))
+          .map(b => `<tr>
             <td>${b.l}</td>
             <td>${fmt12(b.s)}&nbsp;–&nbsp;${fmt12(b.e)}</td>
-          </tr>`;
-        }).join('');
+          </tr>`).join('');
         return `<table class="sched-table">${rows}</table>`;
       }
 
@@ -2209,6 +2207,39 @@
       document.getElementById('schedBtnFinals')?.addEventListener('click', () => openSheet('finals'));
       document.getElementById('schedSheetClose')?.addEventListener('click', closeSheet);
       document.getElementById('schedSheetBackdrop')?.addEventListener('click', closeSheet);
+
+      // Swipe-down-to-close on the top 72px of the card (handle + header zone)
+      const DRAG_ZONE_PX = 72;
+      const CLOSE_THRESHOLD_PX = 48;
+      let dragging = false;
+      let dragStartY = 0;
+      let dragCurrentY = 0;
+      card.addEventListener('touchstart', (e) => {
+        const t = e.touches[0];
+        const rect = card.getBoundingClientRect();
+        if (t.clientY - rect.top <= DRAG_ZONE_PX) {
+          dragging = true;
+          dragStartY = t.clientY;
+          dragCurrentY = 0;
+          card.style.transition = 'none';
+        }
+      }, { passive: true });
+      card.addEventListener('touchmove', (e) => {
+        if (!dragging) return;
+        dragCurrentY = Math.max(0, e.touches[0].clientY - dragStartY);
+        card.style.transform = `translateY(${dragCurrentY}px)`;
+      }, { passive: true });
+      const endDrag = () => {
+        if (!dragging) return;
+        dragging = false;
+        card.style.transition = '';
+        if (dragCurrentY > CLOSE_THRESHOLD_PX) {
+          closeSheet();
+        }
+        card.style.transform = '';
+      };
+      card.addEventListener('touchend', endDrag, { passive: true });
+      card.addEventListener('touchcancel', endDrag, { passive: true });
     })();
   </script>
 </body>
