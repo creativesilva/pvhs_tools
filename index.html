@@ -1809,13 +1809,8 @@
         }
       });
 
-      /* Also handle card thumbnail taps in the feed list */
-      newsFeed.addEventListener('click', function(e) {
-        if (e.target.classList.contains('news-card-thumb')) {
-          e.stopPropagation();
-          openLightbox(e.target.src);
-        }
-      });
+      /* Feed thumbnail tap opens the article, not the lightbox.
+         Lightbox behavior is reserved for images inside the opened article. */
 
       function makeBodySafe(html) {
         // Ensure all links open in new tab and never navigate away
