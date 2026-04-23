@@ -897,9 +897,11 @@
       }
       function overlayOpen() {
         const ids = ['maintModal','installModal','installBanner','verAnnounceSheet',
-          'newsModal','newsLightbox','newsChooser','embedModal','feedbackModal',
+          'newsModal','newsChooser','embedModal','feedbackModal',
           'schedSheet','calAnnounceSheet','a2hsPrompt','directoryChooser'];
         if (ids.some(id => { const el = document.getElementById(id); return el && !el.hidden; })) return true;
+        const lb = document.getElementById('newsLightbox');
+        if (lb && lb.classList.contains('is-open')) return true;
         const nav = document.getElementById('navMenu');
         return nav && nav.classList.contains('is-open');
       }
