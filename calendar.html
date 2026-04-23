@@ -227,25 +227,6 @@
       body:not(.is-standalone) .app { width: 100%; height: 100%; max-height: 100%; border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.12); }
       body { touch-action: pan-y; }
     }
-    /* ── MOBILE SWIPE HINTS ─────────────────────────────── */
-    .swipe-hint { display: none; }
-    @media (hover: none) and (pointer: coarse) {
-      .swipe-hint {
-        display: flex; justify-content: space-between;
-        position: fixed; left: 0; right: 0;
-        bottom: calc(env(safe-area-inset-bottom, 0px) + 6px);
-        padding: 0 10px; pointer-events: none; z-index: 20;
-      }
-      .swipe-hint-chip {
-        font-size: 8.5px; font-weight: 700; letter-spacing: 0.12em;
-        text-transform: uppercase; color: rgba(255,255,255,0.5);
-        background: rgba(0,0,0,0.3); backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        border: 1px solid rgba(255,255,255,0.07);
-        border-radius: 999px; padding: 4px 10px;
-      }
-      .swipe-hint-chip[hidden] { display: none; }
-    }
   </style>
 </head>
 <body>
@@ -817,26 +798,11 @@
 
     // ── SWIPE PAGE NAVIGATION ──────────────────────────────────────────────
     (function() {
-      const PAGES = ['index.html','calendar.html','extension_search.html','countdown.html'];
+      const PAGES = ['index.html','countdown.html','extension_search.html','calendar.html'];
       const path = location.pathname;
       let idx = PAGES.findIndex(p => path.endsWith('/' + p));
       if (idx < 0 && (path.endsWith('/') || /\/pvhs_tools\/?$/.test(path))) idx = 0;
       const inRing = idx >= 0;
-      // Populate mobile swipe hint chips (CSS hides on desktop)
-      const _pageNames = {'index.html':'Home','countdown.html':'Countdown','extension_search.html':'Directory','calendar.html':'Calendar','map.html':'Map'};
-      const _prevChip = document.getElementById('swipeHintPrev');
-      const _nextChip = document.getElementById('swipeHintNext');
-      if (_prevChip || _nextChip) {
-        if (inRing) {
-          const prev = PAGES[(idx - 1 + PAGES.length) % PAGES.length];
-          const next = PAGES[(idx + 1) % PAGES.length];
-          if (_prevChip) _prevChip.querySelector('em').textContent = _pageNames[prev] || prev;
-          if (_nextChip) _nextChip.querySelector('em').textContent = _pageNames[next] || next;
-        } else {
-          if (_prevChip) _prevChip.querySelector('em').textContent = 'Home';
-          if (_nextChip) _nextChip.hidden = true;
-        }
-      }
       const _sdir = localStorage.getItem('pvSwipeDir');
       if (_sdir) {
         localStorage.removeItem('pvSwipeDir');
@@ -882,9 +848,5 @@
     })();
     // ──────────────────────────────────────────────────────────────────────
   </script>
-  <div class="swipe-hint" aria-hidden="true">
-    <span class="swipe-hint-chip" id="swipeHintPrev">&#x2039; <em></em></span>
-    <span class="swipe-hint-chip" id="swipeHintNext"><em></em> &#x203a;</span>
-  </div>
 </body>
 </html>
