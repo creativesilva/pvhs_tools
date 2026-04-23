@@ -1411,14 +1411,15 @@
       const activeBreak = currentBreaks.find(b => now.dateStr >= b.start && now.dateStr <= b.end);
 
       if (activeBreak) {
-        // We're IN a break — show break name and countdown to next school day
+        // We're IN a break — show elapsed time (not countdown, which is 200+ hrs and breaks font-fitter)
         const breakStartD = new Date(activeBreak.start + 'T00:00:00');
         const breakEndD = new Date(activeBreak.end + 'T23:59:59');
         const nowMs = new Date().getTime();
         const breakTotalHrs = Math.round((breakEndD - breakStartD) / 3600000);
-        const breakElapsedHrs = Math.max(0, Math.round((nowMs - breakStartD.getTime()) / 3600000));
+        const breakElapsedSec = Math.max(0, Math.floor((nowMs - breakStartD.getTime()) / 1000));
+        const breakElapsedHrs = Math.floor(breakElapsedSec / 3600);
         document.getElementById("blockLabel").textContent = `${activeBreak.name} ${activeBreak.emoji}`;
-        document.getElementById("timerText").textContent = formatTime(diff, true);
+        document.getElementById("timerText").textContent = formatTime(breakElapsedSec, true);
         document.getElementById("timerText").className = "timer rest";
         document.getElementById("subText").textContent = `${breakElapsedHrs} of ${breakTotalHrs} hrs into break`;
       } else if (isWeekendRecharge) {
