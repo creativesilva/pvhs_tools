@@ -1,0 +1,933 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PVHS Tools">
+  <meta name="theme-color" content="#007474">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-TileColor" content="#021414">
+  <meta name="msapplication-navbutton-color" content="#007474">
+  
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="PV_AppIcon.png">
+  <link rel="icon" type="image/png" sizes="1024x1024" href="PV_AppIcon.png">
+  <title>Directory Search</title>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>emailjs.init('68UkiTjqHIKZMkeCC');</script>
+
+  <style>
+    :root {
+      --teal: #007474; --white: #f7fbfb; --muted: #cfe3e3;
+      --panel: rgba(255,255,255,0.02); --panel-border: rgba(255,255,255,0.05);
+      --shadow: 0 20px 46px rgba(0,0,0,0.30); --soft-shadow: 0 12px 24px rgba(0,0,0,0.22);
+      --card-hover: rgba(255,255,255,0.12); --app-spacing: 16px; --radius: 34px;
+      --standalone-app-width: 100vw; --standalone-app-height: 100dvh;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+    html { height: -webkit-fill-available; }
+    html, body { width: 100%; height: 100%; min-height: 100%; background: #021414; overflow: hidden; }
+    body { min-height: 100vh; min-height: 100dvh; min-height: -webkit-fill-available; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; color: var(--white); touch-action: none; user-select: none; -webkit-user-select: none; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
+
+    /* The Frame ensures the app stays centered with margins on Desktop */
+    .frame { 
+      width: 100%; height: 100dvh; min-height: 100vh; min-height: -webkit-fill-available; display: flex; align-items: center; justify-content: center; 
+      padding: 10px;
+    }
+
+    /* THE PERMANENT IPHONE BUBBLE */
+    .app {
+      width: 430px; 
+      height: 880px; 
+      max-width: 100%; 
+      max-height: 100%;
+      border-radius: var(--radius); 
+      overflow: hidden; position: relative; box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,0.12); border-top-color: rgba(255,255,255,0.04);
+      background: linear-gradient(168deg, rgba(6,28,28,0.97) 0%, rgba(4,24,24,0.95) 30%, rgba(0,72,72,0.92) 60%, rgba(0,100,100,0.96) 82%, rgba(4,30,30,0.97) 100%);
+      display: flex; flex-direction: column; padding: 14px var(--app-spacing) var(--app-spacing) var(--app-spacing);
+      isolation: isolate;
+    }
+
+    .app::before {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(ellipse at 50% 20%, rgba(0,116,116,0.18) 0%, transparent 60%),
+                  radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 50%);
+      z-index: 0;
+    }
+
+    .ghost-logo { position: absolute; top: 56%; left: 50%; width: 120%; opacity: 0.07; transform: translate(-50%, -50%); filter: grayscale(100%) contrast(108%) brightness(114%); pointer-events: none; z-index: 0; }
+    
+    .content { position: relative; z-index: 1; width: 100%; height: 100%; display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
+
+    /* ONE-LINE HEADER */
+    .top-row {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%; gap: 10px; height: 44px; flex-shrink: 0; margin-bottom: 4px;
+      position: relative;
+    }
+
+    /* ── NAV DROPDOWN MENU ─────────────────────────────── */
+    .nav-menu-btn {
+      appearance: none; background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.13); border-radius: 12px;
+      color: rgba(255,255,255,0.92); width: 34px; height: 34px;
+      font-size: 14px; font-weight: 900; letter-spacing: 0.08em;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0;
+      transition: background 0.16s, border-color 0.16s;
+    }
+    .nav-menu-btn.is-open,
+    .nav-menu-btn:active { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.26); }
+    .nav-menu {
+      position: fixed; z-index: 9999; min-width: 172px;
+      background: rgba(3, 20, 20, 0.58);
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 16px; padding: 5px;
+      box-shadow: 0 14px 44px rgba(0,0,0,0.52);
+      backdrop-filter: blur(26px); -webkit-backdrop-filter: blur(26px);
+      transform-origin: top right;
+      transform: scale(0.88) translateY(-8px);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.17s ease, transform 0.19s cubic-bezier(0.34,1.4,0.64,1);
+    }
+    .nav-menu.is-open { opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; }
+    .nav-menu-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 11px;
+      text-decoration: none; color: #eaf8f8; background: transparent;
+      font-size: 11.5px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.12em; border: none; cursor: pointer; width: 100%;
+      transition: background 0.13s;
+    }
+    .nav-menu-item:active { background: rgba(255,255,255,0.1); }
+    .nav-menu-icon { font-size: 14px; flex-shrink: 0; }
+    .nav-menu-sep { height: 1px; background: rgba(255,255,255,0.09); margin: 3px 6px; }
+
+    .logo-clear { width: 38px; height: 38px; object-fit: contain; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); flex-shrink: 0; }
+    .page-title { position: absolute; left: 0; right: 0; text-align: center; font-size: 15px; font-weight: 700; color: #dff7f7; text-transform: uppercase; margin: 0; letter-spacing: 0.14em; pointer-events: none; }
+
+    .search-card { padding: 12px 14px 14px; border-radius: 24px; background: var(--panel); border: 1px solid var(--panel-border); backdrop-filter: blur(10px); flex-shrink: 0; box-shadow: var(--soft-shadow); }
+    .search-title { margin: 0 0 2px 0; font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; text-align: center; }
+    .helper-text { margin: 0 0 10px 0; font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; text-align: center; letter-spacing: 0.08em; }
+    .search-input { width: 100%; border: 1px solid rgba(255,255,255,0.16); border-radius: 16px; padding: 11px 14px; font-size: 15px; font-weight: 500; color: #fff; background: rgba(0,0,0,0.18); outline: none; text-align: center; }
+
+    .results-card { 
+      padding: 12px 12px 0 12px; border-radius: 24px; background: var(--panel); border: 1px solid var(--panel-border); 
+      backdrop-filter: blur(10px); box-shadow: var(--soft-shadow);
+      display: flex; flex-direction: column; flex: 1; overflow: hidden;
+    }
+    .result-count { margin-bottom: 8px; font-size: 10px; font-weight: 600; color: #dff7f7; text-transform: uppercase; text-align: center; opacity: 0.8; flex-shrink: 0; letter-spacing: 0.08em;}
+    
+    .results-list { 
+      flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-bottom: 16px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .result-item { border-radius: 18px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); padding: 10px 12px; flex-shrink: 0; }
+    .result-name { margin: 0 0 3px 0; font-size: 15px; font-weight: 700; color: #fff; text-transform: none; text-align: center; }
+    .result-line { margin: 0; font-size: 10px; font-weight: 600; color: #d8f1f1; text-transform: none; opacity: 0.82; text-align: center; }
+    .result-ext { margin-top: 6px; font-size: 14px; font-weight: 700; color: #fff; text-align: center; }
+
+    .footer-note { margin-top: auto; padding: 10px 0 3px 0; font-size: 9.5px; color: #b5d4d4; font-weight: 600; text-align: center; flex-shrink: 0; }
+
+    body.is-standalone { background: #021414; }
+
+    body.is-standalone::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: #021414;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body.is-standalone .frame {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      min-height: -webkit-fill-available;
+      padding: 0 8px max(24px, calc(env(safe-area-inset-bottom) + 8px)) 8px;
+      z-index: 1;
+    }
+
+    body.is-standalone .app {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 34px;
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 24px 46px rgba(0,0,0,0.22);
+      padding-top: max(10px, env(safe-area-inset-top));
+      padding-right: max(var(--app-spacing), env(safe-area-inset-right));
+      padding-bottom: 18px;
+      padding-left: max(var(--app-spacing), env(safe-area-inset-left));
+    }
+
+    /* NATIVE APP OVERRIDE (Option B) */
+    @media (max-width: 430px) {
+      body:not(.is-popout):not(.is-standalone) .frame {
+        padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom) 12px;
+      }
+      body:not(.is-popout):not(.is-standalone) .app {
+        width: 100vw;
+        height: 100%;
+        max-height: 100%;
+        border-radius: var(--radius);
+        border: 1px solid rgba(255,255,255,0.12);
+      }
+      /* nav menu always visible */
+      body { touch-action: pan-y; }
+    }
+
+    /* ── ADD TO HOME SCREEN PROMPT ─────────────────────── */
+    .a2hs-prompt {
+      position: absolute; bottom: 0; left: 0; right: 0; z-index: 10;
+      padding: 0 14px 16px;
+      transform: translateY(110%);
+      transition: transform 0.48s cubic-bezier(0.34, 1.36, 0.64, 1);
+      pointer-events: none;
+    }
+    .a2hs-prompt.is-visible { transform: translateY(0); pointer-events: auto; }
+    .a2hs-inner {
+      display: flex; align-items: center; gap: 11px;
+      background: rgba(2, 22, 22, 0.93);
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 20px; padding: 12px 14px;
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 -6px 28px rgba(0,0,0,0.34);
+    }
+    .a2hs-icon { width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0; }
+    .a2hs-text { flex: 1; }
+    .a2hs-title { font-size: 11.5px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 0.11em; margin: 0 0 3px; }
+    .a2hs-desc  { font-size: 10px; font-weight: 500; color: var(--muted); line-height: 1.45; margin: 0; }
+    .a2hs-share {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: rgba(0,130,255,0.85); color: #fff;
+      border-radius: 5px; padding: 1px 4px; font-size: 10px; font-weight: 700;
+      vertical-align: middle; margin: 0 1px;
+    }
+    .a2hs-dismiss {
+      appearance: none; background: rgba(255,255,255,0.09);
+      border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.7);
+      border-radius: 99px; width: 26px; height: 26px; font-size: 12px;
+      cursor: pointer; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .a2hs-dismiss:active { background: rgba(255,255,255,0.18); }
+
+    /* ── DESKTOP INSTALL BANNER ─────────────────────── */
+    .install-banner {
+      position: absolute; top: 0; left: 0; right: 0; z-index: 10;
+      padding: 12px 14px 0;
+      transform: translateY(-110%);
+      transition: transform 0.44s cubic-bezier(0.34, 1.3, 0.64, 1);
+      pointer-events: none;
+    }
+    .install-banner.is-visible { transform: translateY(0); pointer-events: auto; }
+    .install-banner-inner {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(0,100,100,0.92);
+      border: 1px solid rgba(75,225,225,0.28);
+      border-radius: 18px; padding: 11px 14px;
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 6px 28px rgba(0,0,0,0.34);
+    }
+    .install-banner-icon { font-size: 22px; flex-shrink: 0; }
+    .install-banner-text { flex: 1; }
+    .install-banner-title { font-size: 11px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 0.11em; margin: 0 0 2px; }
+    .install-banner-desc  { font-size: 10px; font-weight: 500; color: #b8f0f0; line-height: 1.4; margin: 0; }
+    .install-banner-btn {
+      appearance: none; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3);
+      color: #fff; border-radius: 10px; padding: 6px 12px;
+      font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+      cursor: pointer; flex-shrink: 0; white-space: nowrap;
+    }
+    .install-banner-btn:active { background: rgba(255,255,255,0.28); }
+    .install-banner-dismiss {
+      appearance: none; background: transparent; border: none;
+      color: rgba(255,255,255,0.55); font-size: 14px; cursor: pointer;
+      flex-shrink: 0; padding: 2px 4px; line-height: 1;
+    }
+
+    /* ── DESKTOP INSTALL MODAL ──────────────────────── */
+    .install-modal[hidden] { display: none; }
+    .install-modal {
+      position: absolute; inset: 0; z-index: 20;
+      display: flex; align-items: center; justify-content: center; padding: 24px;
+    }
+    .install-modal-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(1,12,12,0.76);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    }
+    .install-modal-dialog {
+      position: relative; width: min(100%, 380px);
+      border-radius: 24px; border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(8,31,31,0.85);
+      box-shadow: 0 26px 48px rgba(0,0,0,0.4);
+      padding: 20px; display: flex; flex-direction: column; gap: 14px;
+    }
+    .install-modal-header { display: flex; align-items: center; gap: 10px; }
+    .install-modal-appicon { width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0; }
+    .install-modal-titles { flex: 1; }
+    .install-modal-title { font-size: 14px; font-weight: 800; color: #fff; margin: 0 0 2px; letter-spacing: 0.05em; }
+    .install-modal-sub   { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; margin: 0; }
+    .install-modal-close {
+      appearance: none; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.6); border-radius: 99px; width: 28px; height: 28px;
+      font-size: 13px; cursor: pointer; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .install-modal-steps { display: flex; flex-direction: column; gap: 10px; }
+    .install-step {
+      display: flex; align-items: flex-start; gap: 10px;
+      background: rgba(255,255,255,0.05); border-radius: 14px; padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+    .install-step-num {
+      width: 20px; height: 20px; border-radius: 99px;
+      background: rgba(0,180,180,0.3); border: 1px solid rgba(0,210,210,0.4);
+      color: #4be1e1; font-size: 10px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+    }
+    .install-step-text { font-size: 11px; font-weight: 500; color: #d0f0f0; line-height: 1.5; margin: 0; }
+    .install-step-text strong { color: #fff; font-weight: 700; }
+    .install-modal-cta {
+      appearance: none; width: 100%;
+      background: linear-gradient(135deg, #007474 0%, #009a9a 100%);
+      border: none; border-radius: 14px; padding: 13px;
+      color: #fff; font-size: 12px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.12em; cursor: pointer;
+    }
+    .install-modal-cta:active { opacity: 0.85; }
+    .install-modal-note { font-size: 9.5px; color: var(--muted); text-align: center; opacity: 0.7; margin: 0; }
+
+    /* ── FEEDBACK MODAL ─────────────────────────────────── */
+    .feedback-modal[hidden] { display: none; }
+    .feedback-modal {
+      position: absolute; inset: 0; z-index: 20;
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .feedback-modal-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(1,12,12,0.8);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    }
+    .feedback-dialog {
+      position: relative; width: min(100%, 360px);
+      border-radius: 24px; border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(6,26,26,0.85);
+      box-shadow: 0 26px 48px rgba(0,0,0,0.44);
+      padding: 18px; display: flex; flex-direction: column; gap: 12px;
+      max-height: calc(100% - 20px); overflow-y: auto;
+    }
+    .feedback-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .feedback-title { font-size: 13px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 0.12em; margin: 0; }
+    .feedback-close {
+      appearance: none; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.6); border-radius: 99px; width: 28px; height: 28px;
+      font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .feedback-rating { display: flex; justify-content: space-between; gap: 4px; }
+    .feedback-rating-btn {
+      appearance: none; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px; flex: 1; padding: 8px 4px; font-size: 20px; cursor: pointer;
+      transition: background 0.15s, border-color 0.15s; display: flex; align-items: center; justify-content: center;
+    }
+    .feedback-rating-btn.is-selected { background: rgba(0,180,180,0.22); border-color: rgba(0,220,220,0.4); }
+    .feedback-rating-btn:active { background: rgba(255,255,255,0.14); }
+    .feedback-field { display: flex; flex-direction: column; gap: 5px; }
+    .feedback-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted); opacity: 0.8; }
+    .feedback-textarea, .feedback-input {
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px; color: #f0fbfb; font-size: 12px; font-weight: 500;
+      padding: 10px 12px; resize: none; outline: none; font-family: inherit;
+    }
+    .feedback-textarea { min-height: 64px; line-height: 1.45; }
+    .feedback-textarea:focus, .feedback-input:focus { border-color: rgba(0,200,200,0.4); }
+    .feedback-submit {
+      appearance: none; width: 100%;
+      background: linear-gradient(135deg, #007474 0%, #009898 100%);
+      border: none; border-radius: 14px; padding: 13px;
+      color: #fff; font-size: 11px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.12em; cursor: pointer;
+    }
+    .feedback-submit:active { opacity: 0.85; }
+    .feedback-note { font-size: 9px; color: var(--muted); text-align: center; opacity: 0.65; margin: 0; }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <div class="app">
+      <img src="PV_Logo.png" alt="" class="ghost-logo">
+      <div class="content">
+        
+        <div class="top-row">
+          <a href="index.html" class="nav-link" aria-label="Home"><img src="PV_Logo.png" alt="Logo" class="logo-clear"></a>
+          <h1 class="page-title">Directory</h1>
+          <button id="navMenuBtn" class="nav-menu-btn" type="button" aria-label="Menu" aria-expanded="false">···</button>
+        </div>
+
+        <div class="search-card">
+          <h2 class="search-title">Search</h2>
+          <p class="helper-text">Name, Dept, or Ext</p>
+          <input id="searchInput" class="search-input" type="text" placeholder="Silva, Guerra, Wisz..." autocomplete="off">
+        </div>
+
+        <div class="results-card">
+          <p class="result-count" id="resultCount">Recommended Contacts</p>
+          <div class="results-list" id="resultsList"></div>
+        </div>
+
+        <div class="footer-note">By: <a href="https://www.creativesilva.com" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">CreativeSilva</a></div>
+      </div>
+
+      <!-- DESKTOP INSTALL BANNER -->
+      <div id="installBanner" class="install-banner" hidden>
+        <div class="install-banner-inner">
+          <span class="install-banner-icon">📲</span>
+          <div class="install-banner-text">
+            <p class="install-banner-title">Install PVHS Tools</p>
+            <p class="install-banner-desc" id="installBannerDesc">Add this to your dock for instant access — works like a real app.</p>
+          </div>
+          <button id="installBannerBtn" class="install-banner-btn" type="button">Install</button>
+          <button id="installBannerDismiss" class="install-banner-dismiss" type="button" aria-label="Dismiss">✕</button>
+        </div>
+      </div>
+
+      <!-- DESKTOP INSTALL MODAL -->
+      <div id="installModal" class="install-modal" hidden>
+        <div class="install-modal-backdrop" id="installModalBackdrop"></div>
+        <div class="install-modal-dialog">
+          <div class="install-modal-header">
+            <img src="PV_AppIcon.png" alt="" class="install-modal-appicon">
+            <div class="install-modal-titles">
+              <p class="install-modal-title">PVHS Tools</p>
+              <p class="install-modal-sub">Install as Desktop App</p>
+            </div>
+            <button id="installModalClose" class="install-modal-close" type="button">✕</button>
+          </div>
+          <div id="installModalSteps" class="install-modal-steps"></div>
+          <button id="installModalCta" class="install-modal-cta" type="button" style="display:none">Install Now</button>
+          <p class="install-modal-note">Once installed, PVHS Tools opens in its own window — no browser chrome, no tabs. Just the app.</p>
+        </div>
+      </div>
+
+      <!-- ADD TO HOME SCREEN PROMPT -->
+      <div id="a2hsPrompt" class="a2hs-prompt" hidden>
+        <div class="a2hs-inner">
+          <img src="PV_AppIcon.png" alt="PVHS Tools" class="a2hs-icon">
+          <div class="a2hs-text">
+            <p class="a2hs-title">Install as App</p>
+            <p class="a2hs-desc" id="a2hsDesc">Tap <span class="a2hs-share">⬆ Share</span> then <strong style="color:#fff">"Add to Home Screen"</strong> for the full experience.</p>
+          </div>
+          <button id="a2hsDismiss" class="a2hs-dismiss" type="button" aria-label="Dismiss">✕</button>
+        </div>
+      </div>
+
+      <!-- FEEDBACK MODAL -->
+      <div id="feedbackModal" class="feedback-modal" hidden>
+        <div class="feedback-modal-backdrop" id="feedbackBackdrop"></div>
+        <div class="feedback-dialog">
+          <div class="feedback-header">
+            <p class="feedback-title">💬 Share Feedback</p>
+            <button id="feedbackClose" class="feedback-close" type="button">✕</button>
+          </div>
+          <div class="feedback-field">
+            <p class="feedback-label">How's the app working for you?</p>
+            <div class="feedback-rating" id="feedbackRating">
+              <button class="feedback-rating-btn" data-val="1" type="button">😕</button>
+              <button class="feedback-rating-btn" data-val="2" type="button">😐</button>
+              <button class="feedback-rating-btn" data-val="3" type="button">🙂</button>
+              <button class="feedback-rating-btn" data-val="4" type="button">😊</button>
+              <button class="feedback-rating-btn" data-val="5" type="button">🤩</button>
+            </div>
+          </div>
+          <div class="feedback-field">
+            <p class="feedback-label">What's working well?</p>
+            <textarea id="feedbackGood" class="feedback-textarea" placeholder="I love that it shows…"></textarea>
+          </div>
+          <div class="feedback-field">
+            <p class="feedback-label">What would you add or change?</p>
+            <textarea id="feedbackImprove" class="feedback-textarea" placeholder="It would be great if…"></textarea>
+          </div>
+          <div class="feedback-field">
+            <p class="feedback-label">Your name (optional)</p>
+            <input id="feedbackName" class="feedback-input" type="text" placeholder="e.g. Ms. Johnson">
+          </div>
+          <button id="feedbackSubmit" class="feedback-submit" type="button">Send Feedback ✉️</button>
+          <p class="feedback-note">Your feedback is sent directly to the developer.</p>
+        </div>
+      </div>
+
+      <!-- NAV DROPDOWN -->
+      <div id="navMenu" class="nav-menu" role="menu">
+        <a href="calendar.html" class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">📅</span>Calendar</a>
+        <a href="countdown.html" class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">⏱</span>Countdown</a>
+        <a href="index.html#news" class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">📰</span>News</a>
+        <a href="index.html"     class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">🏠</span>Home</a>
+        <div id="popoutMenuSep" class="nav-menu-sep"></div>
+        <button id="popoutBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon">🪟</span>Pop Out</button>
+        <div id="installMenuSep" class="nav-menu-sep"></div>
+        <button id="installBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon" id="installIcon">📲</span><span id="installLabel">Add to Home Screen</span></button>
+        <div class="nav-menu-sep"></div>
+        <button id="feedbackBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon">💬</span>Share Feedback</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode');
+    const isPopout = mode === 'popout';
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+
+    const navLinks = document.querySelectorAll(".nav-link");
+
+    function updateStandaloneViewportVars() {
+      if (!isStandalone) return;
+      const heightCandidates = [
+        window.innerHeight,
+        window.outerHeight,
+        window.visualViewport ? Math.round(window.visualViewport.height) : 0,
+        window.screen ? window.screen.height : 0,
+        window.screen ? window.screen.availHeight : 0
+      ].filter(Boolean);
+      const widthCandidates = [
+        window.innerWidth,
+        window.outerWidth,
+        window.visualViewport ? Math.round(window.visualViewport.width) : 0,
+        window.screen ? window.screen.width : 0,
+        window.screen ? window.screen.availWidth : 0
+      ].filter(Boolean);
+
+      const appHeight = Math.max(...heightCandidates);
+      const appWidth = Math.max(...widthCandidates);
+
+      document.documentElement.style.setProperty('--standalone-app-height', `${appHeight}px`);
+      document.documentElement.style.setProperty('--standalone-app-width', `${appWidth}px`);
+    }
+
+    if (isStandalone) {
+      document.body.classList.add('is-standalone');
+      updateStandaloneViewportVars();
+      window.addEventListener('resize', updateStandaloneViewportVars);
+      window.addEventListener('orientationchange', updateStandaloneViewportVars);
+      window.addEventListener('pageshow', updateStandaloneViewportVars);
+      window.visualViewport?.addEventListener('resize', updateStandaloneViewportVars);
+      setTimeout(updateStandaloneViewportVars, 250);
+      setTimeout(updateStandaloneViewportVars, 800);
+    }
+
+    // PERSISTENT UI LOGIC
+    if (isPopout) {
+      document.body.classList.add('is-popout');
+      navLinks.forEach(link => {
+        const url = new URL(link.href, window.location.origin);
+        url.searchParams.set('mode', 'popout');
+        link.href = url.toString();
+      });
+    }
+
+    // Pop-out button
+    if (isMobile || isStandalone || isPopout) {
+      document.getElementById('popoutBtn')?.remove();
+      document.getElementById('popoutMenuSep')?.remove();
+    } else {
+      document.getElementById('popoutBtn')?.addEventListener('click', () => {
+        document.getElementById('navMenu')?.classList.remove('is-open');
+        document.getElementById('navMenuBtn')?.classList.remove('is-open');
+        window.open('extension_search.html?mode=popout', 'pvDirectory', 'width=450,height=900,resizable=yes,scrollbars=no');
+      });
+    }
+
+    // NAV MENU
+    const navMenuBtn = document.getElementById('navMenuBtn');
+    const navMenu    = document.getElementById('navMenu');
+    function positionNavMenu() {
+      if (!navMenuBtn || !navMenu) return;
+      const r = navMenuBtn.getBoundingClientRect();
+      navMenu.style.top   = `${r.bottom + 6}px`;
+      navMenu.style.right = `${window.innerWidth - r.right}px`;
+    }
+    navMenuBtn?.addEventListener('click', e => {
+      e.stopPropagation();
+      positionNavMenu();
+      const open = navMenu.classList.toggle('is-open');
+      navMenuBtn.classList.toggle('is-open', open);
+      navMenuBtn.setAttribute('aria-expanded', String(open));
+    });
+    document.addEventListener('click', () => {
+      navMenu?.classList.remove('is-open');
+      navMenuBtn?.classList.remove('is-open');
+    });
+    navMenu?.addEventListener('click', e => e.stopPropagation());
+
+    // Keep internal navigation inside the installed app.
+    if (isStandalone) {
+      navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault(); 
+          const nextHref = link.getAttribute('href');
+          if (nextHref) window.location.assign(nextHref);
+        });
+      });
+    }
+    const extensionSearch = [{"name":"Adam Rule","role":"Careers","extension":"5608"},{"name":"Alan Brafman","role":"International Languages","extension":"5217"},{"name":"Alejandra Sanchez","role":"International Languages","extension":"5216"},{"name":"Alejandro Gamboa","role":"English","extension":"5624"},{"name":"Alexis Black-Gotham","role":"Science","extension":"5424"},{"name":"Alfredo Ruiz Guzman","role":"Por Vida","extension":"5115"},{"name":"Alice Mitchell","role":"Special Education","extension":"various rooms"},{"name":"Alicia Ekberg","role":"International Languages","extension":"5218"},{"name":"Allison Pehle","role":"English","extension":"5361"},{"name":"Amy Argentieri","role":"Cafeteria","extension":"5675"},{"name":"Andy Curtis","role":"Mathematics","extension":"5210"},{"name":"Angela Collins","role":"Crisis Intervention","extension":"5693"},{"name":"Angelica Meza","role":"International Languages","extension":"5401"},{"name":"Annette MacCuish","role":"English","extension":"5365"},{"name":"Antoinette Davis","role":"Special Education","extension":"various rooms"},{"name":"Araceli Castro","role":"Attendance","extension":"5105"},{"name":"Araceli Mandujano","role":"Administrative Assistant","extension":"5702"},{"name":"Arele Tapia Vazquez","role":"Families Building Stronger More Vibrant","extension":"5114"},{"name":"Argelia Perez-Servin","role":"Interpreter","extension":"5315"},{"name":"Aris Manosar","role":"Physical Education","extension":"5575"},{"name":"Arnold Feher","role":"English","extension":"5321"},{"name":"Arturo Avila-Meza","role":"Science","extension":"5413"},{"name":"Augusta Sharp","role":"Special Education","extension":"5432"},{"name":"Aundrea Macias","role":"Physical Education","extension":"5515"},{"name":"Ben Alberry","role":"Special Education Coordinator","extension":"5758"},{"name":"Ben Rothstein","role":"English","extension":"5366"},{"name":"Bilena Brafman","role":"English","extension":"5302"},{"name":"Breanna Valero","role":"Speech","extension":"5558"},{"name":"Brenda Lopez","role":"Mathematics","extension":"5452"},{"name":"Brent Mathias","role":"Social Science","extension":"5615"},{"name":"Brett Dodson","role":"Social Science","extension":"5634"},{"name":"Britta Bonaventure","role":"English","extension":"5353"},{"name":"Brooke Baarstad","role":"Mathematics","extension":"5209"},{"name":"Brooke Phillips","role":"Agriculture","extension":"5334"},{"name":"Catherine Sturdivant","role":"Accounting Assistant","extension":"5119"},{"name":"Cecilia Baddley","role":"Administrative Assistant Sub","extension":"5708"},{"name":"Chris Carrillo","role":"Counselor","extension":"5198"},{"name":"Chris Etheridge","role":"Special Education","extension":"5463"},{"name":"Chris Harmon","role":"Social Science","extension":"5631"},{"name":"Chris Silva","role":"Visual and Performing Arts","extension":"5322/5331"},{"name":"Christian Basulto","role":"Dean","extension":"5124"},{"name":"Christine Linne","role":"Industrial Technology","extension":"5204"},{"name":"Christine Watkins","role":"Mathematics","extension":"5698"},{"name":"Clemente Moreno","role":"Mathematics","extension":"5625"},{"name":"Cody Smith","role":"Careers","extension":"5610"},{"name":"Courtney Crocker","role":"Board Certified Behavior Analyst","extension":"5759"},{"name":"Cristian Cardenas","role":"Extended Learning Opportunity","extension":"5103"},{"name":"Crystal Buchan","role":"Counselor","extension":"5601"},{"name":"Daci Hughes","role":"English","extension":"5332"},{"name":"Danny Dearborn","role":"Extended Learning Opportunity","extension":"5431"},{"name":"Denise Ortiz","role":"Mathematics","extension":"5451"},{"name":"Dennis Harpster","role":"Social Science","extension":"5622"},{"name":"Dr. Paul Robinson","role":"Principal","extension":"5701"},{"name":"Drew Johnson","role":"Special Education","extension":"various rooms"},{"name":"Dustin Cornejo","role":"Social Science","extension":"5632"},{"name":"Dustin Davis","role":"Physical Education","extension":"5513"},{"name":"Eddie Hernandez","role":"Security","extension":"5773"},{"name":"Elissa Gonzalez","role":"Technology Teacher on Special Assignment","extension":"5696"},{"name":"Elvira Camacho","role":"Mathematics","extension":"5453"},{"name":"Emily Bajwa","role":"English","extension":"5351"},{"name":"Eric Jeffres","role":"Special Education","extension":"5363"},{"name":"Erica Tajon","role":"Psychologist","extension":"5712"},{"name":"Erik Torres","role":"Data Specialist","extension":"5761"},{"name":"Erika Quintana","role":"Business","extension":"5335"},{"name":"Erin Nelson","role":"Business","extension":"5435"},{"name":"Esther Ting","role":"Lab Specialist","extension":"5102"},{"name":"Fabi Etheridge","role":"Administrative Assistant","extension":"5710"},{"name":"Filemon Meza","role":"Science","extension":"5417"},{"name":"Flor Avila-Suarez","role":"Community Liaison","extension":"5711"},{"name":"Gabriel Navarrete","role":"Social Science","extension":"5636"},{"name":"Gabriel Ponce","role":"Agriculture","extension":"5208"},{"name":"Gabriela Bardawil","role":"Guidance Technician","extension":"5122"},{"name":"Geraldo Canongo","role":"English","extension":"5621"},{"name":"Giselle Gutierrez-Marron","role":"English","extension":"5630"},{"name":"Glenn Fairchild","role":"Social Science","extension":"5635"},{"name":"Hallie Smith","role":"Physical Education & Regional Occupational Program","extension":"5517/5551"},{"name":"Harrison Keller","role":"Special Education","extension":"5415"},{"name":"Hector Guerra","role":"Agriculture","extension":"5207"},{"name":"Hedy Eachus","role":"Mathematics","extension":"5461"},{"name":"Herlindo Magana","role":"Mathematics","extension":"5454"},{"name":"Heydi Elenes","role":"Counselor","extension":"5768"},{"name":"Ilyana Clark","role":"Allan Hancock College","extension":"5592"},{"name":"Irma Gonzalez Morales","role":"Librarian","extension":"5101"},{"name":"Isabel Esparza","role":"Registrar","extension":"5764"},{"name":"Israel Hernandez","role":"Counselor","extension":"5111"},{"name":"J. Ryan Rothford","role":"Physical Education","extension":"5516"},{"name":"Jasmine Crisp","role":"Special Education","extension":"5555"},{"name":"Jasmine Granados","role":"Special Education Secretary","extension":"5706"},{"name":"Jay Edwards","role":"Coach","extension":"5602"},{"name":"Jeff Hromadka","role":"Assistant Principal","extension":"5709"},{"name":"Jennifer Jimenez-Contreras","role":"Administrative Assistant","extension":"5708"},{"name":"Jennifer Melena","role":"Athletic Trainer","extension":"5510"},{"name":"Jennifer Montanez","role":"Family Consumer Science","extension":"5325"},{"name":"Jennifer Ogren","role":"English","extension":"5211"},{"name":"Jennifer Rios","role":"Mathematics","extension":"5462"},{"name":"Jessica Zambrano","role":"International Languages","extension":"5213"},{"name":"Jim Doyle","role":"Physical Education","extension":"5514"},{"name":"Jody Dowell","role":"Special Education","extension":"5324"},{"name":"John Ruiz","role":"Special Education","extension":"5629"},{"name":"Jon Marino","role":"English","extension":"5355"},{"name":"Juan 'Jay' Robles III","role":"Food Services Supervisor","extension":"5559"},{"name":"Julie Norris","role":"Maintenance Secretary","extension":"5275"},{"name":"Karine Perez","role":"Administrative Assistant","extension":"5123"},{"name":"Katherine Hays","role":"English","extension":"5304"},{"name":"Kayla Tucker","role":"Special Education","extension":"5433"},{"name":"Kelly Davis","role":"English","extension":"5362"},{"name":"Kelsey Erbstoesser","role":"Family Consumer Science","extension":"5313"},{"name":"Kevin Ilac","role":"Assistant Principal","extension":"5703"},{"name":"Keyla Santos-Casillas","role":"Interpreter","extension":"5317"},{"name":"Kiana Vanderham","role":"English","extension":"5638"},{"name":"Kirsten Garberg","role":"Special Education","extension":"5360"},{"name":"Kristina Sewell","role":"English","extension":"5323"},{"name":"Laura Baines","role":"Science","extension":"5425"},{"name":"Laura Garcia Solorio","role":"Visual and Performing Arts","extension":"5322"},{"name":"Laura Mariscal Mendez","role":"Attendance Assistant","extension":"5107"},{"name":"Laurie Geronimo","role":"Mathematics","extension":"5627"},{"name":"Laurita Marcial","role":"Early Academic Outreach Program Coordinator","extension":"5692"},{"name":"Lesley Cuellar","role":"Mathematics","extension":"5465"},{"name":"Leti Gamino","role":"Health Technician","extension":"5753"},{"name":"Lisa Bisquera","role":"Textbooks","extension":"5106"},{"name":"Lisa Walters","role":"Activities","extension":"5508"},{"name":"Lisbet Barriga Chavez","role":"Visual and Performing Arts","extension":"5203"},{"name":"Lizbeth Munoz Martinez","role":"Receptionist","extension":"5770"},{"name":"Lynette Wyller","role":"Independent Study","extension":"5227"},{"name":"Madelyn Schenk","role":"Science","extension":"5402"},{"name":"Marcie Guerra","role":"Agriculture","extension":"5212"},{"name":"Marcus Guzman","role":"Special Education","extension":"5364"},{"name":"Maria Garcia","role":"Social Science","extension":"5616"},{"name":"Marina Rodriguez-Vargas","role":"Guidance Technician","extension":"5117"},{"name":"Maritza Olguin","role":"Expanded Grade Support","extension":"5637"},{"name":"Mark Veglia","role":"Social Science","extension":"5614"},{"name":"Megan Martinez","role":"Science / Career Technical Education","extension":"5423"},{"name":"Melani Mederos","role":"Career Center","extension":"5604"},{"name":"Melissa Diaz","role":"Family Consumer Science","extension":"5314"},{"name":"Melissa Price","role":"English","extension":"5303"},{"name":"Melticia Brown","role":"Xerox","extension":"5112"},{"name":"Merrie Okie-Goldin","role":"Assistant Principal","extension":"5707"},{"name":"Michelle Allen","role":"Science","extension":"5414"},{"name":"Michelle Gabaldon","role":"International Languages","extension":"5215"},{"name":"Michelle Lyon","role":"Special Education","extension":"5606"},{"name":"Mike Bloodworth","role":"Athletics","extension":"5750"},{"name":"Mike Regan","role":"Extended Learning Opportunity","extension":"5605"},{"name":"Miles Brown","role":"English","extension":"5354"},{"name":"Miranda Fernandez","role":"Physical Education","extension":"5518"},{"name":"Miriana Del Toro","role":"Counselor","extension":"5754"},{"name":"Monica Gonzales","role":"Social Science","extension":"5639"},{"name":"Monica Leyva-Marquez","role":"Mathematics","extension":"5640"},{"name":"Nadia Mancha","role":"Counselor","extension":"5767"},{"name":"Natalie Baldwin","role":"Agriculture","extension":"5206"},{"name":"Neil Eckardt","role":"Mathematics","extension":"5609"},{"name":"Nick Schwent","role":"English","extension":"5628"},{"name":"Nicole Shedd","role":"Science","extension":"5403"},{"name":"Nikki Knowlson","role":"Science","extension":"5421"},{"name":"Patrick Brickey","role":"Independent Study","extension":"5126"},{"name":"Patrick Miller","role":"Special Education","extension":"5318"},{"name":"Patty Costantinidis","role":"Special Education","extension":"5464"},{"name":"Patty Peinado","role":"Mathematics","extension":"5626"},{"name":"Paul De Paulo","role":"Social Science","extension":"5607"},{"name":"Prubjeet Bajwa","role":"Mathematics","extension":"5618"},{"name":"Rachel McLean","role":"Expanded Grade Support","extension":"5612"},{"name":"Ramiro Ruvalcaba","role":"Families Building Stronger More Vibrant","extension":"5116"},{"name":"Rebecca Leadbetter","role":"Counselor","extension":"5766"},{"name":"Regina Orosco","role":"Special Education","extension":"5333"},{"name":"Riccardo Magni","role":"Science","extension":"5411"},{"name":"Richard Hernandez","role":"Visual and Performing Arts - Choir","extension":"5201"},{"name":"Rileigh Mankin","role":"Visual and Performing Arts","extension":"5331"},{"name":"Robin Rocco","role":"Guidance Secretary Sub","extension":"5771"},{"name":"Rocio Trujillo","role":"Counselor","extension":"5763"},{"name":"Rogelio Ordonez Aguilar","role":"Mathematics","extension":"5466"},{"name":"Ross Rivera","role":"Mathematics","extension":"5623"},{"name":"Roxana Maldonado","role":"International Languages","extension":"5214"},{"name":"Rudy Binkele","role":"English","extension":"5352"},{"name":"Sally Hemesath","role":"Physical Education","extension":"5576"},{"name":"Salustia Avila Meza","role":"Interpreter","extension":"5316"},{"name":"Sandra Gonzalez","role":"Counselor","extension":"5765"},{"name":"Scott Wonnell","role":"Industrial Technology","extension":"5205"},{"name":"Selyn Harwin","role":"Visual and Performing Arts","extension":"5202"},{"name":"Sergio Orozco","role":"Psychologist","extension":"5705"},{"name":"Serina Rodriguez","role":"Psychologist","extension":"5757"},{"name":"Shane Lyon","role":"Social Science","extension":"5633"},{"name":"Shannon O'Neal","role":"English","extension":"5356"},{"name":"Sharon Domingues","role":"Mathematics","extension":"5456"},{"name":"Sierra Carlberg","role":"Science","extension":"5422"},{"name":"Socorro Orozco","role":"Nurse","extension":"5760"},{"name":"Stacie Martinez","role":"Social Science","extension":"5613"},{"name":"Stephanie Fikri","role":"Visual and Performing Arts","extension":"5312"},{"name":"Steve Molina","role":"Mathematics","extension":"5404"},{"name":"Steve Ryan","role":"In-School Intervention","extension":"5405"},{"name":"Susan Avrit","role":"Counselor","extension":"5775"},{"name":"Susan Hook","role":"Administrative Assistant","extension":"5704"},{"name":"Tara Sanchez","role":"Speech","extension":"5305"},{"name":"Taylor (TJ) Jordan","role":"Social Science","extension":"5801"},{"name":"Taylor Mihelic","role":"Science","extension":"5412"},{"name":"Teri Wisz (formerly Magni)","role":"English","extension":"5301"},{"name":"Tony Payne","role":"Special Education","extension":"5551"},{"name":"Tracy Coates","role":"Bookkeeper","extension":"5120"},{"name":"Trina Leornas","role":"Mathematics","extension":"5455"},{"name":"Tyler Dickinson","role":"Agriculture","extension":"5311"},{"name":"Tyson Ellis","role":"Plant Manager","extension":"5276"},{"name":"Vanessa Carrillo","role":"International Languages","extension":"5219"},{"name":"Victoria McConnell","role":"Special Education","extension":"5434"},{"name":"PVHS Emergency Line","role":"Emergency","extension":"5000"},{"name":"PVHS Maintenance","role":"Emergency","extension":"878-8155"},{"name":"Police/Fire Emergency","role":"Emergency","extension":"911"},{"name":"SM Police Department","role":"Emergency","extension":"928-3781"},{"name":"SMPD & Fire Dispatch","role":"Emergency","extension":"925-2631"},{"name":"Main Office","role":"Department","extension":"922-1305"},{"name":"Attendance Office","role":"Department","extension":"5105"},{"name":"Security Office","role":"Department","extension":"5773"},{"name":"Health Office / Nurse","role":"Department","extension":"5753/5760"},{"name":"Library","role":"Department","extension":"5101"},{"name":"Counseling Office","role":"Department","extension":"5771"},{"name":"Athletic Director","role":"Department","extension":"5750"},{"name":"Technology Help Desk","role":"Department","extension":"4612"}];
+
+    const defaultSuggestions = ["PVHS Emergency Line", "Julie Norris", "Eddie Hernandez", "Karine Perez"];
+
+    function getLevenshteinDistance(a, b) {
+      const matrix = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+      for (let j = 1; j <= b.length; j++) matrix[0][j] = j;
+      for (let i = 1; i <= a.length; i++) {
+        for (let j = 1; j <= b.length; j++) {
+          const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+          matrix[i][j] = Math.min(matrix[i - 1][j] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j - 1] + cost);
+        }
+      }
+      return matrix[a.length][b.length];
+    }
+
+    const searchInput = document.getElementById("searchInput");
+    const resultsList = document.getElementById("resultsList");
+    const resultCount = document.getElementById("resultCount");
+
+    function renderResults(query) {
+      const q = query.toLowerCase().trim();
+      let results = [];
+
+      if (!q) {
+        results = extensionSearch.filter(e => defaultSuggestions.includes(e.name));
+        resultCount.textContent = "Recommended Contacts";
+      } else {
+        results = extensionSearch.filter(e => {
+          const searchSpace = [e.name, (e.role || ""), (e.extension || ""), (e.room || "")].join(" ").toLowerCase();
+          return searchSpace.includes(q);
+        });
+
+        if (results.length === 0 && q.length >= 3) {
+           results = extensionSearch
+            .map(e => ({ ...e, dist: getLevenshteinDistance(q, e.name.toLowerCase().split(' ').pop().substring(0, q.length)) }))
+            .filter(e => e.dist <= 1)
+            .sort((a, b) => a.dist - b.dist);
+        }
+        resultCount.textContent = results.length > 0 ? `${results.length} found` : "No results found";
+      }
+
+      resultsList.innerHTML = results.length ? "" : '<p style="text-align:center; padding:20px; opacity:0.6; font-size:12px;">NO MATCHES FOUND</p>';
+
+      results.forEach(entry => {
+        const isPhoneNumber = entry.extension.replace(/[^0-9]/g, "").length > 4;
+        const label = isPhoneNumber ? "Phone" : "Ext";
+        const div = document.createElement("div");
+        div.className = "result-item";
+        div.innerHTML = `<p class="result-name">${entry.name}</p><p class="result-line">${entry.role}</p>${entry.room ? `<p class="result-line">Room: ${entry.room}</p>` : ''}<p class="result-ext">${label}: ${entry.extension}</p>`;
+        resultsList.appendChild(div);
+      });
+    }
+
+    searchInput.addEventListener("input", (e) => renderResults(e.target.value));
+    renderResults("");
+
+    // ── A2HS / INSTALL PROMPT ───────────────────────────────────
+    const a2hsPrompt  = document.getElementById('a2hsPrompt');
+    const a2hsDismiss = document.getElementById('a2hsDismiss');
+    const a2hsDesc    = document.getElementById('a2hsDesc');
+    const isIOS       = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isAndroid   = /Android/i.test(navigator.userAgent);
+    const a2hsSeen    = localStorage.getItem('pvhs_a2hs_seen');
+
+    if (isMobile && !isStandalone && !false && !a2hsSeen && a2hsPrompt) {
+      if (isAndroid && a2hsDesc) {
+        a2hsDesc.innerHTML = 'Tap <strong style="color:#fff">⋮ Menu</strong> in your browser then <strong style="color:#fff">"Add to Home Screen"</strong> for the full app experience.';
+      }
+      a2hsPrompt.hidden = false;
+      setTimeout(() => a2hsPrompt.classList.add('is-visible'), 1800);
+      a2hsDismiss?.addEventListener('click', () => {
+        a2hsPrompt.classList.remove('is-visible');
+        localStorage.setItem('pvhs_a2hs_seen', '1');
+        setTimeout(() => { a2hsPrompt.hidden = true; }, 500);
+      });
+    }
+
+    // ── DESKTOP INSTALL SYSTEM ─────────────────────────────────
+    (function() {
+      if (isStandalone) {
+        document.getElementById('installBtn')?.remove();
+        document.getElementById('installMenuSep')?.remove();
+        return;
+      }
+
+      const ua        = navigator.userAgent;
+      const isChrome  = /Chrome/.test(ua) && !/Edg|OPR/.test(ua);
+      const isEdge    = /Edg\//.test(ua);
+      const isSafari  = /Safari/.test(ua) && !/Chrome/.test(ua);
+      const isFirefox = /Firefox/.test(ua);
+      const isMacOS   = /Macintosh/.test(ua);
+      const installSeen = localStorage.getItem('pvhs_install_seen');
+
+      let deferredPrompt = null;
+
+      // Desktop: update install button label & icon
+      if (!isMobile) {
+        const installIcon = document.getElementById('installIcon');
+        const installLabel = document.getElementById('installLabel');
+        if (installIcon) installIcon.textContent = '🖥️';
+        if (installLabel) installLabel.textContent = isMacOS ? 'Add to Dock' : 'Add to Taskbar';
+      }
+
+      function getSteps() {
+        if (isChrome || isEdge) {
+          return [
+            { n:1, html: 'Click the <strong>install icon ⊕</strong> in your browser\'s address bar (top right)' },
+            { n:2, html: 'Click <strong>"Install"</strong> in the popup — that\'s it!' },
+            { n:3, html: 'PVHS Tools will open in its own window and appear in your <strong>' + (isMacOS ? 'Dock & Applications' : 'Taskbar & Start Menu') + '</strong>' }
+          ];
+        }
+        if (isSafari && isMacOS) {
+          return [
+            { n:1, html: 'In the Safari menu bar, click <strong>File</strong>' },
+            { n:2, html: 'Choose <strong>"Add to Dock…"</strong>' },
+            { n:3, html: 'Click <strong>Add</strong> — PVHS Tools will appear in your Dock like a real app' },
+            { n:4, html: '<em style="color:#88c8c8">Requires macOS Sonoma (14) or later</em>' }
+          ];
+        }
+        if (isFirefox) {
+          return [
+            { n:1, html: 'Firefox doesn\'t support app installation' },
+            { n:2, html: 'For the best experience, open this page in <strong>Chrome</strong> or <strong>Edge</strong>' },
+            { n:3, html: 'Then click the install icon in the address bar' }
+          ];
+        }
+        return [
+          { n:1, html: 'Open PVHS Tools in <strong>Chrome</strong> or <strong>Edge</strong>' },
+          { n:2, html: 'Click the <strong>install icon ⊕</strong> in the address bar' },
+          { n:3, html: 'Click <strong>Install</strong> to add it to your ' + (isMacOS ? 'Dock' : 'Taskbar') }
+        ];
+      }
+
+      function buildModal() {
+        const container = document.getElementById('installModalSteps');
+        const cta = document.getElementById('installModalCta');
+        if (!container) return;
+        container.innerHTML = '';
+        getSteps().forEach(s => {
+          const div = document.createElement('div');
+          div.className = 'install-step';
+          div.innerHTML = '<span class="install-step-num">' + s.n + '</span><p class="install-step-text">' + s.html + '</p>';
+          container.appendChild(div);
+        });
+        if ((isChrome || isEdge) && deferredPrompt && cta) cta.style.display = 'block';
+      }
+
+      function openModal() { buildModal(); const m = document.getElementById('installModal'); if (m) m.hidden = false; }
+      function closeModal() { const m = document.getElementById('installModal'); if (m) m.hidden = true; }
+
+      const bannerDesc = document.getElementById('installBannerDesc');
+      if (bannerDesc) {
+        if (isChrome || isEdge) bannerDesc.textContent = 'One click to install — works like a real app on your ' + (isMacOS ? 'Mac' : 'PC') + '.';
+        else if (isSafari)      bannerDesc.textContent = 'Add to your Dock for instant access — no browser needed.';
+        else                    bannerDesc.textContent = 'Open in Chrome or Edge to install as a desktop app.';
+      }
+
+      const showBanner = !isMobile && !installSeen;
+
+      function showInstallBanner() {
+        const banner = document.getElementById('installBanner');
+        if (!banner || !showBanner) return;
+        banner.hidden = false;
+        setTimeout(() => banner.classList.add('is-visible'), 800);
+      }
+
+      window.addEventListener('beforeinstallprompt', e => {
+        e.preventDefault();
+        deferredPrompt = e;
+        showInstallBanner();
+      });
+
+      if (!isMobile && !installSeen && (isSafari || isFirefox)) {
+        setTimeout(showInstallBanner, 800);
+      }
+
+      document.getElementById('installBannerBtn')?.addEventListener('click', () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+          localStorage.setItem('pvhs_install_seen', '1');
+          document.getElementById('installBanner')?.classList.remove('is-visible');
+        } else {
+          openModal();
+        }
+      });
+
+      document.getElementById('installBannerDismiss')?.addEventListener('click', () => {
+        document.getElementById('installBanner')?.classList.remove('is-visible');
+        localStorage.setItem('pvhs_install_seen', '1');
+      });
+
+      document.getElementById('installModalClose')?.addEventListener('click', closeModal);
+      document.getElementById('installModalBackdrop')?.addEventListener('click', closeModal);
+
+      document.getElementById('installModalCta')?.addEventListener('click', () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then(() => { deferredPrompt = null; closeModal(); });
+          localStorage.setItem('pvhs_install_seen', '1');
+        }
+      });
+
+      const navBtn = document.getElementById('installBtn');
+      if (navBtn) {
+        navBtn.addEventListener('click', () => {
+          navMenu?.classList.remove('is-open');
+          navMenuBtn?.classList.remove('is-open');
+          if (isMobile) {
+            if (a2hsPrompt) { a2hsPrompt.hidden = false; setTimeout(() => a2hsPrompt.classList.add('is-visible'), 10); }
+          } else if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+          } else {
+            openModal();
+          }
+        });
+      }
+    })();
+
+    // ── FEEDBACK MODAL ──────────────────────────────────────────
+    (function() {
+      let selectedRating = 0;
+      function openFeedback() {
+        document.getElementById('feedbackModal').hidden = false;
+      }
+      function closeFeedback() {
+        document.getElementById('feedbackModal').hidden = true;
+      }
+      document.getElementById('feedbackBtn')?.addEventListener('click', () => {
+        navMenu?.classList.remove('is-open');
+        navMenuBtn?.classList.remove('is-open');
+        openFeedback();
+      });
+      document.getElementById('feedbackClose')?.addEventListener('click', closeFeedback);
+      document.getElementById('feedbackBackdrop')?.addEventListener('click', closeFeedback);
+      document.querySelectorAll('.feedback-rating-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          selectedRating = Number(btn.dataset.val);
+          document.querySelectorAll('.feedback-rating-btn').forEach(b => b.classList.toggle('is-selected', b === btn));
+        });
+      });
+      document.getElementById('feedbackSubmit')?.addEventListener('click', () => {
+        const submitBtn = document.getElementById('feedbackSubmit');
+        const ratingLabels = ['','😕 Needs Work','😐 It\'s OK','🙂 Pretty Good','😊 Love It','🤩 Amazing!'];
+        const rating   = selectedRating ? ratingLabels[selectedRating] : 'Not rated';
+        const good     = document.getElementById('feedbackGood')?.value.trim()    || '(none)';
+        const improve  = document.getElementById('feedbackImprove')?.value.trim() || '(none)';
+        const name     = document.getElementById('feedbackName')?.value.trim()    || 'Anonymous';
+        const page     = document.title || 'Unknown Page';
+        const message  =
+          `Rating: ${rating}\n` +
+          `Page: ${page}\n\n` +
+          `What's working well:\n${good}\n\n` +
+          `What to add or change:\n${improve}`;
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+
+        emailjs.send('service_4mhkbik', 'template_fd0suj3', {
+          name: name,
+          message: message,
+          rating: rating,
+        }).then(() => {
+          submitBtn.textContent = '✅ Sent! Thank you!';
+          submitBtn.style.background = '#2e7d32';
+          setTimeout(() => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Send Feedback ✉️';
+            submitBtn.style.background = '';
+            closeFeedback();
+            selectedRating = 0;
+            document.querySelectorAll('.feedback-rating-btn').forEach(b => b.classList.remove('is-selected'));
+            document.getElementById('feedbackGood').value = '';
+            document.getElementById('feedbackImprove').value = '';
+            document.getElementById('feedbackName').value = '';
+          }, 2000);
+        }).catch((err) => {
+          console.error('EmailJS error:', err);
+          submitBtn.textContent = '❌ Error, try again';
+          submitBtn.style.background = '#c62828';
+          setTimeout(() => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Send Feedback ✉️';
+            submitBtn.style.background = '';
+          }, 3000);
+        });
+      });
+    })();
+    if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('controllerchange', () => location.reload());
+
+    // ── SWIPE PAGE NAVIGATION ──────────────────────────────────────────────
+    (function() {
+      const PAGES = ['index.html','countdown.html','extension_search.html','calendar.html'];
+      const path = location.pathname;
+      let idx = PAGES.findIndex(p => path.endsWith('/' + p));
+      if (idx < 0 && (path.endsWith('/') || /\/pvhs_tools\/?$/.test(path))) idx = 0;
+      const inRing = idx >= 0;
+      const _sdir = localStorage.getItem('pvSwipeDir');
+      if (_sdir) {
+        localStorage.removeItem('pvSwipeDir');
+        const _app = document.querySelector('.app');
+        if (_app) {
+          _app.style.transform = _sdir === 'l' ? 'translateX(6%)' : 'translateX(-6%)';
+          _app.style.opacity = '0';
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            _app.style.transition = 'transform 0.32s cubic-bezier(0.2,0,0,1), opacity 0.28s ease-out';
+            _app.style.transform = ''; _app.style.opacity = '';
+            setTimeout(() => { _app.style.transition = ''; }, 350);
+          }));
+        }
+      }
+      function overlayOpen() {
+        const ids = ['maintModal','installModal','installBanner','verAnnounceSheet',
+          'newsModal','newsChooser','embedModal','feedbackModal',
+          'schedSheet','calAnnounceSheet','a2hsPrompt','directoryChooser'];
+        if (ids.some(id => { const el = document.getElementById(id); return el && !el.hidden; })) return true;
+        const lb = document.getElementById('newsLightbox');
+        if (lb && lb.classList.contains('is-open')) return true;
+        const nav = document.getElementById('navMenu');
+        return nav && nav.classList.contains('is-open');
+      }
+      let x0 = 0, y0 = 0, live = false;
+      document.addEventListener('touchstart', e => {
+        if (overlayOpen()) { live = false; return; }
+        x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; live = true;
+      }, { passive: true });
+      document.addEventListener('touchcancel', () => { live = false; }, { passive: true });
+      document.addEventListener('touchend', e => {
+        if (!live) return; live = false;
+        const dx = e.changedTouches[0].clientX - x0;
+        const dy = e.changedTouches[0].clientY - y0;
+        if (Math.abs(dx) < 55 || Math.abs(dx) <= Math.abs(dy)) return;
+        const dest = inRing ? PAGES[(idx + (dx < 0 ? 1 : -1) + PAGES.length) % PAGES.length] : 'index.html';
+        const app = document.querySelector('.app');
+        if (app) {
+          app.style.transition = 'transform 0.2s ease-in, opacity 0.2s ease-in';
+          app.style.transform = dx < 0 ? 'translateX(-6%)' : 'translateX(6%)';
+          app.style.opacity = '0';
+        }
+        localStorage.setItem('pvSwipeDir', dx < 0 ? 'l' : 'r');
+        setTimeout(() => { location.href = dest; }, 190);
+      }, { passive: true });
+    })();
+    // ──────────────────────────────────────────────────────────────────────
+  </script>
+</body>
+</html>

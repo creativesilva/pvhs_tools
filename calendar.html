@@ -1,0 +1,855 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PVHS Tools">
+  <meta name="theme-color" content="#007474">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-TileColor" content="#021414">
+  <meta name="msapplication-navbutton-color" content="#007474">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="PV_AppIcon.png">
+  <link rel="icon" type="image/png" href="PV_AppIcon.png">
+  <title>School Calendar</title>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>emailjs.init('68UkiTjqHIKZMkeCC');</script>
+
+  <style>
+    :root {
+      --teal: #007474; --white: #f7fbfb; --muted: #cfe3e3;
+      --panel: rgba(255,255,255,0.02); --panel-border: rgba(255,255,255,0.05);
+      --shadow: 0 20px 46px rgba(0,0,0,0.30); --soft-shadow: 0 12px 24px rgba(0,0,0,0.22);
+      --card-hover: rgba(255,255,255,0.12); --app-spacing: 16px; --radius: 34px;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+    html { height: -webkit-fill-available; }
+    html, body { width: 100%; height: 100%; min-height: 100%; background: #021414; overflow: hidden; }
+    body { min-height: 100vh; min-height: 100dvh; min-height: -webkit-fill-available; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; color: var(--white); touch-action: none; user-select: none; -webkit-user-select: none; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
+
+    .frame { width: 100%; height: 100dvh; min-height: 100vh; min-height: -webkit-fill-available; display: flex; align-items: center; justify-content: center; padding: 10px; }
+
+    .app {
+      width: 430px; height: 880px; max-width: 100%; max-height: 100%;
+      border-radius: var(--radius); overflow: hidden; position: relative;
+      box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,0.12); border-top-color: rgba(255,255,255,0.04);
+      background: linear-gradient(168deg, rgba(6,28,28,0.97) 0%, rgba(4,24,24,0.95) 30%, rgba(0,72,72,0.92) 60%, rgba(0,100,100,0.96) 82%, rgba(4,30,30,0.97) 100%);
+      display: flex; flex-direction: column; padding: 14px var(--app-spacing) var(--app-spacing) var(--app-spacing);
+      isolation: isolate; container-type: inline-size;
+    }
+
+    .app::before {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(ellipse at 50% 20%, rgba(0,116,116,0.18) 0%, transparent 60%),
+                  radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 50%);
+      z-index: 0;
+    }
+
+    .ghost-logo { position: absolute; top: 56%; left: 50%; width: 120%; opacity: 0.07; transform: translate(-50%, -50%); filter: grayscale(100%) contrast(108%) brightness(114%); pointer-events: none; z-index: 0; }
+
+    .content { position: relative; z-index: 1; width: 100%; flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; overflow: hidden; }
+
+    /* ── TOP ROW ── */
+    .top-row { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 10px; height: 44px; flex-shrink: 0; margin-bottom: 2px; position: relative; }
+    .logo-clear { width: 38px; height: 38px; object-fit: contain; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); flex-shrink: 0; }
+    .page-title { position: absolute; left: 0; right: 0; text-align: center; font-size: 15px; font-weight: 700; color: #dff7f7; text-transform: uppercase; margin: 0; letter-spacing: 0.14em; pointer-events: none; }
+
+    /* ── NAV DROPDOWN ── */
+    .nav-menu-btn { appearance: none; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.13); border-radius: 12px; color: rgba(255,255,255,0.92); width: 34px; height: 34px; font-size: 14px; font-weight: 900; letter-spacing: 0.08em; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: background 0.16s, border-color 0.16s; }
+    .nav-menu-btn.is-open, .nav-menu-btn:active { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.26); }
+    .nav-menu { position: fixed; z-index: 9999; min-width: 172px; background: rgba(3,20,20,0.58); border: 1px solid rgba(255,255,255,0.16); border-radius: 16px; padding: 5px; box-shadow: 0 14px 44px rgba(0,0,0,0.52); backdrop-filter: blur(26px); -webkit-backdrop-filter: blur(26px); transform-origin: top right; transform: scale(0.88) translateY(-8px); opacity: 0; pointer-events: none; transition: opacity 0.17s ease, transform 0.19s cubic-bezier(0.34,1.4,0.64,1); }
+    .nav-menu.is-open { opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; }
+    .nav-menu-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 11px; text-decoration: none; color: #dff7f7; background: transparent; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; border: none; cursor: pointer; width: 100%; transition: background 0.13s; }
+    .nav-menu-item:active { background: rgba(255,255,255,0.1); }
+    .nav-menu-icon { font-size: 14px; flex-shrink: 0; }
+    .nav-menu-sep { height: 1px; background: rgba(255,255,255,0.09); margin: 3px 6px; }
+
+    /* ── VIEW TOGGLE ── */
+    .cal-toggle { display: flex; gap: 4px; width: 100%; flex-shrink: 0; margin-bottom: 4px; }
+    .cal-toggle-btn { flex: 1; padding: 6px 4px; border-radius: 12px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; border: 1px solid rgba(255,255,255,0.09); background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.5); cursor: pointer; transition: all 0.15s; appearance: none; }
+    .cal-toggle-btn.is-active { background: rgba(0,116,116,0.22); border-color: rgba(0,116,116,0.45); color: #4be1e1; }
+    .cal-toggle-btn:active { opacity: 0.75; }
+
+    /* ── NAV ROW ── */
+    .cal-nav-row { display: flex; align-items: center; gap: 6px; width: 100%; flex-shrink: 0; margin-bottom: 4px; }
+    .cal-nav-btn { appearance: none; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; color: #dff7f7; width: 28px; height: 28px; font-size: 18px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; line-height: 1; }
+    .cal-nav-btn:active { background: rgba(255,255,255,0.14); }
+    .cal-nav-label { flex: 1; text-align: center; font-size: 13px; font-weight: 800; color: #dff7f7; text-transform: uppercase; letter-spacing: 0.09em; }
+    .cal-today-btn { appearance: none; background: rgba(0,116,116,0.18); border: 1px solid rgba(0,116,116,0.32); border-radius: 10px; color: #4be1e1; padding: 0 10px; height: 28px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; flex-shrink: 0; }
+    .cal-today-btn:active { background: rgba(0,116,116,0.3); }
+
+    /* ── SHARED VIEW WRAPPER ── */
+    .cal-view { display: flex; flex-direction: column; width: 100%; flex: 1; min-height: 0; }
+
+    /* ── MONTH VIEW ── */
+    .cal-weekday-hdr { display: grid; grid-template-columns: repeat(7,1fr); width: 100%; flex-shrink: 0; margin-bottom: 1px; }
+    .cal-weekday-hdr span { text-align: center; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.35); padding: 1px 0; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; width: 100%; flex-shrink: 0; }
+    .cal-cell { border-radius: 9px; padding: 3px 2px 2px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: background 0.12s; min-height: 34px; position: relative; }
+    .cal-cell:active { background: rgba(255,255,255,0.08); }
+    .cal-cell.other-month .cal-date { opacity: 0.22; }
+    .cal-cell.other-month .cal-dots { opacity: 0.3; }
+    .cal-cell.is-today { background: rgba(0,116,116,0.16); border: 1px solid rgba(0,116,116,0.32); }
+    .cal-cell.is-selected { background: rgba(0,116,116,0.28); border: 1px solid rgba(0,116,116,0.55); }
+    .cal-cell.is-no-school { background: rgba(160,30,30,0.07); }
+    .cal-cell.is-weekend { opacity: 0.6; }
+    .cal-date { font-size: 11px; font-weight: 700; color: #dff7f7; line-height: 1; margin-bottom: 1px; }
+    .cal-cell.is-today .cal-date { color: #40dede; font-weight: 900; }
+    .cal-cell.is-selected .cal-date { color: #4be1e1; }
+    .cal-dots { display: flex; gap: 2px; flex-wrap: wrap; justify-content: center; }
+    .cal-dot { width: 4px; height: 4px; border-radius: 50%; flex-shrink: 0; }
+    .cal-dot-no-school { background: #ff5b5b; }
+    .cal-dot-collaboration { background: #4bd4d4; }
+    .cal-dot-finals    { background: #ffaa33; }
+    .cal-dot-grading   { background: #c07bff; }
+    .cal-dot-event     { background: #6fdf6f; }
+    .cal-dot-notable   { background: rgba(255,255,255,0.38); }
+
+    /* ── DAY DETAIL PANEL (month view) ── */
+    .cal-panel { width: 100%; margin-top: 4px; border-radius: 18px; background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.07); flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .cal-panel::-webkit-scrollbar { width: 3px; }
+    .cal-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 10px; }
+    .cal-panel-inner { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 6px; }
+    .cal-panel-date { font-size: 11px; font-weight: 800; color: #dff7f7; text-transform: uppercase; letter-spacing: 0.12em; }
+    .cal-panel-sched { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 1px; }
+    .sched-regular  { color: rgba(255,255,255,0.45); }
+    .sched-collaboration { color: #4bd4d4; }
+    .sched-finals   { color: #ffaa33; }
+    .sched-event    { color: #6fdf6f; }
+    .sched-no-school{ color: #ff6b6b; }
+    .sched-weekend  { color: rgba(255,255,255,0.25); }
+    .sched-minimum  { color: #ffaa33; }
+    .cal-panel-empty { font-size: 10px; color: rgba(255,255,255,0.28); font-style: italic; padding: 6px 0 2px; }
+    .cal-event-row { display: flex; align-items: flex-start; gap: 8px; padding: 6px 8px; border-radius: 10px; background: rgba(255,255,255,0.035); border-left: 2px solid transparent; }
+    .cal-event-row.type-no-school { border-left-color: #ff5b5b; }
+    .cal-event-row.type-collaboration { border-left-color: #4bd4d4; }
+    .cal-event-row.type-finals    { border-left-color: #ffaa33; }
+    .cal-event-row.type-grading   { border-left-color: #c07bff; }
+    .cal-event-row.type-event     { border-left-color: #6fdf6f; }
+    .cal-event-row.type-notable   { border-left-color: rgba(255,255,255,0.25); }
+    .cal-event-row.has-link       { cursor: pointer; }
+    .cal-event-row.has-link:active { background: rgba(255,255,255,0.07); }
+    .cal-event-emoji { font-size: 13px; flex-shrink: 0; line-height: 1.5; }
+    .cal-event-label { font-size: 11px; font-weight: 600; color: #b5d4d4; line-height: 1.45; flex: 1; }
+    .cal-event-link-badge { font-size: 8px; color: rgba(75,212,212,0.6); flex-shrink: 0; line-height: 1.5; padding-left: 2px; }
+
+    /* ── WEEK VIEW ── */
+    .cal-week-list { display: flex; flex-direction: column; gap: 5px; width: 100%; flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
+    .cal-week-list::-webkit-scrollbar { width: 3px; }
+    .cal-week-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 10px; }
+    .cal-week-card { border-radius: 16px; background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.06); padding: 10px 12px; flex-shrink: 0; cursor: pointer; transition: background 0.12s; }
+    .cal-week-card:active { background: rgba(255,255,255,0.07); }
+    .cal-week-card.is-today { border-color: rgba(0,116,116,0.38); background: rgba(0,116,116,0.08); }
+    .cal-week-card.is-weekend { opacity: 0.5; }
+    .cal-week-card.is-no-school { border-color: rgba(255,91,91,0.2); }
+    .cal-week-header { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+    .cal-week-dayname { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.14em; color: rgba(255,255,255,0.4); }
+    .cal-week-daynum { font-size: 18px; font-weight: 900; color: #dff7f7; line-height: 1; }
+    .cal-week-card.is-today .cal-week-daynum { color: #40dede; }
+    .cal-week-sched-badge { margin-left: auto; font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 2px 7px; border-radius: 8px; background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.45); }
+    .cal-week-sched-badge.collaboration { background: rgba(75,212,212,0.14); color: #4bd4d4; }
+    .cal-week-sched-badge.finals   { background: rgba(255,170,51,0.14); color: #ffaa33; }
+    .cal-week-sched-badge.event    { background: rgba(111,223,111,0.14); color: #6fdf6f; }
+    .cal-week-sched-badge.no-school{ background: rgba(255,91,91,0.14); color: #ff6b6b; }
+    .cal-week-sched-badge.minimum  { background: rgba(255,170,51,0.14); color: #ffaa33; }
+    .cal-week-events { display: flex; flex-direction: column; gap: 3px; }
+    .cal-week-event { font-size: 10px; font-weight: 600; color: rgba(181,212,212,0.82); display: flex; align-items: flex-start; gap: 5px; line-height: 1.4; }
+    .cal-week-event-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+    .cal-week-no-events { font-size: 10px; color: rgba(255,255,255,0.22); font-style: italic; }
+
+    /* ── DAY VIEW ── */
+    .cal-day-body { display: flex; flex-direction: column; gap: 8px; width: 100%; flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .cal-day-body::-webkit-scrollbar { width: 3px; }
+    .cal-day-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 10px; }
+    .cal-day-hero { text-align: center; padding: 8px 0 4px; flex-shrink: 0; }
+    .cal-day-hero-name { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.38); }
+    .cal-day-hero-num { font-size: 64px; font-weight: 900; color: #dff7f7; line-height: 0.95; letter-spacing: -0.04em; }
+    .cal-day-hero-month { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em; color: rgba(255,255,255,0.42); margin-top: 2px; }
+    .cal-day-sched-card { border-radius: 18px; padding: 12px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0; }
+    .cal-day-sched-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em; margin: 0 0 4px; }
+    .cal-day-sched-value { font-size: 14px; font-weight: 800; color: #dff7f7; text-transform: uppercase; letter-spacing: 0.07em; margin: 0; }
+    .cal-day-events-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.18em; color: rgba(255,255,255,0.35); margin: 2px 0 2px; flex-shrink: 0; }
+    .cal-day-event-card { border-radius: 16px; padding: 11px 13px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-left: 3px solid transparent; display: flex; align-items: flex-start; gap: 10px; flex-shrink: 0; }
+    .cal-day-event-card.has-link { cursor: pointer; }
+    .cal-day-event-card.has-link:active { filter: brightness(1.15); }
+    .cal-day-event-card.type-no-school { border-left-color: #ff5b5b; background: rgba(255,91,91,0.06); }
+    .cal-day-event-card.type-collaboration { border-left-color: #4bd4d4; background: rgba(75,212,212,0.06); }
+    .cal-day-event-card.type-finals    { border-left-color: #ffaa33; background: rgba(255,170,51,0.06); }
+    .cal-day-event-card.type-grading   { border-left-color: #c07bff; background: rgba(192,123,255,0.06); }
+    .cal-day-event-card.type-event     { border-left-color: #6fdf6f; background: rgba(111,223,111,0.06); }
+    .cal-day-event-card.type-notable   { border-left-color: rgba(255,255,255,0.2); }
+    .cal-day-event-icon { font-size: 18px; flex-shrink: 0; line-height: 1.3; }
+    .cal-day-event-text { flex: 1; }
+    .cal-day-event-name { font-size: 12px; font-weight: 700; color: #dff7f7; line-height: 1.35; margin: 0; }
+    .cal-day-event-meta { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+    .cal-day-event-type { font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.38); }
+    .cal-day-event-tap { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(75,212,212,0.55); }
+    .cal-day-no-events { text-align: center; padding: 20px 0; color: rgba(255,255,255,0.25); font-size: 11px; font-style: italic; flex-shrink: 0; }
+
+    /* ── LEGEND ── */
+    .cal-legend { display: flex; flex-wrap: wrap; gap: 5px 12px; padding: 5px 0 2px; flex-shrink: 0; justify-content: center; }
+    .cal-legend-item { display: flex; align-items: center; gap: 4px; }
+    .cal-legend-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .cal-legend-label { font-size: 8.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.38); }
+
+    /* ── FOOTER ── */
+    .footer-note { margin-top: auto; padding: 6px 0 2px 0; font-size: 9px; color: #b5d4d4; font-weight: 600; text-align: center; flex-shrink: 0; }
+
+    /* ── FEEDBACK MODAL ── */
+    .feedback-modal[hidden] { display: none; }
+    .feedback-modal { position: absolute; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .feedback-modal-backdrop { position: absolute; inset: 0; background: rgba(1,12,12,0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+    .feedback-dialog { position: relative; width: min(100%,360px); border-radius: 24px; border: 1px solid rgba(255,255,255,0.14); background: rgba(6,26,26,0.85); box-shadow: 0 26px 48px rgba(0,0,0,0.44); padding: 18px; display: flex; flex-direction: column; gap: 12px; max-height: calc(100% - 20px); overflow-y: auto; }
+    .feedback-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .feedback-title { font-size: 13px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 0.12em; margin: 0; }
+    .feedback-close { appearance: none; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.6); border-radius: 99px; width: 28px; height: 28px; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .feedback-field { display: flex; flex-direction: column; gap: 5px; }
+    .feedback-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted); opacity: 0.8; }
+    .feedback-textarea, .feedback-input { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; color: #f7fbfb; font-size: 12px; font-weight: 500; padding: 10px 12px; resize: none; outline: none; font-family: inherit; }
+    .feedback-textarea { min-height: 64px; line-height: 1.45; }
+    .feedback-textarea:focus, .feedback-input:focus { border-color: rgba(0,116,116,0.4); }
+    .feedback-submit { appearance: none; width: 100%; background: linear-gradient(135deg,#007474 0%,#00a0a0 100%); border: none; border-radius: 14px; padding: 13px; color: #fff; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; cursor: pointer; }
+    .feedback-submit:active { opacity: 0.85; }
+    .feedback-note { font-size: 9px; color: var(--muted); text-align: center; opacity: 0.65; margin: 0; }
+
+    /* ── STANDALONE ── */
+    body.is-standalone { background: #021414; }
+    body.is-standalone::before { content: ""; position: fixed; inset: 0; background: #021414; pointer-events: none; z-index: 0; }
+    body.is-standalone .frame { position: fixed; inset: 0; width: 100%; height: 100%; min-height: -webkit-fill-available; padding: 0 8px max(24px,calc(env(safe-area-inset-bottom) + 8px)) 8px; z-index: 1; }
+    body.is-standalone .app { position: relative; width: 100%; height: 100%; max-width: 100%; max-height: 100%; border-radius: 34px; border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 24px 46px rgba(0,0,0,0.22); padding-top: max(10px,env(safe-area-inset-top)); padding-right: max(var(--app-spacing),env(safe-area-inset-right)); padding-bottom: 18px; padding-left: max(var(--app-spacing),env(safe-area-inset-left)); }
+
+    @media (max-width: 430px) {
+      body:not(.is-standalone) .frame { padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom) 12px; }
+      body:not(.is-standalone) .app { width: 100%; height: 100%; max-height: 100%; border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.12); }
+      body { touch-action: pan-y; }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <div class="app">
+      <img class="ghost-logo" src="PV_Logo.png" alt="">
+      <div class="content">
+
+        <!-- Top Row -->
+        <div class="top-row">
+          <img src="PV_Logo.png" class="logo-clear" alt="PVHS">
+          <span class="page-title">Calendar</span>
+          <button class="nav-menu-btn" id="navMenuBtn" type="button" aria-label="Menu">···</button>
+        </div>
+
+        <!-- View Toggle -->
+        <div class="cal-toggle">
+          <button class="cal-toggle-btn is-active" id="btnMonth" type="button">Month</button>
+          <button class="cal-toggle-btn" id="btnWeek" type="button">Week</button>
+          <button class="cal-toggle-btn" id="btnDay" type="button">Day</button>
+        </div>
+
+        <!-- Navigation Row -->
+        <div class="cal-nav-row">
+          <button class="cal-nav-btn" id="calPrev" type="button">&#8249;</button>
+          <span class="cal-nav-label" id="calNavLabel"></span>
+          <button class="cal-nav-btn" id="calNext" type="button">&#8250;</button>
+          <button class="cal-today-btn" id="calToday" type="button">Today</button>
+        </div>
+
+        <!-- Month View -->
+        <div class="cal-view" id="viewMonth">
+          <div class="cal-weekday-hdr">
+            <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+          </div>
+          <div class="cal-grid" id="calGrid"></div>
+          <div class="cal-legend">
+            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#ff5b5b"></div><span class="cal-legend-label">No School</span></div>
+            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#4bd4d4"></div><span class="cal-legend-label">Collaboration</span></div>
+            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#ffaa33"></div><span class="cal-legend-label">Finals</span></div>
+            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#c07bff"></div><span class="cal-legend-label">Grading</span></div>
+            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#6fdf6f"></div><span class="cal-legend-label">Events</span></div>
+          </div>
+          <div class="cal-panel" id="calPanel"><div class="cal-panel-inner"><p class="cal-panel-empty">Tap a date to see events</p></div></div>
+        </div>
+
+        <!-- Week View -->
+        <div class="cal-view" id="viewWeek" style="display:none">
+          <div class="cal-week-list" id="weekList"></div>
+        </div>
+
+        <!-- Day View -->
+        <div class="cal-view" id="viewDay" style="display:none">
+          <div class="cal-day-body" id="dayBody"></div>
+        </div>
+
+        <div class="footer-note">By: <a href="https://www.creativesilva.com" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">CreativeSilva</a></div>
+      </div><!-- /content -->
+    </div><!-- /app -->
+  </div><!-- /frame -->
+
+  <!-- Nav Dropdown -->
+  <nav class="nav-menu" id="navMenu" role="menu" aria-hidden="true">
+    <a href="index.html" class="nav-menu-item nav-link"><span class="nav-menu-icon">&#x1F3E0;</span> Home</a>
+    <a href="countdown.html" class="nav-menu-item nav-link"><span class="nav-menu-icon">&#x23F1;</span> Countdown</a>
+    <a href="extension_search.html" class="nav-menu-item nav-link"><span class="nav-menu-icon">&#x1F50D;</span> Directory</a>
+    <a href="index.html#news" class="nav-menu-item nav-link"><span class="nav-menu-icon">&#x1F4F0;</span> News</a>
+    <a href="calendar.html" class="nav-menu-item nav-link"><span class="nav-menu-icon">&#x1F4C5;</span> Calendar</a>
+    <div class="nav-menu-sep"></div>
+    <button class="nav-menu-item" id="navPopOut" type="button"><span class="nav-menu-icon">&#x2197;</span> Pop Out</button>
+    <button class="nav-menu-item" id="navFeedback" type="button"><span class="nav-menu-icon">&#x1F4AC;</span> Share Feedback</button>
+  </nav>
+
+  <!-- Feedback Modal -->
+  <div class="feedback-modal" id="feedbackModal" hidden>
+    <div class="feedback-modal-backdrop" id="feedbackBackdrop"></div>
+    <div class="feedback-dialog">
+      <div class="feedback-header">
+        <h2 class="feedback-title">Share Feedback</h2>
+        <button class="feedback-close" id="feedbackClose" type="button">&#x2715;</button>
+      </div>
+      <div class="feedback-field">
+        <label class="feedback-label" for="fbName">Your Name</label>
+        <input class="feedback-input" id="fbName" type="text" placeholder="First name or anonymous" autocomplete="off">
+      </div>
+      <div class="feedback-field">
+        <label class="feedback-label" for="fbMsg">Message</label>
+        <textarea class="feedback-textarea" id="fbMsg" placeholder="Tell us what's working, what's broken, or what you'd love to see..."></textarea>
+      </div>
+      <button class="feedback-submit" id="feedbackSubmit" type="button">Send Feedback</button>
+      <p class="feedback-note">Your feedback is sent directly to CreativeSilva to make this app a better tool for your daily use.</p>
+    </div>
+  </div>
+
+  <script>
+    // ── STANDALONE DETECTION ──────────────────────────────────
+    if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+      document.body.classList.add('is-standalone');
+    }
+    if (window.opener || new URLSearchParams(location.search).get('popout') === '1') {
+      document.body.classList.add('is-popout');
+    }
+
+    // ── STATIC CALENDAR DATA ──────────────────────────────────
+    const EVENTS = [
+      // School Year Anchors
+      {start:'2025-08-14',end:'2025-08-14',label:'First Day of School',type:'event',emoji:'\u{1F392}'},
+      {start:'2026-01-15',end:'2026-01-15',label:'2nd Semester Begins',type:'event',emoji:'\u{1F4C5}'},
+      {start:'2026-06-10',end:'2026-06-10',label:'Last Day of School',type:'event',emoji:'\u{1F514}'},
+      {start:'2026-06-11',end:'2026-06-11',label:'Graduation',type:'event',emoji:'\u{1F393}'},
+      // No School
+      {start:'2025-09-01',end:'2025-09-01',label:'Labor Day',type:'no-school',emoji:'\u{1F1FA}\u{1F1F8}'},
+      {start:'2025-11-11',end:'2025-11-11',label:'Veterans Day',type:'no-school',emoji:'\u{1F396}'},
+      {start:'2025-11-24',end:'2025-11-28',label:'Thanksgiving Break',type:'no-school',emoji:'\u{1F983}'},
+      {start:'2025-12-22',end:'2026-01-09',label:'Winter Break',type:'no-school',emoji:'\u{2744}\u{FE0F}'},
+      {start:'2026-01-12',end:'2026-01-14',label:'Staff Development',type:'no-school',emoji:'\u{1F4CB}'},
+      {start:'2026-01-19',end:'2026-01-19',label:'MLK Day',type:'no-school',emoji:'\u{270A}'},
+      {start:'2026-02-09',end:'2026-02-09',label:"Lincoln's Day (Observed)",type:'no-school',emoji:'\u{1F3A9}'},
+      {start:'2026-02-16',end:'2026-02-16',label:"Presidents' Day",type:'no-school',emoji:'\u{1F1FA}\u{1F1F8}'},
+      {start:'2026-04-03',end:'2026-04-03',label:'Spring Vacation Day',type:'no-school',emoji:'\u{1F324}'},
+      {start:'2026-04-06',end:'2026-04-10',label:'Spring Break',type:'no-school',emoji:'\u{1F338}'},
+      {start:'2026-05-25',end:'2026-05-25',label:'Memorial Day',type:'no-school',emoji:'\u{1F1FA}\u{1F1F8}'},
+      // Finals
+      {start:'2025-12-17',end:'2025-12-17',label:'Finals Day 1 \u2014 Periods 1, 2 & 7',type:'finals',emoji:'\u{1F4DD}'},
+      {start:'2025-12-18',end:'2025-12-18',label:'Finals Day 2 \u2014 Periods 3 & 4',type:'finals',emoji:'\u{1F4DD}'},
+      {start:'2025-12-19',end:'2025-12-19',label:'Finals Day 3 \u2014 Periods 5 & 6',type:'finals',emoji:'\u{1F4DD}'},
+      {start:'2026-06-08',end:'2026-06-08',label:'Finals Day 1 \u2014 Periods 1, 2 & 7',type:'finals',emoji:'\u{1F4DD}'},
+      {start:'2026-06-09',end:'2026-06-09',label:'Finals Day 2 \u2014 Periods 3 & 4',type:'finals',emoji:'\u{1F4DD}'},
+      {start:'2026-06-10',end:'2026-06-10',label:'Finals Day 3 \u2014 Periods 5 & 6',type:'finals',emoji:'\u{1F4DD}'},
+      // Grading / Progress Reports
+      {start:'2025-09-19',end:'2025-09-19',label:'Progress Reports \u2014 Q1',type:'grading',emoji:'\u{1F4CA}'},
+      {start:'2025-10-31',end:'2025-10-31',label:'Progress Reports \u2014 Q1 End',type:'grading',emoji:'\u{1F4CA}'},
+      {start:'2025-12-19',end:'2025-12-19',label:'Fall Semester Ends (Q2)',type:'grading',emoji:'\u{1F4CA}'},
+      {start:'2026-02-27',end:'2026-02-27',label:'Progress Reports \u2014 Q3',type:'grading',emoji:'\u{1F4CA}'},
+      {start:'2026-04-24',end:'2026-04-24',label:'Progress Reports \u2014 Q3 End',type:'grading',emoji:'\u{1F4CA}'},
+      {start:'2026-06-10',end:'2026-06-10',label:'Spring Semester Ends (Q4)',type:'grading',emoji:'\u{1F4CA}'},
+      // Minimum Days
+      {start:'2025-08-29',end:'2025-08-29',label:'Minimum Day',type:'notable',emoji:'\u{23F0}'},
+      {start:'2026-04-02',end:'2026-04-02',label:'Minimum Day',type:'notable',emoji:'\u{23F0}'},
+      // School Events
+      {start:'2025-08-28',end:'2025-08-28',label:'Back to School Night',type:'event',emoji:'\u{1F3EB}'},
+      {start:'2026-01-05',end:'2026-01-09',label:'Wintersession',type:'notable',emoji:'\u{1F4DA}'},
+      // Staff Development
+      {start:'2025-08-07',end:'2025-08-08',label:'New Teacher Orientation',type:'notable',emoji:'\u{1F4CB}'},
+      {start:'2025-08-11',end:'2025-08-12',label:'Staff Development',type:'notable',emoji:'\u{1F4CB}'},
+      {start:'2025-08-13',end:'2025-08-13',label:'All Staff Workday',type:'notable',emoji:'\u{1F4CB}'},
+    ];
+
+    // ── DYNAMIC EVENTS (loaded from events.json on init) ──────
+    let dynEvents = [];
+
+    // ── SCHOOL DAYS COMPUTATION ───────────────────────────────
+    const TZ = 'America/Los_Angeles';
+    const NO_SCHOOL = new Set([
+      '2025-09-01',
+      '2025-11-11',
+      '2025-11-24','2025-11-25','2025-11-26','2025-11-27','2025-11-28',
+      '2025-12-22','2025-12-23','2025-12-24','2025-12-25','2025-12-26',
+      '2025-12-29','2025-12-30','2025-12-31','2026-01-01','2026-01-02',
+      '2026-01-05','2026-01-06','2026-01-07','2026-01-08','2026-01-09',
+      '2026-01-12','2026-01-13','2026-01-14',
+      '2026-01-19',
+      '2026-02-09',
+      '2026-02-16',
+      '2026-04-03',
+      '2026-04-06','2026-04-07','2026-04-08','2026-04-09','2026-04-10',
+      '2026-05-25'
+    ]);
+
+    const FINALS_MAP = new Map([
+      ['2025-12-17','finals_1'],['2025-12-18','finals_2'],['2025-12-19','finals_3'],
+      ['2026-06-08','finals_1'],['2026-06-09','finals_2'],['2026-06-10','finals_3']
+    ]);
+    const MINIMUM_DAYS = new Set([
+      '2025-08-29','2025-09-19','2025-10-31',
+      '2026-02-27','2026-04-02','2026-04-24'
+    ]);
+
+    function isoDate(d) {
+      return new Intl.DateTimeFormat('en-CA',{timeZone:TZ,year:'numeric',month:'2-digit',day:'2-digit'}).format(d);
+    }
+    function generateSchoolDays(s, e) {
+      const out = [], start = new Date(s+'T12:00:00'), end = new Date(e+'T12:00:00');
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate()+1)) {
+        if (d.getDay()===0||d.getDay()===6) continue;
+        const ds = isoDate(d);
+        if (!NO_SCHOOL.has(ds)) out.push(ds);
+      }
+      return out;
+    }
+    const schoolDays = generateSchoolDays('2025-08-14','2026-06-10');
+    const schoolDaysSet = new Set(schoolDays);
+
+    function getScheduleInfo(ds) {
+      const dow = new Date(ds+'T12:00:00').getDay();
+      if (dow===0||dow===6) return { label:'Weekend', type:'weekend' };
+      if (NO_SCHOOL.has(ds))   return { label:'No School', type:'no-school' };
+      if (!schoolDaysSet.has(ds)) return { label:'No School', type:'no-school' };
+      if (FINALS_MAP.has(ds)) {
+        const t = FINALS_MAP.get(ds);
+        const names = {
+          finals_1: 'Finals \u2014 Periods 1, 2 & 7',
+          finals_2: 'Finals \u2014 Periods 3 & 4',
+          finals_3: 'Finals \u2014 Periods 5 & 6'
+        };
+        return { label: names[t], type:'finals' };
+      }
+      if (MINIMUM_DAYS.has(ds)) return { label:'Minimum Day Schedule', type:'minimum' };
+      if (dow===1) return { label:'Collaboration Schedule', type:'collaboration' };
+      return { label:'Regular Schedule', type:'regular' };
+    }
+
+    // Merge static + dynamic events for a given date
+    function eventsForDate(ds) {
+      const base = EVENTS.filter(e => ds >= e.start && ds <= e.end);
+      const dyn  = dynEvents.filter(e => ds >= e.start && ds <= e.end);
+      return [...base, ...dyn];
+    }
+
+    function dotTypesForDate(ds) {
+      const types = new Set();
+      eventsForDate(ds).forEach(e => types.add(e.type));
+      return [...types];
+    }
+
+    // Open a linked event URL
+    function openEventUrl(url) {
+      if (url) window.open(url, '_blank');
+    }
+
+    // ── STATE ─────────────────────────────────────────────────
+    let viewMode = 'month';
+    let today = isoDate(new Date());
+    let selectedDate = today;
+    function cursorDate() { return new Date(selectedDate+'T12:00:00'); }
+
+    // ── VIEW SWITCHING ────────────────────────────────────────
+    const views = { month: document.getElementById('viewMonth'), week: document.getElementById('viewWeek'), day: document.getElementById('viewDay') };
+    const toggleBtns = { month: document.getElementById('btnMonth'), week: document.getElementById('btnWeek'), day: document.getElementById('btnDay') };
+
+    function switchView(mode) {
+      viewMode = mode;
+      Object.entries(views).forEach(([k,v])=>{ v.style.display = k===mode?'flex':'none'; });
+      Object.entries(toggleBtns).forEach(([k,b])=>{ b.classList.toggle('is-active',k===mode); });
+      render();
+    }
+    document.getElementById('btnMonth').addEventListener('click',()=>switchView('month'));
+    document.getElementById('btnWeek').addEventListener('click',()=>switchView('week'));
+    document.getElementById('btnDay').addEventListener('click',()=>switchView('day'));
+
+    // ── NAVIGATION ────────────────────────────────────────────
+    const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const DAY_NAMES   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const DAY_SHORT   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+    function navLabel() {
+      const d = cursorDate();
+      if (viewMode==='month') return `${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}`;
+      if (viewMode==='week') {
+        const mon = weekMonday(d);
+        const sun = new Date(mon); sun.setDate(sun.getDate()+6);
+        return mon.getMonth()===sun.getMonth()
+          ? `${MONTH_NAMES[mon.getMonth()]} ${mon.getDate()}\u2013${sun.getDate()}`
+          : `${MONTH_NAMES[mon.getMonth()].slice(0,3)} ${mon.getDate()} \u2013 ${MONTH_NAMES[sun.getMonth()].slice(0,3)} ${sun.getDate()}`;
+      }
+      const d2 = cursorDate();
+      return `${DAY_NAMES[d2.getDay()]}, ${MONTH_NAMES[d2.getMonth()]} ${d2.getDate()}`;
+    }
+
+    function weekMonday(d) {
+      const m = new Date(d);
+      const dow = m.getDay();
+      m.setDate(m.getDate() - (dow===0?6:dow-1));
+      return m;
+    }
+
+    function navigate(dir) {
+      const d = cursorDate();
+      if (viewMode==='month') {
+        d.setDate(1); d.setMonth(d.getMonth()+dir);
+        selectedDate = isoDate(d);
+      } else if (viewMode==='week') {
+        d.setDate(d.getDate()+dir*7);
+        selectedDate = isoDate(d);
+      } else {
+        d.setDate(d.getDate()+dir);
+        selectedDate = isoDate(d);
+      }
+      render();
+    }
+
+    document.getElementById('calPrev').addEventListener('click',()=>navigate(-1));
+    document.getElementById('calNext').addEventListener('click',()=>navigate(1));
+    document.getElementById('calToday').addEventListener('click',()=>{ selectedDate=today; render(); });
+
+    // ── MONTH RENDER ──────────────────────────────────────────
+    function renderMonth() {
+      const d = cursorDate();
+      const year = d.getFullYear(), month = d.getMonth();
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month+1, 0).getDate();
+      const prevDays = new Date(year, month, 0).getDate();
+      const grid = document.getElementById('calGrid');
+      grid.innerHTML = '';
+
+      const totalCells = Math.ceil((firstDay+daysInMonth)/7)*7;
+      for (let i=0;i<totalCells;i++) {
+        let cellDate, otherMonth = false;
+        if (i<firstDay) {
+          cellDate = new Date(year,month-1,prevDays-firstDay+i+1);
+          otherMonth = true;
+        } else if (i>=firstDay+daysInMonth) {
+          cellDate = new Date(year,month+1,i-firstDay-daysInMonth+1);
+          otherMonth = true;
+        } else {
+          cellDate = new Date(year,month,i-firstDay+1);
+        }
+        const ds = isoDate(cellDate);
+        const dow = cellDate.getDay();
+        const isWeekend = dow===0||dow===6;
+        const isNoSchool = NO_SCHOOL.has(ds);
+        const isToday = ds===today;
+        const isSelected = ds===selectedDate;
+
+        const cell = document.createElement('div');
+        cell.className = 'cal-cell'
+          +(otherMonth?' other-month':'')
+          +(isToday?' is-today':'')
+          +(isSelected?' is-selected':'')
+          +(isNoSchool&&!isWeekend?' is-no-school':'')
+          +(isWeekend?' is-weekend':'');
+
+        const dateNum = document.createElement('div');
+        dateNum.className = 'cal-date';
+        dateNum.textContent = cellDate.getDate();
+        cell.appendChild(dateNum);
+
+        const dotTypes = dotTypesForDate(ds);
+        if (dotTypes.length) {
+          const dots = document.createElement('div');
+          dots.className = 'cal-dots';
+          dotTypes.slice(0,4).forEach(t=>{
+            const dot = document.createElement('div');
+            dot.className = `cal-dot cal-dot-${t}`;
+            dots.appendChild(dot);
+          });
+          cell.appendChild(dots);
+        }
+
+        cell.addEventListener('click',()=>{ selectedDate=ds; renderMonth(); renderPanel(ds); });
+        grid.appendChild(cell);
+      }
+      renderPanel(selectedDate);
+    }
+
+    function renderPanel(ds) {
+      const panel = document.getElementById('calPanel');
+      const d = new Date(ds+'T12:00:00');
+      const sched = getScheduleInfo(ds);
+      const events = eventsForDate(ds);
+      const dateLabel = `${DAY_NAMES[d.getDay()]}, ${MONTH_NAMES[d.getMonth()]} ${d.getDate()}`;
+
+      let html = `<div class="cal-panel-inner">
+        <div class="cal-panel-date">${dateLabel}</div>
+        <div class="cal-panel-sched sched-${sched.type}">${sched.label}</div>`;
+
+      if (events.length===0) {
+        html += `<p class="cal-panel-empty">No events</p>`;
+      } else {
+        events.forEach(e=>{
+          const linkClass = e.url ? ' has-link' : '';
+          const linkAttr  = e.url ? ` data-url="${e.url}"` : '';
+          const linkBadge = e.url ? `<span class="cal-event-link-badge">&#8599;</span>` : '';
+          html += `<div class="cal-event-row type-${e.type}${linkClass}"${linkAttr}><span class="cal-event-emoji">${e.emoji}</span><span class="cal-event-label">${e.label}</span>${linkBadge}</div>`;
+        });
+      }
+      html += `</div>`;
+      panel.innerHTML = html;
+
+      // Click delegation for linked events in the panel
+      panel.querySelectorAll('[data-url]').forEach(el => {
+        el.addEventListener('click', () => openEventUrl(el.dataset.url));
+      });
+    }
+
+    // ── WEEK RENDER ───────────────────────────────────────────
+    function renderWeek() {
+      const mon = weekMonday(cursorDate());
+      const list = document.getElementById('weekList');
+      list.innerHTML = '';
+      for (let i=0;i<7;i++) {
+        const d = new Date(mon); d.setDate(d.getDate()+i);
+        const ds = isoDate(d);
+        const dow = d.getDay();
+        const isWeekend = dow===0||dow===6;
+        const isNoSchool = NO_SCHOOL.has(ds);
+        const sched = getScheduleInfo(ds);
+        const events = eventsForDate(ds);
+        const isToday = ds===today;
+
+        const card = document.createElement('div');
+        card.className = 'cal-week-card'
+          +(isToday?' is-today':'')
+          +(isWeekend?' is-weekend':'')
+          +(isNoSchool&&!isWeekend?' is-no-school':'');
+
+        const badgeClass = sched.type==='collaboration'?'collaboration':sched.type==='finals'?'finals':sched.type==='event'?'event':sched.type==='no-school'?'no-school':sched.type==='minimum'?'minimum':'';
+        card.innerHTML = `
+          <div class="cal-week-header">
+            <span class="cal-week-dayname">${DAY_SHORT[dow]}</span>
+            <span class="cal-week-daynum">${d.getDate()}</span>
+            <span class="cal-week-sched-badge ${badgeClass}">${sched.label}</span>
+          </div>
+          <div class="cal-week-events" id="wev-${i}"></div>`;
+
+        const evBox = card.querySelector(`#wev-${i}`);
+        if (events.length===0 && !isWeekend) {
+          evBox.innerHTML = `<span class="cal-week-no-events">No events</span>`;
+        } else {
+          events.slice(0,4).forEach(e=>{
+            const dotStyle = `background:${dotColor(e.type)}`;
+            const linkBadge = e.url ? ' &#8599;' : '';
+            evBox.innerHTML += `<div class="cal-week-event"><div class="cal-week-event-dot" style="${dotStyle}"></div>${e.emoji} ${e.label}${linkBadge}</div>`;
+          });
+          if (events.length>4) evBox.innerHTML += `<div class="cal-week-event" style="opacity:.5">+${events.length-4} more</div>`;
+        }
+
+        // Week card click: go to day view
+        card.addEventListener('click',()=>{ selectedDate=ds; switchView('day'); });
+        list.appendChild(card);
+      }
+    }
+
+    function dotColor(type) {
+      const map = {'no-school':'#ff5b5b','collaboration':'#4bd4d4','finals':'#ffaa33','grading':'#c07bff','event':'#6fdf6f','notable':'rgba(255,255,255,0.38)'};
+      return map[type]||'rgba(255,255,255,0.3)';
+    }
+
+    // ── DAY RENDER ────────────────────────────────────────────
+    function renderDay() {
+      const ds = selectedDate;
+      const d = new Date(ds+'T12:00:00');
+      const sched = getScheduleInfo(ds);
+      const events = eventsForDate(ds);
+      const body = document.getElementById('dayBody');
+
+      const typeLabel = { 'no-school':'No School','collaboration':'Collaboration','finals':'Finals','event':'School Event','regular':'Regular School Day','notable':'Notable','weekend':'Weekend','minimum':'Minimum Day' };
+
+      body.innerHTML = `
+        <div class="cal-day-hero">
+          <div class="cal-day-hero-name">${DAY_NAMES[d.getDay()]}</div>
+          <div class="cal-day-hero-num">${d.getDate()}</div>
+          <div class="cal-day-hero-month">${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}</div>
+        </div>
+        <div class="cal-day-sched-card">
+          <p class="cal-day-sched-label sched-${sched.type}">Schedule</p>
+          <p class="cal-day-sched-value">${sched.label}</p>
+        </div>
+        ${events.length?`<p class="cal-day-events-label">Events & Dates</p>`:''}
+        ${events.length===0?`<p class="cal-day-no-events">No scheduled events</p>`:''}
+        ${events.map(e=>{
+          const linkClass = e.url ? ' has-link' : '';
+          const linkAttr  = e.url ? ` data-url="${e.url}"` : '';
+          const tapLabel  = e.url ? `<span class="cal-day-event-tap">Tap for details &#8599;</span>` : '';
+          return `
+            <div class="cal-day-event-card type-${e.type}${linkClass}"${linkAttr}>
+              <span class="cal-day-event-icon">${e.emoji}</span>
+              <div class="cal-day-event-text">
+                <p class="cal-day-event-name">${e.label}</p>
+                <div class="cal-day-event-meta">
+                  <span class="cal-day-event-type">${typeLabel[e.type]||e.type}</span>
+                  ${tapLabel}
+                </div>
+              </div>
+            </div>`;
+        }).join('')}`;
+
+      // Click delegation for linked events in day view
+      body.querySelectorAll('[data-url]').forEach(el => {
+        el.addEventListener('click', () => openEventUrl(el.dataset.url));
+      });
+    }
+
+    // ── MASTER RENDER ─────────────────────────────────────────
+    function render() {
+      document.getElementById('calNavLabel').textContent = navLabel();
+      if (viewMode==='month') renderMonth();
+      else if (viewMode==='week') renderWeek();
+      else renderDay();
+    }
+
+    // ── NAV MENU ──────────────────────────────────────────────
+    const navMenuBtn = document.getElementById('navMenuBtn');
+    const navMenu = document.getElementById('navMenu');
+    function positionMenu() {
+      const r = navMenuBtn.getBoundingClientRect();
+      navMenu.style.top  = (r.bottom+6)+'px';
+      navMenu.style.right= (window.innerWidth-r.right)+'px';
+    }
+    navMenuBtn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const open = navMenu.classList.toggle('is-open');
+      navMenuBtn.classList.toggle('is-open',open);
+      navMenu.setAttribute('aria-hidden',String(!open));
+      if (open) positionMenu();
+    });
+    document.addEventListener('click',e=>{
+      if (!navMenu.contains(e.target)&&e.target!==navMenuBtn) {
+        navMenu.classList.remove('is-open');
+        navMenuBtn.classList.remove('is-open');
+        navMenu.setAttribute('aria-hidden','true');
+      }
+    });
+    document.getElementById('navPopOut')?.addEventListener('click',()=>{
+      window.open(location.href+'?popout=1','_blank','width=430,height=880,resizable=yes');
+      navMenu.classList.remove('is-open'); navMenuBtn.classList.remove('is-open');
+    });
+    document.getElementById('navFeedback')?.addEventListener('click',()=>{
+      document.getElementById('feedbackModal').hidden = false;
+      navMenu.classList.remove('is-open'); navMenuBtn.classList.remove('is-open');
+    });
+
+    // ── FEEDBACK ──────────────────────────────────────────────
+    document.getElementById('feedbackClose')?.addEventListener('click',()=>{ document.getElementById('feedbackModal').hidden=true; });
+    document.getElementById('feedbackBackdrop')?.addEventListener('click',()=>{ document.getElementById('feedbackModal').hidden=true; });
+    document.getElementById('feedbackSubmit')?.addEventListener('click',()=>{
+      const name = document.getElementById('fbName').value.trim()||'Anonymous';
+      const msg  = document.getElementById('fbMsg').value.trim();
+      if (!msg) return;
+      emailjs.send('service_4mhkbik','template_fd0suj3',{
+        from_name: '[PVHS] '+name,
+        message:   '[PVHS Calendar] '+msg
+      }).catch(()=>{});
+      document.getElementById('feedbackModal').hidden=true;
+      document.getElementById('fbName').value='';
+      document.getElementById('fbMsg').value='';
+    });
+
+    // ── SERVICE WORKER ────────────────────────────────────────
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(()=>{});
+      navigator.serviceWorker.addEventListener('controllerchange', () => location.reload());
+    }
+
+    // ── LOGO HOME LINK (PWA standalone fix) ─────────────────
+    (function() {
+      var logo = document.querySelector('.top-row a[aria-label="Home"]');
+      if (logo) logo.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = 'index.html';
+      });
+    })();
+
+    // ── INIT ──────────────────────────────────────────────────
+    render();
+
+    // ── LOAD DYNAMIC EVENTS FROM PARENTSQUARE ────────────────
+    // events.json is written by the parentsquare-news-sync skill.
+    // Events merge on top of the static EVENTS array above.
+    fetch('src/data/events.json?t=' + Date.now())
+      .then(r => r.json())
+      .then(data => {
+        if (data && Array.isArray(data.events) && data.events.length) {
+          dynEvents = data.events;
+          render(); // Re-render with dynamic events merged in
+        }
+      })
+      .catch(() => {}); // Fail silently — static events always show
+
+    // ── SWIPE PAGE NAVIGATION ──────────────────────────────────────────────
+    (function() {
+      const PAGES = ['index.html','countdown.html','extension_search.html','calendar.html'];
+      const path = location.pathname;
+      let idx = PAGES.findIndex(p => path.endsWith('/' + p));
+      if (idx < 0 && (path.endsWith('/') || /\/pvhs_tools\/?$/.test(path))) idx = 0;
+      const inRing = idx >= 0;
+      const _sdir = localStorage.getItem('pvSwipeDir');
+      if (_sdir) {
+        localStorage.removeItem('pvSwipeDir');
+        const _app = document.querySelector('.app');
+        if (_app) {
+          _app.style.transform = _sdir === 'l' ? 'translateX(6%)' : 'translateX(-6%)';
+          _app.style.opacity = '0';
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            _app.style.transition = 'transform 0.32s cubic-bezier(0.2,0,0,1), opacity 0.28s ease-out';
+            _app.style.transform = ''; _app.style.opacity = '';
+            setTimeout(() => { _app.style.transition = ''; }, 350);
+          }));
+        }
+      }
+      function overlayOpen() {
+        const ids = ['maintModal','installModal','installBanner','verAnnounceSheet',
+          'newsModal','newsChooser','embedModal','feedbackModal',
+          'schedSheet','calAnnounceSheet','a2hsPrompt','directoryChooser'];
+        if (ids.some(id => { const el = document.getElementById(id); return el && !el.hidden; })) return true;
+        const lb = document.getElementById('newsLightbox');
+        if (lb && lb.classList.contains('is-open')) return true;
+        const nav = document.getElementById('navMenu');
+        return nav && nav.classList.contains('is-open');
+      }
+      let x0 = 0, y0 = 0, live = false;
+      document.addEventListener('touchstart', e => {
+        if (overlayOpen()) { live = false; return; }
+        x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; live = true;
+      }, { passive: true });
+      document.addEventListener('touchcancel', () => { live = false; }, { passive: true });
+      document.addEventListener('touchend', e => {
+        if (!live) return; live = false;
+        const dx = e.changedTouches[0].clientX - x0;
+        const dy = e.changedTouches[0].clientY - y0;
+        if (Math.abs(dx) < 55 || Math.abs(dx) <= Math.abs(dy)) return;
+        const dest = inRing ? PAGES[(idx + (dx < 0 ? 1 : -1) + PAGES.length) % PAGES.length] : 'index.html';
+        const app = document.querySelector('.app');
+        if (app) {
+          app.style.transition = 'transform 0.2s ease-in, opacity 0.2s ease-in';
+          app.style.transform = dx < 0 ? 'translateX(-6%)' : 'translateX(6%)';
+          app.style.opacity = '0';
+        }
+        localStorage.setItem('pvSwipeDir', dx < 0 ? 'l' : 'r');
+        setTimeout(() => { location.href = dest; }, 190);
+      }, { passive: true });
+    })();
+    // ──────────────────────────────────────────────────────────────────────
+  </script>
+</body>
+</html>

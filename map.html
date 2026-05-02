@@ -1,0 +1,1180 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PVHS Tools">
+  <meta name="theme-color" content="#007474">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-TileColor" content="#021414">
+  <meta name="msapplication-navbutton-color" content="#007474">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="PV_AppIcon.png">
+  <link rel="icon" type="image/png" href="PV_AppIcon.png">
+  <title>Campus Map</title>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>emailjs.init('68UkiTjqHIKZMkeCC');</script>
+
+  <style>
+    :root {
+      --teal: #007474; --white: #f7fbfb; --muted: #cfe3e3;
+      --panel: rgba(255,255,255,0.02); --panel-border: rgba(255,255,255,0.05);
+      --shadow: 0 20px 46px rgba(0,0,0,0.30); --soft-shadow: 0 12px 24px rgba(0,0,0,0.22);
+      --card-hover: rgba(255,255,255,0.12); --app-spacing: 16px; --radius: 34px;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+    html { height: -webkit-fill-available; }
+    html, body { width: 100%; height: 100%; min-height: 100%; background: #021414; overflow: hidden; }
+    body { min-height: 100vh; min-height: 100dvh; min-height: -webkit-fill-available; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; color: var(--white); touch-action: none; user-select: none; -webkit-user-select: none; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+    .frame { width: 100%; height: 100dvh; min-height: 100vh; min-height: -webkit-fill-available; display: flex; align-items: center; justify-content: center; padding: 10px; }
+
+    .app {
+      width: 430px; height: 880px; max-width: 100%; max-height: 100%;
+      border-radius: var(--radius); overflow: hidden; position: relative;
+      box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,0.12); border-top-color: rgba(255,255,255,0.04);
+      background: linear-gradient(168deg, rgba(6,28,28,0.97) 0%, rgba(4,24,24,0.95) 30%, rgba(0,72,72,0.92) 60%, rgba(0,100,100,0.96) 82%, rgba(4,30,30,0.97) 100%);
+      display: flex; flex-direction: column; padding: 14px var(--app-spacing) var(--app-spacing) var(--app-spacing); isolation: isolate;
+    }
+
+    .app::before {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(ellipse at 50% 20%, rgba(0,116,116,0.18) 0%, transparent 60%),
+                  radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 50%);
+      z-index: 0;
+    }
+
+    .ghost-logo { position: absolute; top: 56%; left: 50%; width: 120%; opacity: 0.07; transform: translate(-50%, -50%); filter: grayscale(100%) contrast(108%) brightness(114%); pointer-events: none; z-index: 0; }
+
+    .content { position: relative; z-index: 1; width: 100%; flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: stretch; overflow: hidden; }
+
+    /* ── TOP ROW ── */
+    .top-row { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 10px; height: 44px; flex-shrink: 0; margin-bottom: 4px; position: relative; }
+    .logo-clear { width: 38px; height: 38px; object-fit: contain; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); flex-shrink: 0; }
+    .page-title { position: absolute; left: 0; right: 0; text-align: center; font-size: 15px; font-weight: 700; color: #dff7f7; text-transform: uppercase; margin: 0; letter-spacing: 0.14em; pointer-events: none; }
+
+    /* ── NAV DROPDOWN ── */
+    .nav-menu-btn { appearance: none; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.13); border-radius: 12px; color: rgba(255,255,255,0.92); width: 34px; height: 34px; font-size: 14px; font-weight: 900; letter-spacing: 0.08em; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: background 0.16s, border-color 0.16s; }
+    .nav-menu-btn.is-open, .nav-menu-btn:active { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.26); }
+    .nav-menu { position: fixed; z-index: 9999; min-width: 172px; background: rgba(3,20,20,0.58); border: 1px solid rgba(255,255,255,0.16); border-radius: 16px; padding: 5px; box-shadow: 0 14px 44px rgba(0,0,0,0.52); backdrop-filter: blur(26px); -webkit-backdrop-filter: blur(26px); transform-origin: top right; transform: scale(0.88) translateY(-8px); opacity: 0; pointer-events: none; transition: opacity 0.17s ease, transform 0.19s cubic-bezier(0.34,1.4,0.64,1); }
+    .nav-menu.is-open { opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; }
+    .nav-menu-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 11px; text-decoration: none; color: #eaf8f8; background: transparent; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; border: none; cursor: pointer; width: 100%; transition: background 0.13s; }
+    .nav-menu-item:active { background: rgba(255,255,255,0.1); }
+    .nav-menu-icon { font-size: 14px; flex-shrink: 0; }
+    .nav-menu-sep { height: 1px; background: rgba(255,255,255,0.09); margin: 3px 6px; }
+
+    /* ── SEARCH BAR ── */
+    .map-search-row {
+      display: flex; gap: 6px; width: 100%; flex-shrink: 0; margin-bottom: 6px;
+      position: relative; z-index: 5;
+    }
+    .map-search-input {
+      flex: 1; appearance: none; background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12); border-radius: 12px;
+      color: #f7fbfb; font-size: 13px; padding: 9px 12px;
+      outline: none; font-family: inherit;
+    }
+    .map-search-input:focus { border-color: rgba(0,220,220,0.4); background: rgba(255,255,255,0.12); }
+    .map-search-input::placeholder { color: rgba(255,255,255,0.38); }
+    .map-icon-btn {
+      appearance: none; width: 36px; height: 36px; flex-shrink: 0;
+      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px; color: #dff7f7; font-size: 16px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .map-icon-btn:active { background: rgba(255,255,255,0.14); }
+
+    /* ── SEARCH RESULTS DROPDOWN ── */
+    .map-search-results {
+      position: absolute; top: 42px; left: 0; right: 42px; z-index: 12;
+      background: rgba(6,26,26,0.98); border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 12px; padding: 4px;
+      max-height: 220px; overflow-y: auto;
+      box-shadow: 0 16px 32px rgba(0,0,0,0.5);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    }
+    .map-search-results[hidden] { display: none; }
+    .map-search-item {
+      padding: 8px 10px; border-radius: 8px; cursor: pointer;
+      display: flex; align-items: center; gap: 8px;
+      color: #f7fbfb; font-size: 12.5px;
+    }
+    .map-search-item:hover, .map-search-item.is-active { background: rgba(0,160,160,0.2); }
+    .map-search-item-num { font-weight: 800; color: #4be1e1; min-width: 40px; }
+    .map-search-item-sub { color: var(--muted); font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase; }
+    .map-search-empty { padding: 10px; color: var(--muted); font-size: 11px; text-align: center; }
+
+    /* ── MAP CANVAS ── */
+    .map-wrap {
+      flex: 1; min-height: 0; position: relative;
+      background: radial-gradient(ellipse at center, rgba(8,40,40,0.7) 0%, rgba(3,20,20,0.85) 100%);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px; overflow: hidden;
+      touch-action: none;
+    }
+    #mapSvg { width: 100%; height: 100%; display: block; cursor: grab; }
+    #mapSvg.is-grabbing { cursor: grabbing; }
+
+    /* SVG element styles */
+    .m-field { fill: rgba(100,180,110,0.16); stroke: rgba(100,180,110,0.35); stroke-width: 1.2; }
+    .m-parking { fill: rgba(255,255,255,0.04); stroke: rgba(255,255,255,0.18); stroke-width: 1; stroke-dasharray: 4 3; }
+    .m-building { fill: rgba(0,140,140,0.28); stroke: rgba(75,225,225,0.5); stroke-width: 1.2; cursor: pointer; transition: fill 0.18s; }
+    .m-building:hover, .m-building.is-active { fill: rgba(0,180,180,0.48); }
+    .m-block-shell { fill: rgba(0,80,80,0.35); stroke: rgba(75,225,225,0.65); stroke-width: 2; cursor: pointer; transition: fill 0.18s; }
+    .m-block-shell:hover, .m-block-shell.is-active { fill: rgba(0,140,140,0.45); }
+    .m-hallway { fill: rgba(255,255,255,0.06); stroke: none; pointer-events: none; }
+    .m-door {
+      fill: rgba(255,200,80,0.85);
+      stroke: rgba(255,220,120,0.95);
+      stroke-width: 0.4;
+      pointer-events: none;
+    }
+    .m-room { fill: rgba(0,180,180,0.20); stroke: rgba(120,240,240,0.5); stroke-width: 0.6; cursor: pointer; transition: fill 0.15s; }
+    .m-room:hover, .m-room.is-active { fill: rgba(0,220,220,0.55); }
+    .m-room.is-highlight {
+      fill: rgba(255,200,40,0.65) !important;
+      stroke: #ffd84b; stroke-width: 1.2;
+      animation: roomPulse 1s ease-in-out infinite alternate;
+    }
+    @keyframes roomPulse {
+      from { fill: rgba(255,200,40,0.65); stroke-width: 1.2; }
+      to   { fill: rgba(255,230,80,0.95); stroke-width: 2; }
+    }
+    .m-gate { fill: rgba(255,180,40,0.75); stroke: rgba(255,220,80,0.95); stroke-width: 1.2; }
+    .m-gate-num { fill: #021414; font-size: 14px; font-weight: 800; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+
+    /* SVG labels — sized for viewBox 1400x940 */
+    .m-label-bldg { fill: #ffffff; font-size: 20px; font-weight: 800; text-anchor: middle; dominant-baseline: central; text-transform: uppercase; letter-spacing: 0.06em; pointer-events: none; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+    .m-label-block { fill: #ffffff; font-size: 24px; font-weight: 900; text-anchor: middle; dominant-baseline: central; text-transform: uppercase; letter-spacing: 0.08em; pointer-events: none; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+    .m-label-small { fill: rgba(255,255,255,0.72); font-size: 14px; font-weight: 700; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+    .m-label-field { fill: rgba(200,240,200,0.95); font-size: 20px; font-weight: 800; text-anchor: middle; dominant-baseline: central; text-transform: uppercase; letter-spacing: 0.08em; pointer-events: none; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+    .m-room-num { fill: #f7fbfb; font-size: 9px; font-weight: 700; text-anchor: middle; dominant-baseline: central; pointer-events: none; opacity: 0; transition: opacity 0.2s; }
+    .m-room-num.is-visible { opacity: 1; }
+    .m-street { fill: rgba(255,255,255,0.5); font-size: 16px; font-weight: 700; text-anchor: middle; letter-spacing: 0.15em; }
+
+    /* Compass */
+    .m-compass { pointer-events: none; }
+
+    /* ── ZOOM CONTROLS ── */
+    .map-controls {
+      position: absolute; right: 10px; bottom: 10px; z-index: 6;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .map-control-btn {
+      appearance: none; width: 36px; height: 36px;
+      background: rgba(6,26,26,0.82); border: 1px solid rgba(255,255,255,0.18);
+      color: #dff7f7; border-radius: 10px; font-size: 17px; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.35);
+    }
+    .map-control-btn:active { background: rgba(0,160,160,0.35); }
+
+    /* ── BOTTOM INFO SHEET ── */
+    .map-info-backdrop {
+      position: absolute; inset: 0; z-index: 30;
+      background: rgba(1,12,12,0.55);
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    }
+    .map-info-backdrop[hidden] { display: none; }
+    .map-info-sheet {
+      position: absolute; bottom: 0; left: 0; right: 0; z-index: 31;
+      background: rgba(6,26,26,0.98);
+      border-top: 1px solid rgba(255,255,255,0.14);
+      border-radius: 22px 22px 0 0;
+      padding: 18px 18px calc(18px + env(safe-area-inset-bottom));
+      display: flex; flex-direction: column; gap: 10px;
+      transform: translateY(110%);
+      transition: transform 0.42s cubic-bezier(0.34,1.25,0.64,1);
+    }
+    .map-info-sheet.is-visible { transform: translateY(0); }
+    .map-info-sheet[hidden] { display: none; }
+    .map-info-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .map-info-pill {
+      font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.11em;
+      background: rgba(0,116,116,0.3); color: #4bd4d4;
+      border: 1px solid rgba(0,116,116,0.45); border-radius: 99px; padding: 3px 9px;
+    }
+    .map-info-close {
+      appearance: none; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.6); border-radius: 99px; width: 28px; height: 28px;
+      font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .map-info-title { font-size: 18px; font-weight: 800; color: #fff; margin: 0; }
+    .map-info-sub { font-size: 12px; color: var(--muted); margin: 0; line-height: 1.45; }
+    .map-info-rooms {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;
+      max-height: 180px; overflow-y: auto; padding: 4px 0;
+    }
+    .map-info-room-chip {
+      appearance: none; border: 1px solid rgba(0,220,220,0.35);
+      background: rgba(0,160,160,0.18); color: #4be1e1;
+      border-radius: 99px; padding: 5px 10px;
+      font-size: 11px; font-weight: 800; cursor: pointer;
+    }
+    .map-info-room-chip:active { background: rgba(0,180,180,0.35); }
+
+    .footer-note { text-align: center; font-size: 9px; color: #b5d4d4; font-weight: 600; padding: 4px 0 0; margin-top: 4px; flex-shrink: 0; opacity: 0.75; }
+
+    /* ── STANDALONE ── */
+    body.is-standalone { background: #021414; }
+    body.is-standalone::before { content: ""; position: fixed; inset: 0; background: #021414; pointer-events: none; z-index: 0; }
+    body.is-standalone .frame { position: fixed; inset: 0; width: 100%; height: 100%; min-height: -webkit-fill-available; padding: 0 8px max(24px,calc(env(safe-area-inset-bottom) + 8px)) 8px; z-index: 1; }
+    body.is-standalone .app { position: relative; width: 100%; height: 100%; max-width: 100%; max-height: 100%; border-radius: 34px; border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 24px 46px rgba(0,0,0,0.22); padding-top: max(10px,env(safe-area-inset-top)); padding-right: max(var(--app-spacing),env(safe-area-inset-right)); padding-bottom: 18px; padding-left: max(var(--app-spacing),env(safe-area-inset-left)); }
+
+    @media (max-width: 430px) {
+      body:not(.is-standalone) .frame { padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom) 12px; }
+      body:not(.is-standalone) .app { width: 100%; height: 100%; max-height: 100%; border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.12); }
+      body { touch-action: pan-y; }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <div class="app">
+      <img class="ghost-logo" src="PV_Logo.png" alt="">
+      <div class="content">
+
+        <!-- Top Row -->
+        <div class="top-row">
+          <a href="index.html" class="nav-link" aria-label="Home"><img src="PV_Logo.png" class="logo-clear" alt="PVHS"></a>
+          <h1 class="page-title">Campus Map</h1>
+          <button class="nav-menu-btn" id="navMenuBtn" type="button" aria-label="Menu">···</button>
+        </div>
+
+        <!-- Search -->
+        <div class="map-search-row">
+          <input type="text" class="map-search-input" id="mapSearchInput" placeholder="Find a room (e.g. 415)" autocomplete="off" inputmode="search">
+          <button id="mapSearchClear" class="map-icon-btn" type="button" aria-label="Clear">✕</button>
+          <div id="mapSearchResults" class="map-search-results" hidden></div>
+        </div>
+
+        <!-- Map -->
+        <div class="map-wrap">
+          <svg id="mapSvg" viewBox="0 0 2000 1080" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+            <!-- Generated by JS -->
+          </svg>
+
+          <!-- Zoom controls -->
+          <div class="map-controls">
+            <button id="mapZoomIn" class="map-control-btn" type="button" aria-label="Zoom in">+</button>
+            <button id="mapZoomOut" class="map-control-btn" type="button" aria-label="Zoom out">−</button>
+            <button id="mapReset" class="map-control-btn" type="button" aria-label="Reset view" style="font-size:14px">⟲</button>
+          </div>
+        </div>
+
+        <div class="footer-note">Tap a building for details · Pinch or use −/+ to zoom</div>
+      </div><!-- /content -->
+    </div><!-- /app -->
+  </div><!-- /frame -->
+
+  <!-- Nav Dropdown -->
+  <nav class="nav-menu" id="navMenu" role="menu" aria-hidden="true">
+    <a href="index.html" class="nav-menu-item nav-link"><span class="nav-menu-icon">&#x1F3E0;</span> Home</a>
+    <a href="countdown.html" class="nav-menu-item nav-link"><span class="nav-menu-icon">&#x23F1;</span> Countdown</a>
+    <a href="extension_search.html" class="nav-menu-item nav-link"><span class="nav-menu-icon">&#x1F50D;</span> Staff Search</a>
+    <a href="map.html" class="nav-menu-item nav-link"><span class="nav-menu-icon">&#x1F5FA;</span> Campus Map</a>
+    <a href="calendar.html" class="nav-menu-item nav-link"><span class="nav-menu-icon">&#x1F4C5;</span> Calendar</a>
+  </nav>
+
+  <!-- Bottom Info Sheet -->
+  <div id="mapInfoBackdrop" class="map-info-backdrop" hidden></div>
+  <div id="mapInfoSheet" class="map-info-sheet" hidden>
+    <div class="map-info-top">
+      <span class="map-info-pill" id="mapInfoType">Building</span>
+      <button id="mapInfoClose" class="map-info-close" type="button" aria-label="Close">&#x2715;</button>
+    </div>
+    <p class="map-info-title" id="mapInfoTitle">—</p>
+    <p class="map-info-sub" id="mapInfoSub"></p>
+    <div class="map-info-rooms" id="mapInfoRooms" hidden></div>
+  </div>
+
+  <script>
+    // ── STANDALONE DETECTION ──
+    if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+      document.body.classList.add('is-standalone');
+    }
+
+    // ── CAMPUS DATA ────────────────────────────────────────
+    // Rough positions in viewBox 1400x940. Positions approximate PDF layout.
+    // Classroom blocks get room-level detail. Other structures get shaped outlines + labels.
+
+    // Helper to build a column of rooms with even spacing
+    // dir: 'down' = first room at top, 'up' = first room at bottom
+    function colRooms(start, count, x, y, w, h, dir) {
+      const rooms = [];
+      const cellH = h / count;
+      for (let i = 0; i < count; i++) {
+        const n = start + i;
+        const yPos = y + (dir === 'up' ? (count - 1 - i) * cellH : i * cellH);
+        rooms.push({ n: String(n), x: x + 1, y: yPos + 1, w: w - 2, h: cellH - 2 });
+      }
+      return rooms;
+    }
+    // Build grid rooms by columns array. Each col: {nums:[...], x, y, w, h}
+    function customLayout(cols) {
+      const rooms = [];
+      cols.forEach(col => {
+        const cellH = col.h / col.nums.length;
+        col.nums.forEach((n, i) => {
+          rooms.push({
+            n: String(n), x: col.x + 1, y: col.y + i * cellH + 1,
+            w: col.w - 2, h: cellH - 2
+          });
+        });
+      });
+      return rooms;
+    }
+
+    const rng = (s,e) => { const a=[]; for (let i=s;i<=e;i++) a.push(i); return a; };
+
+    // CLASSROOM BLOCKS — strict grid coordinates, documented bounds:
+    //   800s:    x 460-610   y 200-440    (150 wide)
+    //   600s:    x 640-1170  y 200-480    (530 wide, tallest-north)
+    //   Bldg H2F:x 1200-1430 y 150-260    (230 wide, floating above 400s)
+    //   400s:    x 1200-1470 y 480-750    (270 wide, east-central)
+    //   300s:    x 1500-1700 y 560-870    (200 wide)
+    //   200s:    x 1720-1820 y 470-820    (100 wide, narrow tall)
+    //   500s:    x 700-960   y 510-800    (260 wide, south-central)
+    //   500s-S:  x 700-870   y 830-1020   (south wing 551-557)
+    //   100s:    x 1000-1170 y 810-940    (170 wide)
+    //   700s:    x 1200-1410 y 820-950    (210 wide)
+    //
+    // All gaps ≥ 30 viewBox units between buildings.
+    const BLOCKS = [
+      // 800s block — x 460-610, y 200-440
+      {
+        id:'800', label:'800s', desc:'Bldg R/P · small classrooms east of pool',
+        outline:{x:460, y:200, w:150, h:240},
+        rooms: customLayout([
+          { x:466, y:210, w:68, h:220, nums:[635,634,633,632,631] },
+          { x:538, y:210, w:68, h:220, nums:[636,637,638,639,640] }
+        ]),
+        hallways: [{x:534, y:210, w:6, h:220}],
+        doors: [{x:535, y:440, side:'s'}]
+      },
+
+      // 600s block — x 640-1170, y 200-480
+      {
+        id:'600', label:'600s Block', desc:'North-central · Largest classroom block',
+        outline:{x:640, y:200, w:530, h:280},
+        rooms: customLayout([
+          // North strip (top row): 613-618 (west) + 620-630 (east)
+          { x:646, y:208, w:28, h:58, nums:[613] },
+          { x:676, y:208, w:28, h:58, nums:[614] },
+          { x:706, y:208, w:28, h:58, nums:[615] },
+          { x:736, y:208, w:28, h:58, nums:[616] },
+          { x:766, y:208, w:28, h:58, nums:[617] },
+          { x:796, y:208, w:28, h:58, nums:[618] },
+          // gap, then 620-630 (11 rooms)
+          { x:838, y:208, w:28, h:58, nums:[620] },
+          { x:868, y:208, w:28, h:58, nums:[621] },
+          { x:898, y:208, w:28, h:58, nums:[622] },
+          { x:928, y:208, w:28, h:58, nums:[623] },
+          { x:958, y:208, w:28, h:58, nums:[624] },
+          { x:988, y:208, w:28, h:58, nums:[625] },
+          { x:1018, y:208, w:28, h:58, nums:[626] },
+          { x:1048, y:208, w:28, h:58, nums:[627] },
+          { x:1078, y:208, w:28, h:58, nums:[628] },
+          { x:1108, y:208, w:28, h:58, nums:[629] },
+          { x:1138, y:208, w:28, h:58, nums:[630] },
+          // Middle-left 4-stack (612,611,610,609 — top to bottom)
+          { x:646, y:290, w:52, h:180, nums:[612,611,610,609] },
+          // 2x2 block: 605/606 top, 607/608 bottom
+          { x:710, y:290, w:60, h:85, nums:[605,606] },
+          { x:710, y:380, w:60, h:85, nums:[607,608] },
+          // 2x2 block: 604/603 top, 602/601 bottom
+          { x:776, y:290, w:60, h:85, nums:[604,603] },
+          { x:776, y:380, w:60, h:85, nums:[602,601] }
+        ]),
+        hallways: [{x:644, y:270, w:524, h:14}],
+        doors: [
+          {x:640, y:280, side:'w'},
+          {x:1170, y:280, side:'e'},
+          {x:900, y:200, side:'n'}
+        ]
+      },
+
+      // Bldg H 2nd floor — x 1200-1430, y 150-260 (floating above 400s)
+      {
+        id:'400-h2', label:'Bldg H · 2nd Floor', desc:'400s 2nd floor — 12 rooms',
+        outline:{x:1200, y:150, w:230, h:110},
+        rooms: customLayout([
+          // Top row: 466-461 (right to left visually, so 466 leftmost, 461 rightmost)
+          { x:1206, y:158, w:34, h:46, nums:[466] },
+          { x:1242, y:158, w:34, h:46, nums:[465] },
+          { x:1278, y:158, w:34, h:46, nums:[464] },
+          { x:1314, y:158, w:34, h:46, nums:[463] },
+          { x:1350, y:158, w:34, h:46, nums:[462] },
+          { x:1386, y:158, w:38, h:46, nums:[461] },
+          // Bottom row: 456-451
+          { x:1206, y:208, w:34, h:46, nums:[456] },
+          { x:1242, y:208, w:34, h:46, nums:[455] },
+          { x:1278, y:208, w:30, h:46, nums:[454] },
+          // 457 small room inset
+          { x:1310, y:218, w:16, h:26, nums:[457] },
+          { x:1328, y:208, w:22, h:46, nums:[453] },
+          { x:1352, y:208, w:32, h:46, nums:[452] },
+          { x:1386, y:208, w:38, h:46, nums:[451] }
+        ]),
+        hallways: [{x:1204, y:204, w:222, h:6}],
+        doors: [{x:1315, y:150, side:'n'}]
+      },
+
+      // 400s block — x 1200-1470, y 480-750
+      {
+        id:'400-f1', label:'400s', desc:'Central-east · 1st floor · 21 rooms',
+        outline:{x:1200, y:480, w:270, h:270},
+        rooms: customLayout([
+          // Row 1: 435 434 433 432 431
+          { x:1208, y:488, w:50, h:50, nums:[435] },
+          { x:1260, y:488, w:50, h:50, nums:[434] },
+          { x:1312, y:488, w:50, h:50, nums:[433] },
+          { x:1364, y:488, w:50, h:50, nums:[432] },
+          { x:1416, y:488, w:48, h:50, nums:[431] },
+          // Row 2: 425 424 423 422 421
+          { x:1208, y:542, w:50, h:50, nums:[425] },
+          { x:1260, y:542, w:50, h:50, nums:[424] },
+          { x:1312, y:542, w:50, h:50, nums:[423] },
+          { x:1364, y:542, w:50, h:50, nums:[422] },
+          { x:1416, y:542, w:48, h:50, nums:[421] },
+          // Row 3: 414 413 [415] 412 411
+          { x:1208, y:608, w:50, h:50, nums:[414] },
+          { x:1260, y:608, w:50, h:50, nums:[413] },
+          { x:1314, y:620, w:46, h:26, nums:[415] },
+          { x:1364, y:608, w:50, h:50, nums:[412] },
+          { x:1416, y:608, w:48, h:50, nums:[411] },
+          // Row 4: 404 403 402 401
+          { x:1208, y:662, w:62, h:60, nums:[404] },
+          { x:1272, y:662, w:62, h:60, nums:[403] },
+          { x:1336, y:662, w:62, h:60, nums:[402] },
+          { x:1402, y:662, w:62, h:60, nums:[401] },
+          // 405
+          { x:1290, y:726, w:90, h:22, nums:[405] }
+        ]),
+        hallways: [{x:1204, y:598, w:262, h:8}],
+        doors: [
+          {x:1200, y:604, side:'w'},
+          {x:1470, y:604, side:'e'},
+          {x:1335, y:480, side:'n'},
+          {x:1335, y:750, side:'s'}
+        ]
+      },
+
+      // 300s block — x 1500-1700, y 560-870
+      {
+        id:'300', label:'300s', desc:'Building E · 4 columns + central hallway',
+        outline:{x:1500, y:560, w:200, h:310},
+        rooms: customLayout([
+          // Col 0: 304,303,302,301 (4 rooms, bottom-aligned)
+          { x:1506, y:628, w:44, h:236, nums:[304,303,302,301] },
+          // Col 1: 314,313,312,311 (4 rooms, bottom-aligned)
+          { x:1552, y:628, w:42, h:236, nums:[314,313,312,311] },
+          // Col 2: 325,324,323,322,321 (5 rooms full height)
+          { x:1602, y:568, w:42, h:296, nums:[325,324,323,322,321] },
+          // Col 3: 335,334,333,332,331 (5 rooms full height)
+          { x:1648, y:568, w:46, h:296, nums:[335,334,333,332,331] }
+        ]),
+        hallways: [{x:1594, y:566, w:10, h:300}],
+        doors: [
+          {x:1620, y:560, side:'n'},
+          {x:1620, y:870, side:'s'},
+          {x:1500, y:720, side:'w'},
+          {x:1700, y:720, side:'e'}
+        ]
+      },
+
+      // 200s block — x 1720-1820, y 470-820 (narrow tall)
+      {
+        id:'200', label:'200s', desc:'Bldg G & J · far east, narrow tall',
+        outline:{x:1720, y:470, w:100, h:350},
+        rooms: customLayout([
+          { x:1726, y:478, w:44, h:336, nums:[218,217,216,215,214,213,212,211,210,209] },
+          { x:1774, y:478, w:42, h:336, nums:[201,202,203,204,205,206,207,208] }
+        ]),
+        hallways: [{x:1768, y:478, w:8, h:336}],
+        doors: [
+          {x:1770, y:470, side:'n'},
+          {x:1770, y:820, side:'s'}
+        ]
+      },
+
+      // 500s main block — x 700-960, y 510-800
+      {
+        id:'500', label:'500s', desc:'Central · big rooms 504/505/506',
+        outline:{x:700, y:510, w:260, h:290},
+        rooms: customLayout([
+          // Top row: 502 | 501
+          { x:708, y:518, w:118, h:50, nums:[502] },
+          { x:830, y:518, w:122, h:50, nums:[501] },
+          // 503 (left half only)
+          { x:708, y:572, w:118, h:40, nums:[503] },
+          // Big center: 504
+          { x:720, y:618, w:220, h:50, nums:[504] },
+          // 505
+          { x:720, y:672, w:220, h:38, nums:[505] },
+          // 506
+          { x:720, y:714, w:220, h:38, nums:[506] },
+          // Bottom row: 509 | 508 | 516 | 507
+          { x:708, y:756, w:54, h:38, nums:[509] },
+          { x:766, y:756, w:54, h:38, nums:[508] },
+          { x:824, y:756, w:54, h:38, nums:[516] },
+          { x:882, y:756, w:70, h:38, nums:[507] }
+        ]),
+        hallways: [{x:704, y:752, w:252, h:2}],
+        doors: [
+          {x:700, y:660, side:'w'},
+          {x:960, y:660, side:'e'},
+          {x:830, y:800, side:'s'}
+        ]
+      },
+
+      // 500s south wing — x 700-870, y 830-1020
+      {
+        id:'500-south', label:'500s South', desc:'551-557 small south wing',
+        outline:{x:700, y:830, w:170, h:190},
+        rooms: customLayout([
+          { x:706, y:838, w:158, h:28, nums:[551] },
+          { x:706, y:870, w:158, h:28, nums:[552] },
+          { x:706, y:902, w:158, h:28, nums:[553] },
+          { x:706, y:934, w:158, h:28, nums:[554] },
+          { x:706, y:966, w:76, h:46, nums:[555] },
+          { x:786, y:966, w:78, h:46, nums:[556] },
+          { x:706, y:1016, w:158, h:2, nums:[557] }
+        ]),
+        hallways: [],
+        doors: [{x:785, y:830, side:'n'}]
+      },
+
+      // 100s block — x 1000-1170, y 810-940
+      {
+        id:'100', label:'100s · Library', desc:'Main entrance area',
+        outline:{x:1000, y:810, w:170, h:130},
+        rooms: customLayout([
+          { x:1006, y:818, w:50, h:38, nums:[107] },
+          { x:1060, y:818, w:50, h:38, nums:[105] },
+          { x:1114, y:818, w:52, h:38, nums:[104] },
+          { x:1006, y:860, w:50, h:32, nums:[110] },
+          { x:1060, y:860, w:50, h:32, nums:[109] },
+          { x:1114, y:860, w:52, h:32, nums:[103] },
+          { x:1006, y:896, w:76, h:38, nums:[100] },
+          { x:1086, y:896, w:80, h:38, nums:[102] }
+        ]),
+        hallways: [{x:1004, y:856, w:164, h:4}],
+        doors: [{x:1080, y:810, side:'n'}, {x:1080, y:940, side:'s'}]
+      },
+
+      // 700s block — x 1200-1410, y 820-950
+      {
+        id:'700', label:'700s · Admin', desc:'Administration & main office',
+        outline:{x:1200, y:820, w:210, h:130},
+        rooms: customLayout([
+          { x:1206, y:828, w:48, h:38, nums:[711] },
+          { x:1258, y:828, w:48, h:38, nums:[712] },
+          { x:1310, y:828, w:48, h:38, nums:[723] },
+          { x:1362, y:828, w:44, h:38, nums:[724] },
+          { x:1206, y:870, w:48, h:34, nums:[730] },
+          { x:1258, y:870, w:48, h:34, nums:[731] },
+          { x:1310, y:870, w:48, h:34, nums:[732] },
+          { x:1362, y:870, w:44, h:34, nums:[744] },
+          { x:1206, y:908, w:48, h:38, nums:[745] },
+          { x:1258, y:908, w:48, h:38, nums:[746] },
+          { x:1310, y:908, w:48, h:38, nums:[748] },
+          { x:1362, y:908, w:44, h:38, nums:[749] }
+        ]),
+        hallways: [{x:1204, y:866, w:202, h:6}],
+        doors: [
+          {x:1200, y:885, side:'w'},
+          {x:1410, y:885, side:'e'},
+          {x:1300, y:950, side:'s'}
+        ]
+      }
+    ];
+
+    // CAMPUS LAYOUT — strict grid, documented bounds, NO OVERLAPS
+    // viewBox 2000 × 1080. Coordinates carefully laid out:
+    //
+    //   WEST                              CENTRAL                       EAST
+    //   ─────────────────────┬─────────────────────────────┬──────────────────
+    //   Baseball    Pool     │  800s  │   600s main       │  Bldg H 2F (top) │
+    //   (0,0)-(260,260)     │        │   (720-1160)      │  (1200-1430,150)│
+    //   ─────────────────────┼─────────────────────────────┼──────────────────
+    //   Parking      Gym     │  Caf   │   500s main │ 400s│    300s │ 200s  │
+    //                        │        │             │     │         │ Bldg E│
+    //   ─────────────────────┼─────────────────────────────┼──────────────────
+    //   Football tracks      │ 500sS  │  100s │ 700s │     │         │  PAC  │
+    //   BLDG L K M           │ 551-7  │       │ Admin│     │         │       │
+    //   ─────────────────────┴─────────────────────────────┴──────────────────
+    //
+    const STRUCTURES = [
+      // West fields
+      { id:'baseball', type:'field', label:'Baseball Field',
+        shape:'poly', points:'10,10 270,10 270,250 180,290 50,290 10,220' },
+      { id:'football', type:'field', label:'Football Field & Track',
+        shape:'oval', cx:230, cy:840, rx:210, ry:100 },
+      { id:'tennis', type:'field', label:'Tennis Courts',
+        shape:'rect', x:560, y:600, w:120, h:160 },
+
+      // West parking
+      { id:'park-1', type:'parking', label:'Student Parking (356 Spaces)',
+        shape:'rect', x:20, y:370, w:390, h:170 },
+      { id:'park-2', type:'parking', label:'Student Parking',
+        shape:'rect', x:20, y:570, w:390, h:50 },
+
+      // West non-classroom buildings
+      { id:'bldg-n', type:'building', label:'Pool',
+        shape:'rect', x:290, y:190, w:150, h:170 },
+      { id:'bldg-f', type:'building', label:'Gym',
+        shape:'rect', x:290, y:640, w:240, h:90 },
+      { id:'bldg-c', type:'building', label:'Cafeteria',
+        shape:'rect', x:560, y:440, w:100, h:140 },
+      { id:'bldg-l', type:'building', label:'Bldg L',
+        shape:'rect', x:20, y:750, w:230, h:50 },
+      { id:'bldg-k', type:'building', label:'Bldg K',
+        shape:'rect', x:260, y:750, w:180, h:50 },
+      { id:'bldg-m', type:'building', label:'Bleachers',
+        shape:'rect', x:80, y:960, w:360, h:35 },
+
+      // East non-classroom
+      { id:'pac', type:'building', label:'PAC',
+        shape:'rect', x:1620, y:880, w:280, h:170 },
+      { id:'bldg-e-2f', type:'building', label:'Bldg E · 350s/360s',
+        shape:'rect', x:1820, y:540, w:120, h:280 }
+    ];
+
+    // Gates (visual markers) — positioned per PDF
+    const GATES = [
+      {n:1,  x:930, y:990}, {n:2,  x:930, y:920}, {n:3,  x:850, y:940},
+      {n:4,  x:770, y:960}, {n:5,  x:760, y:920}, {n:8,  x:740, y:800},
+      {n:9,  x:700, y:640}, {n:10, x:1160, y:380}, {n:11, x:1330, y:380},
+      {n:12, x:1400, y:380}, {n:13, x:1450, y:680}, {n:14, x:1660, y:620},
+      {n:15, x:1670, y:820}, {n:16, x:1680, y:880}, {n:17, x:1650, y:970},
+      {n:18, x:1800, y:1020}, {n:19, x:1790, y:990}, {n:20, x:1380, y:970}
+    ];
+
+    // Build ROOMS array for search (rooms are pre-positioned in customLayout)
+    const ROOMS = [];
+    BLOCKS.forEach(block => {
+      block.rooms.forEach(r => {
+        ROOMS.push({
+          n: r.n, blockId: block.id, blockLabel: block.label,
+          x: r.x + r.w/2, y: r.y + r.h/2, rect: r
+        });
+      });
+    });
+
+    // ── SVG RENDERING ──────────────────────────────────────
+    const svg = document.getElementById('mapSvg');
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+
+    function el(tag, attrs, text) {
+      const e = document.createElementNS(SVG_NS, tag);
+      for (const k in attrs) e.setAttribute(k, attrs[k]);
+      if (text !== undefined) e.textContent = text;
+      return e;
+    }
+
+    // Layer groups
+    const gFields    = el('g', {id:'gFields'});
+    const gParking   = el('g', {id:'gParking'});
+    const gBuildings = el('g', {id:'gBuildings'});
+    const gRooms     = el('g', {id:'gRooms'});
+    const gRoomNums  = el('g', {id:'gRoomNums'});
+    const gGates     = el('g', {id:'gGates'});
+    const gLabels    = el('g', {id:'gLabels'});
+    const gOverlay   = el('g', {id:'gOverlay'});
+    svg.appendChild(gFields); svg.appendChild(gParking);
+    svg.appendChild(gBuildings); svg.appendChild(gRooms);
+    svg.appendChild(gRoomNums); svg.appendChild(gGates);
+    svg.appendChild(gLabels); svg.appendChild(gOverlay);
+
+    // Street label (Panther Dr along the bottom)
+    gLabels.appendChild(el('line', {x1:0,y1:1040,x2:2000,y2:1040,
+      stroke:'rgba(255,255,255,0.18)',  'stroke-width':'2'}));
+    gLabels.appendChild(el('text', {class:'m-street', x:1000, y:1065},
+      'PANTHER DR'));
+
+    // Structures (fields, buildings, parking)
+    STRUCTURES.forEach(s => {
+      let shape, cx, cy, isField = s.type === 'field', isParking = s.type === 'parking';
+      const cls = isField ? 'm-field' : isParking ? 'm-parking' : 'm-building';
+      const target = isField ? gFields : isParking ? gParking : gBuildings;
+
+      if (s.shape === 'rect') {
+        shape = el('rect', {x:s.x, y:s.y, width:s.w, height:s.h, rx:6,
+                            class:cls, 'data-id':s.id, 'data-type':s.type});
+        cx = s.x + s.w/2; cy = s.y + s.h/2;
+      } else if (s.shape === 'poly') {
+        shape = el('polygon', {points:s.points, class:cls, 'data-id':s.id, 'data-type':s.type});
+        const pts = s.points.split(' ').map(p => p.split(',').map(Number));
+        cx = pts.reduce((a,p)=>a+p[0],0)/pts.length;
+        cy = pts.reduce((a,p)=>a+p[1],0)/pts.length;
+      } else if (s.shape === 'oval') {
+        shape = el('ellipse', {cx:s.cx, cy:s.cy, rx:s.rx, ry:s.ry,
+                               class:cls, 'data-id':s.id, 'data-type':s.type});
+        // Add inner track
+        target.appendChild(el('ellipse', {cx:s.cx, cy:s.cy, rx:s.rx*0.78, ry:s.ry*0.72,
+          fill:'rgba(100,170,110,0.25)', stroke:'rgba(180,230,180,0.25)', 'stroke-width':'0.8'}));
+        cx = s.cx; cy = s.cy;
+      }
+      target.appendChild(shape);
+
+      // Label
+      const labelClass = isField ? 'm-label-field' : 'm-label-bldg';
+      target.appendChild(el('text', {class:labelClass, x:cx, y:cy}, s.label));
+    });
+
+    // Blocks (classrooms) — render as floor plans: outline, hallways, rooms, doors
+    BLOCKS.forEach(block => {
+      const o = block.outline;
+
+      // Outer building wall (clickable shell)
+      const shell = el('rect', {x:o.x, y:o.y, width:o.w, height:o.h, rx:4,
+                                class:'m-block-shell', 'data-id':block.id, 'data-type':'block'});
+      gBuildings.appendChild(shell);
+
+      // Hallways (lighter background showing walking paths)
+      (block.hallways || []).forEach(h => {
+        gBuildings.appendChild(el('rect', {x:h.x, y:h.y, width:h.w, height:h.h,
+                                            class:'m-hallway'}));
+      });
+
+      // Individual rooms
+      block.rooms.forEach(r => {
+        const room = el('rect', {x:r.x, y:r.y, width:r.w, height:r.h, rx:1.5,
+                                 class:'m-room', 'data-room':r.n, 'data-block':block.id});
+        gRooms.appendChild(room);
+        // Number label (hidden until zoom)
+        gRoomNums.appendChild(el('text', {class:'m-room-num', x:r.x + r.w/2, y:r.y + r.h/2,
+                                          'data-room':r.n}, r.n));
+      });
+
+      // Doors — small triangles pointing inward
+      (block.doors || []).forEach(d => {
+        const size = 8;
+        let pts;
+        if (d.side === 'n') pts = `${d.x-size},${d.y} ${d.x+size},${d.y} ${d.x},${d.y+size}`;
+        else if (d.side === 's') pts = `${d.x-size},${d.y} ${d.x+size},${d.y} ${d.x},${d.y-size}`;
+        else if (d.side === 'w') pts = `${d.x},${d.y-size} ${d.x},${d.y+size} ${d.x+size},${d.y}`;
+        else pts = `${d.x},${d.y-size} ${d.x},${d.y+size} ${d.x-size},${d.y}`;
+        gBuildings.appendChild(el('polygon', {points:pts, class:'m-door'}));
+      });
+
+      // Block label (shown above building)
+      gLabels.appendChild(el('text', {class:'m-label-block',
+        x:o.x + o.w/2, y:o.y - 12, 'data-block-label':block.id}, block.label.toUpperCase()));
+    });
+
+    // Gates
+    GATES.forEach(g => {
+      gGates.appendChild(el('circle', {cx:g.x, cy:g.y, r:7, class:'m-gate'}));
+      gGates.appendChild(el('text', {class:'m-gate-num', x:g.x, y:g.y}, g.n));
+    });
+
+    // ── PAN & ZOOM ────────────────────────────────────────
+    // Natural campus extent: 2000x1080 (landscape)
+    const CAMPUS = {x:0, y:0, w:2000, h:1080};
+    const CAMPUS_CENTER = {x: 1000, y: 540};
+    let BASE_VB = {x:0, y:0, w:2000, h:1080};
+    let vb = {...BASE_VB};
+    const MIN_W = 200, MAX_W = 3200;
+
+    function computeBaseVB() {
+      // With preserveAspectRatio="xMidYMid slice", the SVG auto-fills the container.
+      // BASE_VB is simply the full campus — user can pan/zoom from here.
+      BASE_VB = {x: CAMPUS.x, y: CAMPUS.y, w: CAMPUS.w, h: CAMPUS.h};
+    }
+
+    function applyVB() {
+      svg.setAttribute('viewBox', `${vb.x} ${vb.y} ${vb.w} ${vb.h}`);
+      // Show room numbers only when zoomed in (campus width 2000 → threshold 1300)
+      const visible = vb.w < 1300;
+      gRoomNums.querySelectorAll('.m-room-num').forEach(t => t.classList.toggle('is-visible', visible));
+    }
+
+    // Initial fit (after layout settles)
+    requestAnimationFrame(() => {
+      computeBaseVB();
+      vb = {...BASE_VB};
+      applyVB();
+    });
+
+    // Re-fit on resize
+    window.addEventListener('resize', () => {
+      computeBaseVB();
+    });
+
+    function clamp() {
+      vb.w = Math.max(MIN_W, Math.min(MAX_W, vb.w));
+      vb.h = vb.w * (BASE_VB.h / BASE_VB.w);
+      // Allow panning a bit past campus edges for comfort
+      const padding = 150;
+      vb.x = Math.max(CAMPUS.x - padding, Math.min(CAMPUS.x + CAMPUS.w + padding - vb.w, vb.x));
+      vb.y = Math.max(CAMPUS.y - padding, Math.min(CAMPUS.y + CAMPUS.h + padding - vb.h, vb.y));
+    }
+
+    // Convert client (screen) coords → SVG coords using current CTM.
+    // Correct for any preserveAspectRatio (meet/slice).
+    function clientToSvg(cx, cy) {
+      const pt = svg.createSVGPoint();
+      pt.x = cx; pt.y = cy;
+      const ctm = svg.getScreenCTM();
+      if (!ctm) return null;
+      return pt.matrixTransform(ctm.inverse());
+    }
+
+    // In meet mode: scale = min(rect.w/vb.w, rect.h/vb.h), letterbox on the non-filling dim.
+    function getMeetScale(vbW, vbH, rect) {
+      return Math.min(rect.width / vbW, rect.height / vbH);
+    }
+
+    // Compute vb.x/y so the given SVG anchor appears at the given client coord.
+    // Correct for meet mode (including letterbox offsets).
+    function vbForAnchor(anchorSvgX, anchorSvgY, targetClientX, targetClientY, newW, newH, rect) {
+      const scale = getMeetScale(newW, newH, rect);
+      const letterboxX = (rect.width  - newW * scale) / 2;
+      const letterboxY = (rect.height - newH * scale) / 2;
+      return {
+        x: anchorSvgX - (targetClientX - rect.left - letterboxX) / scale,
+        y: anchorSvgY - (targetClientY - rect.top  - letterboxY) / scale
+      };
+    }
+
+    function zoomAt(clientX, clientY, factor) {
+      const rect = svg.getBoundingClientRect();
+      const anchor = clientToSvg(clientX, clientY);
+      if (!anchor) return;
+      let newW = vb.w / factor;
+      newW = Math.max(MIN_W, Math.min(MAX_W, newW));
+      const newH = newW * (BASE_VB.h / BASE_VB.w);
+      const pos = vbForAnchor(anchor.x, anchor.y, clientX, clientY, newW, newH, rect);
+      vb.w = newW; vb.h = newH;
+      vb.x = pos.x; vb.y = pos.y;
+      clamp();
+      applyVB();
+    }
+
+    function zoomCenter(factor) {
+      const rect = svg.getBoundingClientRect();
+      zoomAt(rect.left + rect.width/2, rect.top + rect.height/2, factor);
+    }
+
+    function resetView() {
+      vb = {...BASE_VB};
+      applyVB();
+    }
+
+    // Desktop: wheel zoom
+    svg.addEventListener('wheel', e => {
+      e.preventDefault();
+      zoomAt(e.clientX, e.clientY, e.deltaY < 0 ? 1.15 : 1/1.15);
+    }, {passive:false});
+
+    // Mouse drag — anchor-based so movement follows cursor exactly regardless of aspect
+    let mouseState = null;
+    svg.addEventListener('mousedown', e => {
+      svg.classList.add('is-grabbing');
+      const anchor = clientToSvg(e.clientX, e.clientY);
+      if (!anchor) return;
+      mouseState = {anchor, startVb: {...vb}};
+    });
+    window.addEventListener('mousemove', e => {
+      if (!mouseState) return;
+      const rect = svg.getBoundingClientRect();
+      const pos = vbForAnchor(mouseState.anchor.x, mouseState.anchor.y,
+                              e.clientX, e.clientY,
+                              mouseState.startVb.w, mouseState.startVb.h, rect);
+      vb.w = mouseState.startVb.w; vb.h = mouseState.startVb.h;
+      vb.x = pos.x; vb.y = pos.y;
+      clamp(); applyVB();
+    });
+    window.addEventListener('mouseup', () => { mouseState = null; svg.classList.remove('is-grabbing'); });
+
+    // Touch events — anchor-based pan and pinch using SVG matrix math (slice-aware)
+    let touchState = null;
+    function _mid(a, b) { return {x: (a.clientX + b.clientX)/2, y: (a.clientY + b.clientY)/2}; }
+    function _dist(a, b) { const dx = a.clientX - b.clientX, dy = a.clientY - b.clientY; return Math.sqrt(dx*dx + dy*dy); }
+
+    function captureTouch(touches) {
+      if (touches.length === 0) { touchState = null; return; }
+      const startVb = {...vb};
+      if (touches.length === 1) {
+        const t = touches[0];
+        const anchor = clientToSvg(t.clientX, t.clientY);
+        if (!anchor) return;
+        touchState = {mode:'pan', startVb, anchor};
+      } else {
+        const mid = _mid(touches[0], touches[1]);
+        const anchor = clientToSvg(mid.x, mid.y);
+        if (!anchor) return;
+        touchState = {mode:'pinch', startVb, anchor, startDist: _dist(touches[0], touches[1])};
+      }
+    }
+
+    svg.addEventListener('touchstart', e => { captureTouch(e.touches); }, {passive: true});
+
+    svg.addEventListener('touchmove', e => {
+      if (!touchState) return;
+      e.preventDefault();
+      const rect = svg.getBoundingClientRect();
+      if (rect.width === 0) return;
+
+      if (touchState.mode === 'pan' && e.touches.length === 1) {
+        const t = e.touches[0];
+        const pos = vbForAnchor(touchState.anchor.x, touchState.anchor.y,
+                                t.clientX, t.clientY,
+                                touchState.startVb.w, touchState.startVb.h, rect);
+        vb.w = touchState.startVb.w; vb.h = touchState.startVb.h;
+        vb.x = pos.x; vb.y = pos.y;
+        clamp(); applyVB();
+      } else if (touchState.mode === 'pinch' && e.touches.length >= 2) {
+        const curMid = _mid(e.touches[0], e.touches[1]);
+        const curDist = _dist(e.touches[0], e.touches[1]);
+        if (curDist < 1) return;
+        const factor = curDist / touchState.startDist;
+        let newW = touchState.startVb.w / factor;
+        newW = Math.max(MIN_W, Math.min(MAX_W, newW));
+        const newH = newW * (BASE_VB.h / BASE_VB.w);
+        const pos = vbForAnchor(touchState.anchor.x, touchState.anchor.y,
+                                curMid.x, curMid.y, newW, newH, rect);
+        vb.w = newW; vb.h = newH;
+        vb.x = pos.x; vb.y = pos.y;
+        clamp(); applyVB();
+      }
+    }, {passive: false});
+
+    svg.addEventListener('touchend', e => {
+      if (e.touches.length === 0) touchState = null;
+      else captureTouch(e.touches);
+    }, {passive: true});
+    svg.addEventListener('touchcancel', () => { touchState = null; }, {passive: true});
+
+    // Double-tap zoom
+    let lastTap = 0;
+    svg.addEventListener('touchend', e => {
+      const now = Date.now();
+      if (now - lastTap < 280 && e.changedTouches.length === 1 && e.touches.length === 0) {
+        const t = e.changedTouches[0];
+        zoomAt(t.clientX, t.clientY, vb.w > 800 ? 2.5 : 0.5);
+      }
+      lastTap = now;
+    });
+
+    // Zoom buttons
+    document.getElementById('mapZoomIn').addEventListener('click', () => zoomCenter(1.4));
+    document.getElementById('mapZoomOut').addEventListener('click', () => zoomCenter(1/1.4));
+    document.getElementById('mapReset').addEventListener('click', resetView);
+
+    // ── SEARCH ────────────────────────────────────────────
+    const searchInput = document.getElementById('mapSearchInput');
+    const searchResults = document.getElementById('mapSearchResults');
+    const searchClear = document.getElementById('mapSearchClear');
+
+    function renderResults(list, query) {
+      if (!list.length) {
+        searchResults.innerHTML = '<div class="map-search-empty">No rooms match "' + query + '"</div>';
+        searchResults.hidden = false;
+        return;
+      }
+      searchResults.innerHTML = '';
+      list.slice(0, 20).forEach(r => {
+        const item = document.createElement('div');
+        item.className = 'map-search-item';
+        item.innerHTML = '<span class="map-search-item-num">' + r.n + '</span>' +
+                         '<span class="map-search-item-sub">' + r.blockLabel + '</span>';
+        item.addEventListener('click', () => {
+          focusRoom(r);
+          searchResults.hidden = true;
+          searchInput.value = r.n;
+          searchInput.blur();
+        });
+        searchResults.appendChild(item);
+      });
+      searchResults.hidden = false;
+    }
+
+    function doSearch(q) {
+      q = q.trim().toLowerCase();
+      if (!q) { searchResults.hidden = true; return; }
+      const matches = ROOMS.filter(r => r.n.toLowerCase().startsWith(q) || r.n.toLowerCase().includes(q));
+      renderResults(matches, q);
+    }
+
+    searchInput.addEventListener('input', e => doSearch(e.target.value));
+    searchInput.addEventListener('focus', e => { if (e.target.value) doSearch(e.target.value); });
+    searchClear.addEventListener('click', () => {
+      searchInput.value = '';
+      searchResults.hidden = true;
+      clearHighlight();
+      resetView();
+    });
+
+    // Submit on enter
+    searchInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const q = searchInput.value.trim();
+        const exact = ROOMS.find(r => r.n === q);
+        if (exact) {
+          focusRoom(exact);
+          searchResults.hidden = true;
+          searchInput.blur();
+        }
+      } else if (e.key === 'Escape') {
+        searchResults.hidden = true;
+        searchInput.blur();
+      }
+    });
+
+    // Close results when clicking outside
+    document.addEventListener('click', e => {
+      if (!searchResults.contains(e.target) && e.target !== searchInput) {
+        searchResults.hidden = true;
+      }
+    });
+
+    function clearHighlight() {
+      document.querySelectorAll('.m-room.is-highlight').forEach(r => r.classList.remove('is-highlight'));
+    }
+
+    function focusRoom(room) {
+      clearHighlight();
+      const svgRoom = document.querySelector(`[data-room="${room.n}"]`);
+      if (svgRoom && svgRoom.classList.contains('m-room')) svgRoom.classList.add('is-highlight');
+      // Pan/zoom to room — zoom to ~600 viewBox width so room + neighbors fit
+      const targetW = 600;
+      const targetH = targetW * (BASE_VB.h / BASE_VB.w);
+      vb.x = room.x - targetW/2;
+      vb.y = room.y - targetH/2;
+      vb.w = targetW; vb.h = targetH;
+      clamp();
+      applyVB();
+    }
+
+    // ── BUILDING TAP SHEET ────────────────────────────────
+    const infoSheet = document.getElementById('mapInfoSheet');
+    const infoBackdrop = document.getElementById('mapInfoBackdrop');
+    const infoTitle = document.getElementById('mapInfoTitle');
+    const infoSub = document.getElementById('mapInfoSub');
+    const infoPill = document.getElementById('mapInfoType');
+    const infoRooms = document.getElementById('mapInfoRooms');
+
+    function openInfo(title, sub, pill, rooms) {
+      infoTitle.textContent = title;
+      infoSub.textContent = sub || '';
+      infoPill.textContent = pill || 'Info';
+      if (rooms && rooms.length) {
+        infoRooms.innerHTML = '';
+        infoRooms.hidden = false;
+        rooms.forEach(n => {
+          const chip = document.createElement('button');
+          chip.className = 'map-info-room-chip';
+          chip.type = 'button';
+          chip.textContent = n;
+          chip.addEventListener('click', () => {
+            closeInfo();
+            const r = ROOMS.find(x => x.n === n);
+            if (r) focusRoom(r);
+          });
+          infoRooms.appendChild(chip);
+        });
+      } else {
+        infoRooms.hidden = true;
+      }
+      infoBackdrop.hidden = false;
+      infoSheet.hidden = false;
+      requestAnimationFrame(() => requestAnimationFrame(() => infoSheet.classList.add('is-visible')));
+    }
+    function closeInfo() {
+      infoSheet.classList.remove('is-visible');
+      setTimeout(() => { infoSheet.hidden = true; infoBackdrop.hidden = true; }, 420);
+    }
+    infoBackdrop.addEventListener('click', closeInfo);
+    document.getElementById('mapInfoClose').addEventListener('click', closeInfo);
+
+    // Click on block/building opens info
+    svg.addEventListener('click', e => {
+      // Block
+      const block = e.target.closest('.m-block-shell');
+      if (block) {
+        const bid = block.dataset.id;
+        const b = BLOCKS.find(x => x.id === bid);
+        if (b) openInfo(b.label, b.desc, 'Classroom Block', b.rooms.map(String));
+        return;
+      }
+      // Room
+      const room = e.target.closest('.m-room');
+      if (room) {
+        const rn = room.dataset.room;
+        const r = ROOMS.find(x => x.n === rn);
+        if (r) { focusRoom(r); return; }
+      }
+      // Building/field/parking
+      const building = e.target.closest('.m-building, .m-field, .m-parking');
+      if (building) {
+        const bid = building.dataset.id;
+        const s = STRUCTURES.find(x => x.id === bid);
+        if (s) openInfo(s.label, '', s.type === 'field' ? 'Field' : s.type === 'parking' ? 'Parking' : 'Building');
+      }
+    });
+
+    // ── NAV MENU ──────────────────────────────────────────
+    const navMenuBtn = document.getElementById('navMenuBtn');
+    const navMenu = document.getElementById('navMenu');
+    function positionMenu() {
+      const r = navMenuBtn.getBoundingClientRect();
+      navMenu.style.top  = (r.bottom+6)+'px';
+      navMenu.style.right= (window.innerWidth-r.right)+'px';
+    }
+    navMenuBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      positionMenu();
+      const open = navMenu.classList.toggle('is-open');
+      navMenuBtn.classList.toggle('is-open', open);
+      navMenu.setAttribute('aria-hidden', String(!open));
+    });
+    document.addEventListener('click', e => {
+      if (!navMenu.contains(e.target) && e.target !== navMenuBtn) {
+        navMenu.classList.remove('is-open');
+        navMenuBtn.classList.remove('is-open');
+        navMenu.setAttribute('aria-hidden', 'true');
+      }
+    });
+
+    // ── LOGO HOME LINK (PWA standalone fix) ───────────────
+    (function() {
+      var logo = document.querySelector('.top-row a[aria-label="Home"]');
+      if (logo) logo.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = 'index.html';
+      });
+    })();
+
+    // ── SERVICE WORKER ────────────────────────────────────
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(()=>{});
+      navigator.serviceWorker.addEventListener('controllerchange', () => location.reload());
+    }
+
+    // ── DEEP LINK: #room-415 ──────────────────────────────
+    (function() {
+      const hash = window.location.hash;
+      if (!hash.startsWith('#room-')) return;
+      const rn = hash.slice(6);
+      const r = ROOMS.find(x => x.n === rn);
+      if (!r) return;
+      // Wait for initial fit (two frames after load) before focusing
+      window.addEventListener('load', () => {
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          focusRoom(r);
+          searchInput.value = rn;
+        }));
+      });
+      history.replaceState(null, '', window.location.pathname);
+    })();
+  </script>
+</body>
+</html>
