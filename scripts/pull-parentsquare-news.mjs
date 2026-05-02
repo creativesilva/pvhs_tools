@@ -86,6 +86,11 @@ function normalizePost(post) {
   if (!date || !isReasonableDate(date)) fail(`ParentSquare post ${id} is missing a usable date.`);
 
   const bodyText = cleanText(post.bodyText || post.summary || title);
+  const bodyHtml = typeof post.bodyHtml === 'string' && post.bodyHtml.trim()
+    ? post.bodyHtml.trim()
+    : typeof post.body === 'string' && post.body.trim()
+      ? post.body.trim()
+      : '';
   return {
     id,
     title,
@@ -94,7 +99,7 @@ function normalizePost(post) {
     author: cleanText(post.author || 'Pioneer Valley High School'),
     url: cleanText(post.url),
     pinned: Boolean(post.pinned),
-    body: paragraphHtml(bodyText),
+    body: bodyHtml || paragraphHtml(bodyText),
     images: Array.isArray(post.images) ? post.images.filter(Boolean) : []
   };
 }
@@ -119,62 +124,105 @@ async function waitForLoggedInFeed(page) {
   fail('ParentSquare was still on sign-in after 30 minutes. Leaving the browser open so you can finish signing in, then run this command again.');
 }
 
-async function scrapeFeedPosts(page) {
+async function collectFeedLinks(page) {
   return page.evaluate((maxPosts) => {
     const clean = (value) => String(value || '').replace(/\s+/g, ' ').trim();
     const postLinks = Array.from(document.querySelectorAll('a[href*="/feeds/"]'))
       .map((link) => ({ link, id: (link.href.match(/\/feeds\/(\d+)/) || [])[1], href: link.href, title: clean(link.textContent) }))
       .filter((item) => item.id && item.title && !/^print$/i.test(item.title) && !/^read more/i.test(item.title));
 
-    const posts = [];
+    const links = [];
     const seen = new Set();
 
     for (const item of postLinks) {
       if (seen.has(item.id)) continue;
       seen.add(item.id);
-
-      let card = item.link;
-      for (let i = 0; i < 8 && card?.parentElement; i += 1) {
-        card = card.parentElement;
-        const links = Array.from(card.querySelectorAll('a[href*="/feeds/"]'));
-        const hasThis = links.some((link) => link.href.includes(`/feeds/${item.id}`));
-        const hasOtherPost = links.some((link) => {
-          const id = (link.href.match(/\/feeds\/(\d+)/) || [])[1];
-          return id && id !== item.id && !/^print$/i.test(clean(link.textContent));
-        });
-        if (hasThis && !hasOtherPost && clean(card.textContent).length > item.title.length + 20) break;
-      }
-
-      const text = clean(card?.textContent || item.link.closest('div')?.textContent || item.title);
-      const author = (text.match(/Posted by\s+(.+?)(?:\s+[.•]\s+|\s+\d+\s+(?:hours?|days?) ago|\s+(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),)/i) || [])[1] || '';
-      const dateText = (text.match(/\b(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),\s+[A-Za-z]{3,9}\s+\d{1,2}\s+at\s+\d{1,2}:\d{2}\s*(?:AM|PM)?/i) || [])[0] || '';
-      const bodyText = text
-        .replace(item.title, '')
-        .replace(/Posted by\s+.+?(?:\s+[.•]\s+|\s+\d+\s+(?:hours?|days?) ago)/i, '')
-        .replace(dateText, '')
-        .replace(/\b(?:Appreciate|Comment|Print)\b/gi, '')
-        .replace(/\b(?:Instant|User Preferred) Notifications\b.*$/i, '');
-
-      const images = Array.from(card?.querySelectorAll('img[src]') || [])
-        .map((img) => img.currentSrc || img.src)
-        .filter((src) => /^https?:\/\//i.test(src))
-        .filter((src) => !/avatar|logo|icon|spinner|transparent/i.test(src));
-
-      posts.push({
+      links.push({
         id: item.id,
         title: item.title,
-        author,
-        dateText,
-        url: item.href.split('?')[0].split('#')[0],
-        bodyText,
-        images: [...new Set(images)]
+        url: new URL(`/feeds/${item.id}`, location.origin).href
       });
 
-      if (posts.length >= maxPosts) break;
+      if (links.length >= maxPosts) break;
     }
 
-    return posts;
+    return links;
   }, MAX_NEW_POSTS);
+}
+
+async function scrapePostDetail(page, link) {
+  await page.goto(link.url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await page.waitForTimeout(1500);
+
+  const data = await page.evaluate(() => {
+    const clean = (value) => String(value || '').replace(/\s+/g, ' ').trim();
+    const absolutize = (value) => {
+      try {
+        return new URL(value, location.href).href;
+      } catch {
+        return '';
+      }
+    };
+
+    const feed = document.querySelector('[id^="feed_"].feed') || document.querySelector('.feed.ps-box') || document;
+    const title = clean(feed.querySelector('.subject')?.textContent);
+    const author = clean(feed.querySelector('.feed-metadata-from .user-name')?.textContent || feed.querySelector('.user-name')?.textContent);
+    const timestamp = feed.querySelector('.time-ago')?.getAttribute('data-timestamp') || '';
+    const visibleDate = clean(Array.from(feed.querySelectorAll('.feed-metadata span')).map((span) => span.textContent).find((text) => /(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),/.test(text)));
+    const description = Array.from(feed.querySelectorAll('.description'))
+      .sort((a, b) => clean(b.textContent).length - clean(a.textContent).length)[0];
+    const clone = description ? description.cloneNode(true) : null;
+
+    if (clone) {
+      clone.querySelectorAll('script, style, button, form, input, textarea, select, .translation-note').forEach((node) => node.remove());
+      clone.querySelectorAll('a[href]').forEach((anchor) => {
+        anchor.setAttribute('href', absolutize(anchor.getAttribute('href')));
+        anchor.setAttribute('target', '_blank');
+        anchor.setAttribute('rel', 'noopener noreferrer');
+      });
+      clone.querySelectorAll('img[src]').forEach((img) => {
+        img.setAttribute('src', absolutize(img.currentSrc || img.getAttribute('src')));
+        img.removeAttribute('srcset');
+        img.removeAttribute('sizes');
+        img.removeAttribute('width');
+        img.removeAttribute('height');
+        img.setAttribute('loading', 'lazy');
+      });
+    }
+
+    const bodyHtml = clone?.innerHTML?.trim() || '';
+    const bodyText = clean(clone?.textContent || description?.textContent || '');
+    const images = Array.from((description || feed).querySelectorAll('img[src]'))
+      .map((img) => absolutize(img.currentSrc || img.getAttribute('src')))
+      .filter((src) => /^https?:\/\//i.test(src))
+      .filter((src) => !/avatar|logo|icon|spinner|transparent|assets\.parentsquare\.com/i.test(src));
+
+    return {
+      title,
+      author,
+      timestamp,
+      visibleDate,
+      bodyHtml,
+      bodyText,
+      images: [...new Set(images)]
+    };
+  });
+
+  const date = data.timestamp
+    ? new Date(data.timestamp).toISOString().slice(0, 10)
+    : normalizeDate(data.visibleDate);
+
+  return normalizePost({
+    id: link.id,
+    title: data.title || link.title,
+    summary: data.bodyText,
+    date,
+    author: data.author,
+    url: link.url,
+    bodyText: data.bodyText,
+    bodyHtml: data.bodyHtml,
+    images: data.images
+  });
 }
 
 async function readExistingNews() {
@@ -251,13 +299,16 @@ async function main() {
     await page.goto(FEED_URL, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await page.waitForTimeout(2500);
 
-    const rawPosts = await scrapeFeedPosts(page);
-    if (!rawPosts.length) fail('ParentSquare feed loaded, but I could not find posts.');
+    const links = await collectFeedLinks(page);
+    if (!links.length) fail('ParentSquare feed loaded, but I could not find posts.');
 
-    const newPosts = rawPosts.map((post) => normalizePost({
-      ...post,
-      date: normalizeDate(post.dateText)
-    }));
+    const newPosts = [];
+    for (const link of links) {
+      console.log(`Pulling ${link.title}...`);
+      const post = await scrapePostDetail(page, link);
+      console.log(`Saved ${post.title}: ${cleanText(post.body).length} body chars, ${post.images.length} image(s).`);
+      newPosts.push(post);
+    }
     const existingPosts = await readExistingNews();
     const posts = mergePosts(newPosts, existingPosts);
 

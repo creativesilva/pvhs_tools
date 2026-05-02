@@ -1820,8 +1820,8 @@
       function showDetail(post) {
         document.getElementById('newsToggle').style.display = 'none';
         var bodyHtml = post.body ? makeBodySafe(post.body) : ('<p>' + (post.summary || '') + '</p>');
-        // Inject images inline within the body text for natural reading flow
-        if (post.images && post.images.length > 0) {
+        // Inject image list only when the saved ParentSquare body does not already include images.
+        if (!/<img\b/i.test(bodyHtml) && post.images && post.images.length > 0) {
           var parser = new DOMParser();
           var doc = parser.parseFromString('<div>' + bodyHtml + '</div>', 'text/html');
           var container = doc.body.firstChild;

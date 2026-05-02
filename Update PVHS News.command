@@ -19,9 +19,9 @@ RESULT=$?
 
 echo ""
 if [ $RESULT -eq 0 ]; then
-  echo "Done. News was updated and published if there were changes."
+  echo "Done. News was updated locally. Review it, then commit and push when ready."
 else
-  echo "Something went wrong. Nothing else was staged automatically."
+  echo "Something went wrong. Nothing was staged, committed, or pushed automatically."
 fi
 
 echo ""

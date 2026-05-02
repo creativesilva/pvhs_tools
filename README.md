@@ -4,19 +4,19 @@ PVHS Tools is a static web app served from the files in this repository. The mai
 
 ## One-Click ParentSquare News Workflow
 
-Use `Update PVHS News.command` for the simplest update flow.
+Use `Update PVHS News.command` for the simplest update flow, or run `npm run news:pull` from Terminal.
 
 1. Double-click `Update PVHS News.command`.
 2. ParentSquare opens.
-3. Select and copy the newest posts from the ParentSquare feed.
-4. Return to the command window and press Enter.
-5. The script updates `src/data/news.json`, commits only that file, and pushes to `origin main`.
+3. If ParentSquare asks you to sign in, sign in once and leave the update window open.
+4. The script pulls the 10 newest ParentSquare posts, including full post bodies and images.
+5. The script updates `src/data/news.json` and keeps no more than 20 total articles.
 
-The command never runs `git add .`, and it does not stage large local design files.
+The command does not stage, commit, push, or deploy. Review the News tab, then commit and push when ready.
 
 ## Manual ParentSquare News Workflow
 
-This project does not scrape ParentSquare, does not log in to ParentSquare, and does not push changes automatically when news files change.
+This project uses your local ParentSquare browser session. It does not automate ParentSquare login and does not push changes automatically when news files change.
 
 You can also run the same update from Terminal:
 
@@ -24,10 +24,10 @@ You can also run the same update from Terminal:
 npm run news:pull
 ```
 
-For a no-push local update, copy posts and run:
+For the older editable JSON staging flow, edit `src/data/news.manual.json` and run:
 
 ```bash
-npm run news:paste
+npm run news:update
 ```
 
 The app-facing file is still `src/data/news.json`; do not edit `index.html` for normal news updates.

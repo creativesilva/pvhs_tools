@@ -7,7 +7,7 @@
   "scripts": {
     "news:check": "node scripts/update-news.mjs --check",
     "news:paste": "node scripts/update-news-from-paste.mjs",
-    "news:pull": "node scripts/pull-parentsquare-news.mjs --publish",
+    "news:pull": "node scripts/pull-parentsquare-news.mjs",
     "news:update": "node scripts/update-news.mjs"
   },
   "dependencies": {
