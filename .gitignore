@@ -1,0 +1,15 @@
+.DS_Store
+*.psb
+*.ai
+node_modules/
+.parentsquare-session/
+.parentsquare-auto-session/
+.parentsquare-auto-session-copy/
+.ps-test-session/
+.parentsquare-pull-session/
+.parentsquare-session2/
+.playwright-browsers/
+.swift-cache/
+.swift-tmp/
+.tmp-chrome-test/
+npm-debug.log*

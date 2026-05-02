@@ -1,0 +1,16 @@
+{
+  "name": "pvhs-tools",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PVHS Tools static web app manual utilities.",
+  "type": "module",
+  "scripts": {
+    "news:check": "node scripts/update-news.mjs --check",
+    "news:paste": "node scripts/update-news-from-paste.mjs",
+    "news:pull": "node scripts/pull-parentsquare-news.mjs --publish",
+    "news:update": "node scripts/update-news.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.59.1"
+  }
+}
