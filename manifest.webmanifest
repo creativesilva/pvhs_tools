@@ -1,0 +1,42 @@
+{
+  "id": "/pvhs_tools/",
+  "name": "PVHS Tools",
+  "short_name": "PVHS Tools",
+  "description": "Pioneer Valley High School staff tools — countdown, directory, and quick links.",
+  "start_url": "/pvhs_tools/",
+  "scope": "/pvhs_tools/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#021414",
+  "theme_color": "#007474",
+  "icons": [
+    {
+      "src": "/pvhs_tools/PV_AppIcon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pvhs_tools/PV_AppIcon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Countdown",
+      "short_name": "Countdown",
+      "url": "/pvhs_tools/countdown.html",
+      "icons": [{ "src": "/pvhs_tools/PV_AppIcon.png", "sizes": "1024x1024" }]
+    },
+    {
+      "name": "Staff Directory",
+      "short_name": "Directory",
+      "url": "/pvhs_tools/extension_search.html",
+      "icons": [{ "src": "/pvhs_tools/PV_AppIcon.png", "sizes": "1024x1024" }]
+    }
+  ],
+  "categories": ["education", "utilities"]
+}
