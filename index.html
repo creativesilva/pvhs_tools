@@ -613,6 +613,8 @@
       scrollbar-width: none; scroll-behavior: smooth;
     }
     .ath-tabs::-webkit-scrollbar { display: none; }
+    .ath-tabs { cursor: grab; }
+    .ath-tabs.is-dragging { cursor: grabbing; user-select: none; }
     .ath-tab {
       appearance: none; border: 1px solid rgba(255,255,255,0.1);
       background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.6);
@@ -2255,6 +2257,19 @@
         var step = 120;
         btnL.addEventListener('click', function() { tabs.scrollBy({left: -step, behavior: 'smooth'}); });
         btnR.addEventListener('click', function() { tabs.scrollBy({left:  step, behavior: 'smooth'}); });
+
+        // Click-and-drag to scroll on desktop
+        var dragStart = 0, dragScrollLeft = 0, dragging = false;
+        tabs.addEventListener('pointerdown', function(e) {
+          dragging = true; dragStart = e.clientX; dragScrollLeft = tabs.scrollLeft;
+          tabs.classList.add('is-dragging'); tabs.setPointerCapture(e.pointerId);
+        });
+        tabs.addEventListener('pointermove', function(e) {
+          if (!dragging) return;
+          tabs.scrollLeft = dragScrollLeft - (e.clientX - dragStart);
+        });
+        tabs.addEventListener('pointerup',    function() { dragging = false; tabs.classList.remove('is-dragging'); });
+        tabs.addEventListener('pointercancel',function() { dragging = false; tabs.classList.remove('is-dragging'); });
       })();
 
       // Game day notifications
