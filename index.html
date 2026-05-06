@@ -604,12 +604,12 @@
     }
     .ath-scroll-btn:hover { background: rgba(0,160,160,0.25); color: #4be1e1; }
     .ath-scroll-btn:active { background: rgba(0,160,160,0.35); }
-    @media (min-width: 431px) {
+    @media (min-width: 431px), (pointer: fine) {
       .ath-scroll-btn { display: flex; }
     }
     .ath-tabs {
       display: flex; gap: 6px; overflow-x: auto; flex-shrink: 0; flex: 1;
-      padding: 2px 0 8px 0; -webkit-overflow-scrolling: touch;
+      padding: 2px 0; -webkit-overflow-scrolling: touch;
       scrollbar-width: none; scroll-behavior: smooth;
     }
     .ath-tabs::-webkit-scrollbar { display: none; }
