@@ -1358,7 +1358,11 @@
             if (isLastFivePassing) {
               alertMessage = "Hurry To Class";
             } else if (timerState !== "normal") {
-              alertMessage = "No Restroom Access";
+              if (isFirstTen) {
+                alertMessage = `No Restroom Access · ${formatTime(600 - elapsed)}`;
+              } else {
+                alertMessage = "No Restroom Access";
+              }
             }
 
             const isCollab = /COLLAB/i.test(blocks[i].l);
