@@ -1242,12 +1242,18 @@
       // Finals Day 2: Per 3, 4 (Dec 18, Jun 9)
       finals_2: [ {l:"3RD PERIOD", s:"08:30", e:"10:25"}, {l:"LUNCH", s:"10:25", e:"10:55"}, {l:"4TH PERIOD", s:"11:05", e:"13:00"} ],
       // Finals Day 3: Per 5, 6 (Dec 19, Jun 10)
-      finals_3: [ {l:"5TH PERIOD", s:"08:30", e:"10:25"}, {l:"LUNCH", s:"10:25", e:"10:55"}, {l:"6TH PERIOD", s:"11:05", e:"13:00"} ]
+      finals_3: [ {l:"5TH PERIOD", s:"08:30", e:"10:25"}, {l:"LUNCH", s:"10:25", e:"10:55"}, {l:"6TH PERIOD", s:"11:05", e:"13:00"} ],
+      // All School Rally — 5/29/26
+      rally: [ {l:"1ST PERIOD", s:"08:30", e:"09:10"}, {l:"PASSING", s:"09:10", e:"09:20"}, {l:"2ND PERIOD", s:"09:20", e:"10:00"}, {l:"NUTRITION", s:"10:00", e:"10:05"}, {l:"PASSING", s:"10:05", e:"10:15"}, {l:"3RD PERIOD", s:"10:15", e:"10:55"}, {l:"PASSING", s:"10:55", e:"11:05"}, {l:"4TH PERIOD", s:"11:05", e:"11:45"}, {l:"LUNCH", s:"11:45", e:"12:15"}, {l:"PASSING", s:"12:15", e:"12:25"}, {l:"5TH PERIOD / RALLY 1", s:"12:25", e:"13:15"}, {l:"PASSING", s:"13:15", e:"13:25"}, {l:"5TH PERIOD / RALLY 2", s:"13:25", e:"14:15"}, {l:"PASSING", s:"14:15", e:"14:25"}, {l:"6TH PERIOD", s:"14:25", e:"15:05"}, {l:"PASSING", s:"15:05", e:"15:15"}, {l:"7TH PERIOD", s:"15:15", e:"15:55"} ]
     };
     // Map finals dates to their specific schedule
     const finalsMap = {
       "2025-12-17": "finals_1", "2025-12-18": "finals_2", "2025-12-19": "finals_3",
       "2026-06-08": "finals_1", "2026-06-09": "finals_2", "2026-06-10": "finals_3"
+    };
+    // Map other special dates to their specific schedule key + display label
+    const specialDayMap = {
+      "2026-05-29": { key: "rally", label: "ALL SCHOOL RALLY" }
     };
 
     function getNow() {
@@ -1287,6 +1293,7 @@
 
     function getScheduleType(dStr) {
       if (finalsDays.has(dStr)) return "FINALS SCHEDULE";
+      if (specialDayMap[dStr]) return specialDayMap[dStr].label;
       if (minimumDays.has(dStr)) return "MINIMUM DAY";
       const d = new Date(dStr + 'T12:00:00');
       const wd = new Intl.DateTimeFormat("en-US", {timeZone, weekday:"long"}).format(d);
@@ -1295,6 +1302,7 @@
     }
     function getScheduleBlocks(dStr) {
       if (finalsMap[dStr]) return schedules[finalsMap[dStr]];
+      if (specialDayMap[dStr]) return schedules[specialDayMap[dStr].key];
       if (minimumDays.has(dStr)) return schedules.minimum;
       const d = new Date(dStr + 'T12:00:00');
       const wd = new Intl.DateTimeFormat("en-US", {timeZone, weekday:"long"}).format(d);
@@ -1520,8 +1528,7 @@
       const { totalSec, dateStr, weekday } = now;
       if (!schoolDays.includes(dateStr)) return;
 
-      const isMD   = minimumDays.has(dateStr);
-      const blocks = isMD ? schedules.minimum : (weekday === 'Monday' ? schedules.monday : schedules.regular);
+      const blocks = getScheduleBlocks(dateStr);
       const lastEnd = parseToSec(blocks[blocks.length - 1].e);
       if (totalSec >= lastEnd) return;
 
@@ -1624,8 +1631,7 @@
       const { totalSec, dateStr, weekday } = now;
       const nowMs = Date.now();
       const todayMidnightMs = nowMs - totalSec * 1000;
-      const isMD = minimumDays.has(dateStr);
-      const blks = isMD ? schedules.minimum : (weekday === "Monday" ? schedules.monday : schedules.regular);
+      const blks = getScheduleBlocks(dateStr);
       const firstStart = parseToSec(blks[0].s);
       const lastEnd    = parseToSec(blks[blks.length - 1].e);
       const isSD       = schoolDays.includes(dateStr);
@@ -1642,11 +1648,6 @@
         if (cls) el.className = 'prog-bar ' + cls;
       }
       function setTxt(id, t) { const el = document.getElementById(id); if (el) el.textContent = t; }
-      function getSchBlocks(dStr) {
-        const md = minimumDays.has(dStr);
-        const wd = new Intl.DateTimeFormat('en-US', {timeZone, weekday:'long'}).format(new Date(dStr + 'T12:00:00'));
-        return md ? schedules.minimum : (wd === 'Monday' ? schedules.monday : schedules.regular);
-      }
 
       // ── 1. SCHOOL DAY — countdown bar (1st bell → end of 7th period) ──
       // Bar drains full→empty during school hours. After 7th bell: empty + "SCHOOL IS OUT".
@@ -1702,7 +1703,7 @@
       }
       if (weekSDs.length > 0) {
         const fw = weekSDs[0], lw = weekSDs[weekSDs.length - 1];
-        const fwB = getSchBlocks(fw.dStr), lwB = getSchBlocks(lw.dStr);
+        const fwB = getScheduleBlocks(fw.dStr), lwB = getScheduleBlocks(lw.dStr);
         const wkStart = toMs(fw.off, parseToSec(fwB[0].s));
         const wkEnd   = toMs(lw.off, parseToSec(lwB[lwB.length - 1].e));
         wkFrac = wkStart < wkEnd ? (nowMs - wkStart) / (wkEnd - wkStart) : 0;
