@@ -1,39 +1,84 @@
 {
-  "last_updated": "2026-05-07T16:15:18.563Z",
+  "last_updated": "2026-05-13T16:51:07Z",
   "source": "ParentSquare",
   "events": [
     {
-      "start": "2026-05-07",
-      "end": "2026-05-07",
-      "label": "College Craze Thursday",
-      "type": "event",
-      "emoji": "🏫",
-      "newsId": "78309536",
-      "url": "https://www.parentsquare.com/feeds/78309536"
-    },
-    {
-      "start": "2026-05-06",
-      "end": "2026-05-06",
-      "label": "Peer Leaders Meeting @ Lunch",
-      "type": "event",
+      "start": "2026-05-13",
+      "end": "2026-05-13",
+      "label": "he Dean’s office. The deadline to sign up is next Wednesday,",
+      "type": "notable",
       "emoji": "📅",
-      "newsId": "79555634",
-      "url": "https://www.parentsquare.com/feeds/79555634"
-    },
-    {
-      "start": "2026-05-07",
-      "end": "2026-05-07",
-      "label": "Words of Encouragement Rock Painting @ Lunch",
-      "type": "event",
-      "emoji": "📅",
-      "newsId": "79555634",
-      "url": "https://www.parentsquare.com/feeds/79555634"
+      "newsId": "80165994",
+      "url": "https://www.parentsquare.com/feeds/80165994"
     },
     {
       "start": "2026-05-08",
       "end": "2026-05-08",
-      "label": "District Wellness Meeting at 12:30 PM (Wellness Center Closed)",
+      "label": "Newsletter 5/8/2026 WEEKLY UPDATE PIONEER VALLEY HIGH SCHOOL",
+      "type": "event",
+      "emoji": "📅",
+      "newsId": "79963210",
+      "url": "https://www.parentsquare.com/feeds/79963210"
+    },
+    {
+      "start": "2026-05-13",
+      "end": "2026-05-13",
+      "label": "e which one. The last day to submit the survey is Wednesday,",
+      "type": "event",
+      "emoji": "📅",
+      "newsId": "79978456",
+      "url": "https://www.parentsquare.com/feeds/79978456"
+    },
+    {
+      "start": "2026-05-19",
+      "end": "2026-05-19",
+      "label": "rvey is Wednesday, May 13th. Senior Awards Night is Tuesday,",
       "type": "notable",
+      "emoji": "🎓",
+      "newsId": "79978456",
+      "url": "https://www.parentsquare.com/feeds/79978456"
+    },
+    {
+      "start": "2026-05-12",
+      "end": "2026-05-12",
+      "label": "There will be a meeting for JV football",
+      "type": "event",
+      "emoji": "🏈",
+      "newsId": "79976385",
+      "url": "https://www.parentsquare.com/feeds/79976385"
+    },
+    {
+      "start": "2026-05-12",
+      "end": "2026-05-12",
+      "label": "JV Football Meeting Tuesday, May 12 lunch There will be a me",
+      "type": "event",
+      "emoji": "🏈",
+      "newsId": "79976385",
+      "url": "https://www.parentsquare.com/feeds/79976385"
+    },
+    {
+      "start": "2026-05-12",
+      "end": "2026-05-12",
+      "label": "lunch There will be a meeting for JV football on Tuesday,",
+      "type": "event",
+      "emoji": "🏈",
+      "newsId": "79976385",
+      "url": "https://www.parentsquare.com/feeds/79976385"
+    },
+    {
+      "start": "2026-05-06",
+      "end": "2026-05-06",
+      "label": "Peer Leaders Meeting - @ Lunch",
+      "type": "event",
+      "emoji": "📅",
+      "newsId": "79555634",
+      "url": "https://www.parentsquare.com/feeds/79555634"
+    },
+    {
+      "start": "2026-05-07",
+      "end": "2026-05-07",
+      "label": "Words of Encouragement Rock Painting - @ Lunch",
+      "type": "event",
       "emoji": "📅",
       "newsId": "79555634",
       "url": "https://www.parentsquare.com/feeds/79555634"
@@ -41,16 +86,7 @@
     {
       "start": "2026-05-14",
       "end": "2026-05-14",
-      "label": "Salty & Sweet DIY Salt Scrub Workshop @ Lunch",
-      "type": "event",
-      "emoji": "📅",
-      "newsId": "79555634",
-      "url": "https://www.parentsquare.com/feeds/79555634"
-    },
-    {
-      "start": "2026-05-18",
-      "end": "2026-05-22",
-      "label": "Mental Health Awareness Week",
+      "label": "Salty & Sweet DIY Salt Scrub Workshop - @ Lunch",
       "type": "event",
       "emoji": "📅",
       "newsId": "79555634",
@@ -59,7 +95,61 @@
     {
       "start": "2026-05-18",
       "end": "2026-05-18",
-      "label": "Cloud Dough Workshop @ Lunch",
+      "label": "Cloud Dough Workshop - @ Lunch",
+      "type": "event",
+      "emoji": "📅",
+      "newsId": "79555634",
+      "url": "https://www.parentsquare.com/feeds/79555634"
+    },
+    {
+      "start": "2026-05-22",
+      "end": "2026-05-22",
+      "label": "Mental Health Resource Fair - @ Lunch",
+      "type": "event",
+      "emoji": "🎪",
+      "newsId": "79555634",
+      "url": "https://www.parentsquare.com/feeds/79555634"
+    },
+    {
+      "start": "2026-05-27",
+      "end": "2026-05-27",
+      "label": "Mental Health Workshop (Hosted by CAPSLO) - @ Lunch",
+      "type": "event",
+      "emoji": "📅",
+      "newsId": "79555634",
+      "url": "https://www.parentsquare.com/feeds/79555634"
+    },
+    {
+      "start": "2026-05-26",
+      "end": "2026-05-26",
+      "label": "ghlights: Share & Care Club Meetings - Held regularly (note:",
+      "type": "event",
+      "emoji": "📅",
+      "newsId": "79555634",
+      "url": "https://www.parentsquare.com/feeds/79555634"
+    },
+    {
+      "start": "2026-05-06",
+      "end": "2026-05-06",
+      "label": "May 26 meeting cancelled). Peer Leaders Meeting - @ Lunch on",
+      "type": "event",
+      "emoji": "📅",
+      "newsId": "79555634",
+      "url": "https://www.parentsquare.com/feeds/79555634"
+    },
+    {
+      "start": "2026-05-07",
+      "end": "2026-05-07",
+      "label": "on May 6. Words of Encouragement Rock Painting - @ Lunch on",
+      "type": "event",
+      "emoji": "📅",
+      "newsId": "79555634",
+      "url": "https://www.parentsquare.com/feeds/79555634"
+    },
+    {
+      "start": "2026-05-14",
+      "end": "2026-05-14",
+      "label": "on May 7. Salty & Sweet DIY Salt Scrub Workshop - @ Lunch on",
       "type": "event",
       "emoji": "📅",
       "newsId": "79555634",
@@ -68,101 +158,74 @@
     {
       "start": "2026-05-20",
       "end": "2026-05-20",
-      "label": "Dress Up Day: Wear Green (Mental Health Awareness)",
+      "label": "Health Awareness Week - May 18-22 Dress Up Day: Wear Green -",
       "type": "event",
       "emoji": "🏫",
-      "newsId": "79555634",
-      "url": "https://www.parentsquare.com/feeds/79555634"
-    },
-    {
-      "start": "2026-05-22",
-      "end": "2026-05-22",
-      "label": "Mental Health Resource Fair @ Lunch",
-      "type": "event",
-      "emoji": "🎪",
-      "newsId": "79555634",
-      "url": "https://www.parentsquare.com/feeds/79555634"
-    },
-    {
-      "start": "2026-05-25",
-      "end": "2026-05-25",
-      "label": "Memorial Day - No School",
-      "type": "holiday",
-      "emoji": "📅",
-      "newsId": "79555634",
-      "url": "https://www.parentsquare.com/feeds/79555634"
-    },
-    {
-      "start": "2026-05-26",
-      "end": "2026-05-26",
-      "label": "Wellness Center Closed (9:30 AM - 4:30 PM)",
-      "type": "notable",
-      "emoji": "📅",
-      "newsId": "79555634",
-      "url": "https://www.parentsquare.com/feeds/79555634"
-    },
-    {
-      "start": "2026-05-27",
-      "end": "2026-05-27",
-      "label": "Mental Health Workshop (CAPSLO) @ Lunch",
-      "type": "event",
-      "emoji": "📅",
       "newsId": "79555634",
       "url": "https://www.parentsquare.com/feeds/79555634"
     },
     {
       "start": "2026-05-18",
       "end": "2026-05-18",
-      "label": "PVHS Spring Concert at 6:30 PM (Performing Arts Center)",
+      "label": "r mental health awareness. Cloud Dough Workshop - @ Lunch on",
+      "type": "event",
+      "emoji": "📅",
+      "newsId": "79555634",
+      "url": "https://www.parentsquare.com/feeds/79555634"
+    },
+    {
+      "start": "2026-05-22",
+      "end": "2026-05-22",
+      "label": "Lunch on May 18. Mental Health Resource Fair - @ Lunch on",
+      "type": "event",
+      "emoji": "🎪",
+      "newsId": "79555634",
+      "url": "https://www.parentsquare.com/feeds/79555634"
+    },
+    {
+      "start": "2026-05-27",
+      "end": "2026-05-27",
+      "label": "y 22. Mental Health Workshop (Hosted by CAPSLO) - @ Lunch on",
+      "type": "event",
+      "emoji": "📅",
+      "newsId": "79555634",
+      "url": "https://www.parentsquare.com/feeds/79555634"
+    },
+    {
+      "start": "2026-05-01",
+      "end": "2026-05-01",
+      "label": "S Weekly Newsletter WEEKLY UPDATE PIONEER VALLEY HIGH SCHOOL",
+      "type": "event",
+      "emoji": "📅",
+      "newsId": "78814421",
+      "url": "https://www.parentsquare.com/feeds/78814421"
+    },
+    {
+      "start": "2026-05-18",
+      "end": "2026-05-18",
+      "label": "We invite you to join us",
       "type": "event",
       "emoji": "📅",
       "newsId": "79195957",
       "url": "https://www.parentsquare.com/feeds/79195957"
     },
     {
-      "start": "2026-04-30",
-      "end": "2026-04-30",
-      "label": "College Craze Thursday",
+      "start": "2026-05-18",
+      "end": "2026-05-18",
+      "label": "upcoming Spring Concert. We invite you to join us on Monday,",
       "type": "event",
-      "emoji": "🏫",
-      "newsId": "78299685",
-      "url": "https://www.parentsquare.com/feeds/78299685"
+      "emoji": "📅",
+      "newsId": "79195957",
+      "url": "https://www.parentsquare.com/feeds/79195957"
     },
     {
       "start": "2026-04-29",
       "end": "2026-04-29",
-      "label": "Future Panther Night (5:00 - 7:00 PM, Panther Gym)",
-      "type": "event",
-      "emoji": "🎪",
-      "newsId": "78768890",
-      "url": "https://www.parentsquare.com/feeds/78768890"
-    },
-    {
-      "start": "2026-04-28",
-      "end": "2026-05-08",
-      "label": "CAASPP Testing - Juniors (ELA & Math)",
-      "type": "notable",
-      "emoji": "📝",
-      "newsId": "78782669",
-      "url": "https://www.parentsquare.com/feeds/78782669"
-    },
-    {
-      "start": "2026-04-28",
-      "end": "2026-04-28",
-      "label": "Final College Funding Workshop (5:30 - 6:30 PM)",
-      "type": "event",
-      "emoji": "🎓",
-      "newsId": "78323087",
-      "url": "https://www.parentsquare.com/feeds/78323087"
-    },
-    {
-      "start": "2026-04-27",
-      "end": "2026-05-01",
-      "label": "Sexual Assault Awareness Week",
+      "label": "ll. 📍 Location Recap Where: The Panther Gym When: Wednesday,",
       "type": "event",
       "emoji": "📅",
-      "newsId": "78760632",
-      "url": "https://www.parentsquare.com/feeds/78760632"
+      "newsId": "78892577",
+      "url": "https://www.parentsquare.com/feeds/78892577"
     }
   ]
 }
