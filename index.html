@@ -115,6 +115,124 @@
     .nav-menu-icon { font-size: 14px; flex-shrink: 0; }
     .nav-menu-sep { height: 1px; background: rgba(255,255,255,0.09); margin: 3px 6px; }
 
+    .embed-modal[hidden] { display: none; }
+    .embed-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .embed-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(1, 12, 12, 0.72);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .embed-dialog {
+      position: relative;
+      width: min(100%, 430px);
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(8, 31, 31, 0.92);
+      box-shadow: 0 26px 48px rgba(0,0,0,0.34);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .embed-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .embed-title {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #eaf8f8;
+    }
+    .embed-close {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,0.09);
+      background: rgba(255,255,255,0.04);
+      color: #eaf8f8;
+      border-radius: 12px;
+      padding: 7px 10px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .embed-note {
+      font-size: 10px;
+      line-height: 1.45;
+      color: #c8dddd;
+      opacity: 0.9;
+    }
+    .embed-presets { display: flex; gap: 8px; }
+    .embed-preset {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,0.09);
+      background: rgba(255,255,255,0.03);
+      color: #dff7f7;
+      border-radius: 12px;
+      padding: 8px 12px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .embed-preset.is-active {
+      background: rgba(0, 209, 209, 0.18);
+      border-color: rgba(75, 225, 225, 0.34);
+    }
+    .embed-code {
+      width: 100%;
+      min-height: 134px;
+      resize: none;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(0,0,0,0.24);
+      color: #f4fbfb;
+      font: 500 11px/1.45 SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      padding: 12px;
+      outline: none;
+    }
+    .embed-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .embed-copy {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.08);
+      color: #ffffff;
+      border-radius: 12px;
+      padding: 9px 12px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .embed-status {
+      font-size: 10px;
+      line-height: 1.35;
+      color: #b8d3d3;
+      text-align: right;
+    }
+
     .logo-clear { width: 38px; height: 38px; object-fit: contain; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)); flex-shrink: 0; }
     .page-title { position: absolute; left: 0; right: 0; text-align: center; font-size: 15px; font-weight: 700; color: #dff7f7; text-transform: uppercase; margin: 0; letter-spacing: 0.14em; pointer-events: none; }
     .header { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0; margin-top: 0; }
@@ -1211,6 +1329,8 @@
         <button id="newsMenuBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon">📰</span>News</button>
         <div id="popoutMenuSep" class="nav-menu-sep"></div>
         <button id="popoutBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon">🪟</span>Pop Out</button>
+        <div id="embedMenuSep" class="nav-menu-sep" style="display:none"></div>
+        <button id="embedBtn" class="nav-menu-item" type="button" role="menuitem" style="display:none"><span class="nav-menu-icon">📋</span>Embed</button>
         <div id="installMenuSep" class="nav-menu-sep"></div>
         <button id="installBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon" id="installIcon">📲</span><span id="installLabel">Add to Home Screen</span></button>
         <div class="nav-menu-sep"></div>
@@ -1257,6 +1377,27 @@
           <div id="installModalSteps" class="install-modal-steps" style="display:none"></div>
           <button id="installModalCta" class="install-modal-cta" type="button" style="display:none">Install Now</button>
           <p class="install-modal-note">Once installed, PVHS Tools opens in its own window — no browser needed. Just the app.</p>
+        </div>
+      </div>
+
+      <!-- EMBED MODAL -->
+      <div id="embedModal" class="embed-modal" hidden>
+        <div class="embed-backdrop" id="embedBackdrop"></div>
+        <div class="embed-dialog" role="dialog" aria-modal="true" aria-labelledby="embedTitle">
+          <div class="embed-header">
+            <h2 id="embedTitle" class="embed-title">Embed Countdown</h2>
+            <button id="embedCloseBtn" class="embed-close" type="button">Close</button>
+          </div>
+          <p class="embed-note">Choose a preset, then copy the clean embed code for your class page or classroom display.</p>
+          <div class="embed-presets">
+            <button class="embed-preset is-active" type="button" data-embed-target="canvas">Canvas</button>
+            <button class="embed-preset" type="button" data-embed-target="classroomscreen">ClassroomScreen</button>
+          </div>
+          <textarea id="embedCode" class="embed-code" readonly></textarea>
+          <div class="embed-actions">
+            <button id="copyEmbedBtn" class="embed-copy" type="button">Copy Code</button>
+            <span id="embedStatus" class="embed-status">This uses the clean embed view of the countdown page.</span>
+          </div>
         </div>
       </div>
 
@@ -1385,6 +1526,76 @@
       navMenuBtn?.classList.remove('is-open');
       window.open('index.html?mode=popout', 'pvTools', 'width=450,height=900,resizable=yes,scrollbars=no');
     });
+
+    // ── EMBED MODAL ─────────────────────────────────────────────
+    (function() {
+      if (isMobile || isStandalone || isPopout) return;
+      const embedMenuSep = document.getElementById('embedMenuSep');
+      const embedBtn     = document.getElementById('embedBtn');
+      const embedModal   = document.getElementById('embedModal');
+      const embedBackdrop  = document.getElementById('embedBackdrop');
+      const embedCloseBtn  = document.getElementById('embedCloseBtn');
+      const embedCode      = document.getElementById('embedCode');
+      const copyEmbedBtn   = document.getElementById('copyEmbedBtn');
+      const embedStatus    = document.getElementById('embedStatus');
+      const embedPresets   = document.querySelectorAll('.embed-preset');
+      const embedConfig = {
+        canvas:         { label: 'Canvas',         height: 540 },
+        classroomscreen:{ label: 'ClassroomScreen', height: 520 }
+      };
+      let activeEmbedTarget = 'canvas';
+
+      function getEmbedSrc() {
+        return new URL('countdown.html?mode=embed', window.location.href).toString();
+      }
+      function buildEmbedCode(key) {
+        const cfg = embedConfig[key] || embedConfig.canvas;
+        return `<iframe src="${getEmbedSrc()}" title="PVHS Classroom Countdown" width="100%" height="${cfg.height}" style="border:0;overflow:hidden;background:transparent;" loading="lazy" scrolling="no" allowtransparency="true" allowfullscreen></iframe>`;
+      }
+      function updateEmbedCode(key = activeEmbedTarget) {
+        activeEmbedTarget = key;
+        if (embedCode) embedCode.value = buildEmbedCode(key);
+        const cfg = embedConfig[key] || embedConfig.canvas;
+        if (embedStatus) embedStatus.textContent = `${cfg.label} preset selected. You can change the height later if needed.`;
+        embedPresets.forEach(b => b.classList.toggle('is-active', b.dataset.embedTarget === key));
+      }
+      function openEmbedModal() {
+        updateEmbedCode(activeEmbedTarget);
+        embedModal.hidden = false;
+        document.body.style.overflow = 'hidden';
+      }
+      function closeEmbedModal() {
+        embedModal.hidden = true;
+        document.body.style.overflow = '';
+      }
+
+      if (embedMenuSep) embedMenuSep.style.display = 'block';
+      if (embedBtn) {
+        embedBtn.style.display = 'flex';
+        embedBtn.addEventListener('click', () => {
+          navMenu?.classList.remove('is-open');
+          navMenuBtn?.classList.remove('is-open');
+          openEmbedModal();
+        });
+      }
+      embedCloseBtn?.addEventListener('click', closeEmbedModal);
+      embedBackdrop?.addEventListener('click', closeEmbedModal);
+      copyEmbedBtn?.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(embedCode.value);
+          if (embedStatus) embedStatus.textContent = 'Embed code copied.';
+        } catch {
+          embedCode.select();
+          document.execCommand('copy');
+          if (embedStatus) embedStatus.textContent = 'Embed code copied.';
+        }
+      });
+      embedPresets.forEach(b => b.addEventListener('click', () => updateEmbedCode(b.dataset.embedTarget)));
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && !embedModal.hidden) closeEmbedModal();
+      });
+      updateEmbedCode();
+    })();
 
     // ── MAINTENANCE MODAL ───────────────────────────────────────
     (function() {
