@@ -458,6 +458,16 @@
       margin-top: 4px;
     }
 
+    /* ── MINI EMBED — period + days only ───────────────────── */
+    body.is-embed-mini #accessText,
+    body.is-embed-mini #scheduleText,
+    body.is-embed-mini .progress-card,
+    body.is-embed-mini .embed-clock-tile,
+    body.is-embed-mini .info-vert-divider,
+    body.is-embed-mini .info-strip .info-cell:last-child { display: none !important; }
+    body.is-embed-mini .info-strip { justify-content: center; }
+    body.is-embed-mini .info-cell { text-align: center; }
+
     body.is-standalone { background: #021414; }
 
     body.is-standalone::before {
@@ -960,6 +970,8 @@
           <div class="embed-presets">
             <button class="embed-preset is-active" type="button" data-embed-target="canvas">Canvas</button>
             <button class="embed-preset" type="button" data-embed-target="classroomscreen">ClassroomScreen</button>
+            <button class="embed-preset" type="button" data-embed-target="canvas-mini">Canvas · Mini</button>
+            <button class="embed-preset" type="button" data-embed-target="classroomscreen-mini">Screen · Mini</button>
           </div>
           <textarea id="embedCode" class="embed-code" readonly></textarea>
           <div class="embed-actions">
@@ -1077,9 +1089,13 @@
       document.documentElement.style.setProperty('--standalone-app-width', `${appWidth}px`);
     }
 
+    const isMini = isEmbed && urlParams.get('view') === 'mini';
     if (isEmbed) {
       document.documentElement.classList.add('is-embed-root');
       document.body.classList.add('is-embed');
+    }
+    if (isMini) {
+      document.body.classList.add('is-embed-mini');
     }
 
     if (isStandalone) {
@@ -1165,18 +1181,18 @@
     }
 
     const embedConfig = {
-      canvas: { label: "Canvas", height: 540 },
-      classroomscreen: { label: "ClassroomScreen", height: 520 }
+      canvas:                 { label: "Canvas",          height: 540 },
+      classroomscreen:        { label: "ClassroomScreen", height: 520 },
+      "canvas-mini":          { label: "Canvas · Mini",   height: 340, mini: true },
+      "classroomscreen-mini": { label: "Screen · Mini",   height: 320, mini: true }
     };
     let activeEmbedTarget = "canvas";
 
-    function getEmbedSrc() {
-      return new URL("countdown.html?mode=embed", window.location.href).toString();
-    }
-
     function buildEmbedCode(targetKey) {
       const config = embedConfig[targetKey] || embedConfig.canvas;
-      return `<iframe src="${getEmbedSrc()}" title="PVHS Classroom Countdown" width="100%" height="${config.height}" style="border:0;overflow:hidden;background:transparent;" loading="lazy" scrolling="no" allowtransparency="true" allowfullscreen></iframe>`;
+      const src = new URL("countdown.html?mode=embed", window.location.href);
+      if (config.mini) src.searchParams.set("view", "mini");
+      return `<iframe src="${src.toString()}" title="PVHS Classroom Countdown" width="100%" height="${config.height}" style="border:0;overflow:hidden;background:transparent;" loading="lazy" scrolling="no" allowtransparency="true" allowfullscreen></iframe>`;
     }
 
     function updateEmbedCode(targetKey = activeEmbedTarget) {
