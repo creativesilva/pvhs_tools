@@ -307,6 +307,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
+      justify-content: center;
     }
     .embed-preset {
       appearance: none;
@@ -973,7 +974,7 @@
             <button class="embed-preset is-active" type="button" data-embed-target="canvas">Canvas</button>
             <button class="embed-preset" type="button" data-embed-target="classroomscreen">ClassroomScreen</button>
             <button class="embed-preset" type="button" data-embed-target="canvas-mini">Canvas · Mini</button>
-            <button class="embed-preset" type="button" data-embed-target="classroomscreen-mini">Screen · Mini</button>
+            <button class="embed-preset" type="button" data-embed-target="classroomscreen-mini">ClassroomScreen · Mini</button>
           </div>
           <textarea id="embedCode" class="embed-code" readonly></textarea>
           <div class="embed-actions">
@@ -1186,7 +1187,7 @@
       canvas:                 { label: "Canvas",          height: 540 },
       classroomscreen:        { label: "ClassroomScreen", height: 520 },
       "canvas-mini":          { label: "Canvas · Mini",   height: 340, mini: true },
-      "classroomscreen-mini": { label: "Screen · Mini",   height: 320, mini: true }
+      "classroomscreen-mini": { label: "ClassroomScreen · Mini",   height: 320, mini: true }
     };
     let activeEmbedTarget = "canvas";
 
