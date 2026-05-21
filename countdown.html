@@ -466,10 +466,12 @@
     body.is-embed-mini #scheduleText,
     body.is-embed-mini .progress-card,
     body.is-embed-mini .embed-clock-tile,
+    body.is-embed-mini .footer-note,
     body.is-embed-mini .info-vert-divider,
     body.is-embed-mini .info-strip .info-cell:last-child { display: none !important; }
     body.is-embed-mini .info-strip { justify-content: center; }
     body.is-embed-mini .info-cell { text-align: center; }
+    body.is-embed-mini .content { gap: clamp(6px, 2vw, 10px); padding-bottom: 12px; }
 
     body.is-standalone { background: #021414; }
 
@@ -1185,8 +1187,8 @@
     const embedConfig = {
       canvas:                 { label: "Canvas",          height: 540 },
       classroomscreen:        { label: "ClassroomScreen", height: 520 },
-      "canvas-mini":          { label: "Canvas · Mini",   height: 340, mini: true },
-      "classroomscreen-mini": { label: "ClassroomScreen · Mini",   height: 320, mini: true }
+      "canvas-mini":          { label: "Canvas · Mini",          height: 430, mini: true },
+      "classroomscreen-mini": { label: "ClassroomScreen · Mini",  height: 410, mini: true }
     };
     let activeEmbedTarget = "canvas";
 
