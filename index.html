@@ -1546,16 +1546,16 @@
       const embedConfig = {
         canvas:                 { label: 'Canvas',          height: 540 },
         classroomscreen:        { label: 'ClassroomScreen', height: 520 },
-        'canvas-mini':          { label: 'Canvas · Mini',          height: 220, mini: true },
-        'classroomscreen-mini': { label: 'ClassroomScreen · Mini',  height: 220, mini: true }
+        'canvas-mini':          { label: 'Canvas · Mini',          height: 220, view: 'mini' },
+        'classroomscreen-mini': { label: 'ClassroomScreen · Mini',  height: 300, view: 'mini-cs' }
       };
       let activeEmbedTarget = 'canvas';
 
       function buildEmbedCode(key) {
         const cfg = embedConfig[key] || embedConfig.canvas;
         const src = new URL('countdown.html?mode=embed', window.location.href);
-        if (cfg.mini) src.searchParams.set('view', 'mini');
-        const style = cfg.mini
+        if (cfg.view) src.searchParams.set('view', cfg.view);
+        const style = cfg.view === 'mini'
           ? 'border:0;overflow:hidden;background:transparent;display:block;max-width:400px;'
           : 'border:0;overflow:hidden;background:transparent;';
         return `<iframe src="${src.toString()}" title="PVHS Classroom Countdown" width="100%" height="${cfg.height}" style="${style}" loading="lazy" scrolling="no" allowtransparency="true" allowfullscreen></iframe>`;
