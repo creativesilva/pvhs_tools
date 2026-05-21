@@ -462,8 +462,6 @@
     }
 
     /* ── MINI EMBED — fully scalable, fills iframe at any size ── */
-    body.is-embed-mini #accessText,
-    body.is-embed-mini #scheduleText,
     body.is-embed-mini .progress-card,
     body.is-embed-mini .embed-clock-tile,
     body.is-embed-mini .footer-note,
@@ -484,27 +482,18 @@
     body.is-embed-mini .info-label   { font-size: 3vmin !important; letter-spacing: 0.15em !important; }
     body.is-embed-mini .info-number  { font-size: 18vmin !important; line-height: 1 !important; }
     body.is-embed-mini .info-sub     { font-size: 3vmin !important; }
+    body.is-embed-mini .access-row   { font-size: 3vmin !important; margin-top: 0.4vmin !important; letter-spacing: 0.06em !important; }
+    body.is-embed-mini .status-row   { font-size: 2.8vmin !important; margin-top: 0.3vmin !important; letter-spacing: 0.06em !important; }
 
-    /* ── CLASSROOMSCREEN MINI — period + both info cols, no clock/bars, scalable ── */
-    body.is-embed-mini-cs #accessText,
-    body.is-embed-mini-cs .progress-card,
+    /* ── CLASSROOMSCREEN MINI — full embed look, no clock tile or progress bars ── */
     body.is-embed-mini-cs .embed-clock-tile,
+    body.is-embed-mini-cs .progress-card,
     body.is-embed-mini-cs .footer-note { display: none !important; }
-    body.is-embed-mini-cs .frame        { padding: 0 !important; }
-    body.is-embed-mini-cs .app          { width: 100vw !important; height: 100vh !important; max-width: 100vw !important; max-height: 100vh !important; border-radius: 0 !important; padding: 0 !important; }
-    body.is-embed-mini-cs .content      { width: 100% !important; height: 100% !important; overflow: hidden !important; justify-content: flex-start !important; gap: 1.5vmin !important; padding: 1.5vmin !important; align-items: stretch !important; }
-    body.is-embed-mini-cs .period-card  { flex: 3 1 0 !important; min-height: 0 !important; margin-bottom: 0 !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; padding: 1.5vmin 3vmin !important; border-radius: clamp(10px, 2vmin, 22px) !important; gap: 0.4vmin !important; }
-    body.is-embed-mini-cs .info-strip   { flex: 2 1 0 !important; min-height: 0 !important; margin-bottom: 0 !important; padding: 1.5vmin 2vmin !important; border-radius: clamp(10px, 2vmin, 22px) !important; align-items: center !important; justify-content: space-around !important; }
-    body.is-embed-mini-cs .info-cell    { text-align: center !important; gap: 0.3vmin !important; }
-    body.is-embed-mini-cs .info-vert-divider { width: 1px !important; margin: 0 1vmin !important; }
-    body.is-embed-mini-cs .block-label  { font-size: 4.5vmin !important; margin-bottom: 0 !important; letter-spacing: 0.07em !important; }
-    body.is-embed-mini-cs .timer        { font-size: 15vmin !important; line-height: 1 !important; }
-    body.is-embed-mini-cs .subtext      { font-size: 2.8vmin !important; margin: 0.2vmin 0 0 0 !important; }
-    body.is-embed-mini-cs #scheduleText { font-size: 2.5vmin !important; margin: 0.2vmin 0 0 0 !important; }
-    body.is-embed-mini-cs .info-label   { font-size: 2.5vmin !important; letter-spacing: 0.12em !important; }
-    body.is-embed-mini-cs .info-number  { font-size: 13vmin !important; line-height: 1 !important; }
-    body.is-embed-mini-cs .info-main    { font-size: 3.5vmin !important; line-height: 1.3 !important; text-align: center !important; }
-    body.is-embed-mini-cs .info-sub     { font-size: 2.2vmin !important; }
+    body.is-embed-mini-cs .frame   { padding: 0 !important; }
+    body.is-embed-mini-cs .app     { width: 100vw !important; height: 100vh !important; max-width: 100vw !important; max-height: 100vh !important; }
+    body.is-embed-mini-cs .content { height: 100% !important; overflow: hidden !important; }
+    body.is-embed-mini-cs .period-card,
+    body.is-embed-mini-cs .info-strip { flex: 1 1 0 !important; min-height: 0 !important; margin-bottom: 0 !important; }
 
     body.is-standalone { background: #021414; }
 
@@ -1086,7 +1075,7 @@
     }
 
     function fitCountdownText() {
-      if (isMini || isMiniCS) return; // vmin CSS handles sizing; inline style would fight it
+      if (isMini) return; // vmin CSS handles sizing; inline style would fight it
       const timerValue = (timerTextEl?.textContent || "").trim();
       const hasHours = timerValue.split(":").length >= 3;
       const timerMax = isEmbed
@@ -1223,7 +1212,7 @@
       canvas:                 { label: "Canvas",          height: 540 },
       classroomscreen:        { label: "ClassroomScreen", height: 520 },
       "canvas-mini":          { label: "Canvas · Mini",          height: 220, view: "mini" },
-      "classroomscreen-mini": { label: "ClassroomScreen · Mini",  height: 300, view: "mini-cs" }
+      "classroomscreen-mini": { label: "ClassroomScreen · Mini",  height: 350, view: "mini-cs" }
     };
     let activeEmbedTarget = "canvas";
 
