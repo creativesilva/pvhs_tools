@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: transparent;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .card {
+      width: 100%; height: 100%;
+      padding: 10px 14px 8px;
+      display: flex;
+      flex-direction: column;
+      background: rgba(0, 6, 6, 0.58);
+      border-left: 4px solid #007474;
+    }
+
+    /* ── Clock ───────────────────────────────────────── */
+    .clock {
+      font-size: 19px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.02em;
+      color: #ffffff;
+      line-height: 1;
+      padding-bottom: 1px;
+    }
+    .clock-label {
+      font-size: 7.5px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.28);
+    }
+
+    /* ── Divider ─────────────────────────────────────── */
+    .divider {
+      height: 1px;
+      background: rgba(255,255,255,0.07);
+      margin: 6px 0;
+    }
+
+    /* ── Period + countdown ──────────────────────────── */
+    .period-label {
+      font-size: 7.5px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #5eead4;
+      padding-bottom: 1px;
+    }
+    .countdown {
+      font-size: 27px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.03em;
+      color: #ffffff;
+      line-height: 1;
+    }
+    .countdown.caution { color: #f0c44a; }
+    .countdown.warning { color: #ff6060; }
+    .countdown.rest    { color: #5eead4; }
+
+    /* ── Restroom access ─────────────────────────────── */
+    .access {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 8.5px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 3px 7px;
+      border-radius: 3px;
+      color: rgba(255,255,255,0.28);
+      background: rgba(255,255,255,0.04);
+      width: fit-content;
+    }
+    .access.ok      { color: #5fcc8a; background: rgba(95,204,138,0.13); }
+    .access.caution { color: #f0c44a; background: rgba(240,196,74,0.13); }
+    .access.warning { color: #ff6060; background: rgba(255,96,96,0.13);  }
+
+    /* ── Next schedule ───────────────────────────────── */
+    .next-sched {
+      font-size: 8.5px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.32);
+    }
+
+    /* ── School days ─────────────────────────────────── */
+    .days-row {
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+    }
+    .days-num {
+      font-size: 20px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: #5eead4;
+      line-height: 1;
+    }
+    .days-label {
+      font-size: 8.5px;
+      color: rgba(255,255,255,0.45);
+      letter-spacing: 0.05em;
+    }
+    .last-day {
+      font-size: 8px;
+      color: rgba(255,255,255,0.25);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding-top: 1px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+
+    <div class="clock" id="clock">--:--:-- --</div>
+    <div class="clock-label">Current Time</div>
+
+    <div class="divider"></div>
+
+    <div class="period-label" id="period-label">Loading…</div>
+    <div class="countdown" id="countdown">--:--:--</div>
+
+    <div class="divider"></div>
+
+    <div class="access" id="access">● Checking…</div>
+
+    <div class="divider"></div>
+
+    <div class="next-sched" id="next-sched">Next: —</div>
+
+    <div class="divider"></div>
+
+    <div class="days-row">
+      <span class="days-num" id="days-num">—</span>
+      <span class="days-label">School Days Left</span>
+    </div>
+    <div class="last-day" id="last-day">Last Day: Jun 10</div>
+
+  </div>
+
+  <script src="schedule-data.js"></script>
+  <script>
+    const clockEl     = document.getElementById('clock');
+    const periodEl    = document.getElementById('period-label');
+    const countEl     = document.getElementById('countdown');
+    const accessEl    = document.getElementById('access');
+    const nextSchedEl = document.getElementById('next-sched');
+    const daysNumEl   = document.getElementById('days-num');
+    const lastDayEl   = document.getElementById('last-day');
+
+    // Last day of school — format once
+    const lastSD = schoolDays[schoolDays.length - 1];
+    lastDayEl.textContent = "Last Day: " + new Intl.DateTimeFormat("en-US", {
+      timeZone, month: "short", day: "numeric"
+    }).format(new Date(lastSD + "T12:00:00"));
+
+    function setAccess(state, text) {
+      accessEl.className = "access" + (state ? " " + state : "");
+      accessEl.textContent = "● " + text;
+    }
+
+    function tick() {
+      const now  = getNow();
+      const date = new Date();
+
+      // ── Live clock (HH:MM:SS AM/PM) ─────────────────────────
+      clockEl.textContent = new Intl.DateTimeFormat("en-US", {
+        timeZone, hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true
+      }).format(date);
+
+      // ── School days remaining ────────────────────────────────
+      daysNumEl.textContent = schoolDays.filter(d => d >= now.dateStr).length;
+
+      // ── Today / next schedule label ─────────────────────────
+      const isSchoolDay   = schoolDays.includes(now.dateStr);
+      const todayBlocks   = getScheduleBlocks(now.dateStr);
+      const lastBlockEnd  = parseToSec(todayBlocks[todayBlocks.length - 1].e);
+      const isAfterSchool = isSchoolDay && now.totalSec >= lastBlockEnd;
+
+      if (isSchoolDay && !isAfterSchool) {
+        nextSchedEl.textContent = "Today: " + getScheduleType(now.dateStr);
+      } else {
+        const nextSD = schoolDays.find(d => d > now.dateStr);
+        nextSchedEl.textContent = nextSD
+          ? "Next: " + getScheduleType(nextSD)
+          : "School Year Complete";
+      }
+
+      // ── Named break? ─────────────────────────────────────────
+      const activeBreak = currentBreaks.find(b => now.dateStr >= b.start && now.dateStr <= b.end);
+      if (activeBreak) {
+        const breakEnd = new Date(activeBreak.end + "T08:30:00");
+        const sec      = Math.max(0, Math.floor((breakEnd - date) / 1000));
+        periodEl.textContent = activeBreak.name + " " + activeBreak.emoji;
+        countEl.textContent  = formatTime(sec, true);
+        countEl.className    = "countdown rest";
+        setAccess("ok", "Free Time");
+        return;
+      }
+
+      // ── Weekend ──────────────────────────────────────────────
+      const isWeekend = now.weekday === "Saturday" || now.weekday === "Sunday";
+      if (isWeekend || (isAfterSchool && now.weekday === "Friday")) {
+        const nextStart = new Date(
+          (schoolDays.find(d => d > now.dateStr) || lastSD) + "T08:30:00"
+        );
+        periodEl.textContent = "Weekend";
+        countEl.textContent  = formatTime(Math.max(0, Math.floor((nextStart - date) / 1000)), true);
+        countEl.className    = "countdown rest";
+        setAccess("ok", "Free Time");
+        return;
+      }
+
+      // ── Non-school weekday ───────────────────────────────────
+      if (!isSchoolDay) {
+        const nextStart = new Date(
+          (schoolDays.find(d => d > now.dateStr) || lastSD) + "T08:30:00"
+        );
+        periodEl.textContent = "Day Off";
+        countEl.textContent  = formatTime(Math.max(0, Math.floor((nextStart - date) / 1000)), true);
+        countEl.className    = "countdown rest";
+        setAccess("ok", "Free Time");
+        return;
+      }
+
+      const blocks     = getScheduleBlocks(now.dateStr);
+      const firstStart = parseToSec(blocks[0].s);
+
+      // ── Before school ────────────────────────────────────────
+      if (now.totalSec < firstStart) {
+        const sec = Math.max(0, Math.floor((new Date(now.dateStr + "T08:30:00") - date) / 1000));
+        periodEl.textContent = "Before School";
+        countEl.textContent  = formatTime(sec, true);
+        countEl.className    = "countdown rest";
+        setAccess("ok", "Free Time");
+        return;
+      }
+
+      // ── After school ─────────────────────────────────────────
+      if (isAfterSchool) {
+        const nextStart = new Date(
+          (schoolDays.find(d => d > now.dateStr) || lastSD) + "T08:30:00"
+        );
+        periodEl.textContent = "After School";
+        countEl.textContent  = formatTime(Math.max(0, Math.floor((nextStart - date) / 1000)), true);
+        countEl.className    = "countdown rest";
+        setAccess("ok", "Free Time");
+        return;
+      }
+
+      // ── Active school block ──────────────────────────────────
+      for (let i = 0; i < blocks.length; i++) {
+        const s = parseToSec(blocks[i].s);
+        const e = parseToSec(blocks[i].e);
+        if (now.totalSec < s || now.totalSec >= e) continue;
+
+        const rem     = e - now.totalSec;
+        const elapsed = now.totalSec - s;
+        const label   = blocks[i].l;
+        const isClass   = isInstructionalPeriod(label);
+        const isPassing = isPassingBlock(label);
+        const isLunch   = /LUNCH|NUTRITION/i.test(label);
+
+        periodEl.textContent = label;
+
+        // Countdown
+        const isLastFive    = isClass && rem <= 300;
+        const isLastTen     = isClass && rem <= 600;
+        const isFirstTen    = isClass && elapsed < 600;
+        const isLastFivePas = isPassing && rem <= 300;
+
+        if (isLastFive) {
+          countEl.textContent = "05:00";
+          countEl.className   = "countdown warning";
+        } else if (isLastTen || isFirstTen) {
+          countEl.textContent = formatTime(rem);
+          countEl.className   = "countdown caution";
+        } else {
+          countEl.textContent = formatTime(rem);
+          countEl.className   = "countdown";
+        }
+
+        // Restroom access
+        if (isLunch) {
+          setAccess("ok", "Restroom OK");
+        } else if (isPassing) {
+          isLastFivePas ? setAccess("warning", "Hurry To Class") : setAccess("ok", "Restroom OK");
+        } else if (isClass) {
+          if (isLastFive) {
+            setAccess("warning", "No Access");
+          } else if (isLastTen || isFirstTen) {
+            const txt = isFirstTen
+              ? "No Access · " + formatTime(600 - elapsed)
+              : "No Access";
+            setAccess("caution", txt);
+          } else {
+            setAccess("", "No Access");
+          }
+        } else {
+          // BREAK, DEPT. COLLABORATION, etc.
+          setAccess("ok", "Restroom OK");
+        }
+        return;
+      }
+    }
+
+    tick();
+    setInterval(tick, 1000);
+  </script>
+</body>
+</html>
