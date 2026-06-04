@@ -723,6 +723,45 @@
     .feedback-submit:active { opacity: 0.85; }
     .feedback-note { font-size: 9px; color: var(--muted); text-align: center; opacity: 0.65; margin: 0; }
 
+    /* ── LOGO UPDATE MODAL ─────────────────────────────────── */
+    .logo-update-modal[hidden] { display: none; }
+    .logo-update-modal {
+      position: absolute; inset: 0; z-index: 22;
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .logo-update-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(1,12,12,0.85);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    }
+    .logo-update-dialog {
+      position: relative; width: min(100%, 340px);
+      border-radius: 24px; border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(6,26,26,0.92);
+      box-shadow: 0 26px 48px rgba(0,0,0,0.5);
+      padding: 20px; display: flex; flex-direction: column; gap: 14px; align-items: center;
+    }
+    .logo-update-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; }
+    .logo-update-title { font-size: 12px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 0.12em; margin: 0; }
+    .logo-update-badge { font-size: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.14em; background: rgba(0,180,180,0.22); color: #7ee8e8; border: 1px solid rgba(0,200,200,0.3); border-radius: 99px; padding: 2px 8px; }
+    .logo-update-img { width: 130px; height: 130px; object-fit: contain; filter: drop-shadow(0 4px 20px rgba(0,200,200,0.2)); }
+    .logo-update-body { font-size: 12px; font-weight: 500; color: #c8efef; text-align: center; line-height: 1.55; margin: 0; }
+    .logo-update-body strong { color: #fff; font-weight: 700; }
+    .logo-update-hint {
+      font-size: 11px; font-weight: 600; color: rgba(200,239,239,0.8); text-align: center;
+      line-height: 1.5; margin: 0; background: rgba(0,180,180,0.1);
+      border: 1px solid rgba(0,200,200,0.2); border-radius: 14px; padding: 11px 14px; width: 100%;
+    }
+    .logo-update-hint strong { color: #7ee8e8; }
+    .logo-update-btn {
+      appearance: none; width: 100%;
+      background: linear-gradient(135deg, #007474 0%, #009898 100%);
+      border: none; border-radius: 14px; padding: 13px;
+      color: #fff; font-size: 11px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.12em; cursor: pointer;
+    }
+    .logo-update-btn:active { opacity: 0.85; }
+
     /* ── SCHEDULE BUTTONS ─────────────────────────────────────── */
     .sched-btn-row { display: flex; gap: 6px; width: 100%; margin-bottom: 5px; flex-shrink: 0; }
     .sched-btn {
@@ -921,6 +960,22 @@
           </div>
           <button id="feedbackSubmit" class="feedback-submit" type="button">Send Feedback ✉️</button>
           <p class="feedback-note">Your feedback is sent directly to the developer.</p>
+        </div>
+      </div>
+
+      <!-- LOGO UPDATE ANNOUNCEMENT MODAL -->
+      <div id="logoUpdateModal" class="logo-update-modal" hidden>
+        <div class="logo-update-backdrop" id="logoUpdateBackdrop"></div>
+        <div class="logo-update-dialog">
+          <div class="logo-update-header">
+            <p class="logo-update-title">🐾 Panther Logo Refresh</p>
+            <span class="logo-update-badge">Beta Preview</span>
+            <button id="logoUpdateClose" class="feedback-close" type="button">✕</button>
+          </div>
+          <img src="PV_Logo.png" alt="New PVHS Panther Logo" class="logo-update-img">
+          <p class="logo-update-body">We've refreshed the <strong>PVHS Panther logo</strong> with an updated design. This is a <strong>beta preview</strong> — your feedback helps us finalize it before the official rollout.</p>
+          <div class="logo-update-hint">To share your thoughts, tap <strong>☰ Menu → Share Feedback</strong> — it goes directly to <strong>Mr. Silva</strong>.</div>
+          <button id="logoUpdateCloseBtn" class="logo-update-btn" type="button">Got It — Looks Good!</button>
         </div>
       </div>
 
@@ -2061,12 +2116,7 @@
       window.addEventListener('beforeinstallprompt', e => {
         e.preventDefault();
         deferredPrompt = e;
-        showInstallBanner();
       });
-
-      if (!isMobile && !installSeen && (isSafari || isFirefox)) {
-        setTimeout(showInstallBanner, 800);
-      }
 
       document.getElementById('installBannerBtn')?.addEventListener('click', () => {
         if (deferredPrompt) {
@@ -2180,6 +2230,24 @@
           }, 3000);
         });
       });
+    })();
+
+    // ── LOGO UPDATE ANNOUNCEMENT ───────────────────────────────────────────
+    (function() {
+      if (!localStorage.getItem('pvhs_logo_v2_seen')) {
+        setTimeout(() => {
+          const m = document.getElementById('logoUpdateModal');
+          if (m) m.hidden = false;
+        }, 1200);
+      }
+      function close() {
+        const m = document.getElementById('logoUpdateModal');
+        if (m) m.hidden = true;
+        localStorage.setItem('pvhs_logo_v2_seen', '1');
+      }
+      document.getElementById('logoUpdateClose')?.addEventListener('click', close);
+      document.getElementById('logoUpdateCloseBtn')?.addEventListener('click', close);
+      document.getElementById('logoUpdateBackdrop')?.addEventListener('click', close);
     })();
 
     // ── SCHEDULE SHEET ─────────────────────────────────────────────────────
