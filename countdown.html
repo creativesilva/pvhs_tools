@@ -2127,7 +2127,7 @@
 
     // ── LOGO UPDATE ANNOUNCEMENT ───────────────────────────────────────────
     (function() {
-      if (!localStorage.getItem('pvhs_logo_v2_seen')) {
+      if (!localStorage.getItem('pvhs_logo_v2b_seen')) {
         setTimeout(() => {
           const m = document.getElementById('logoUpdateModal');
           if (m) m.hidden = false;
@@ -2136,7 +2136,7 @@
       function close() {
         const m = document.getElementById('logoUpdateModal');
         if (m) m.hidden = true;
-        localStorage.setItem('pvhs_logo_v2_seen', '1');
+        localStorage.setItem('pvhs_logo_v2b_seen', '1');
       }
       document.getElementById('logoUpdateClose')?.addEventListener('click', close);
       document.getElementById('logoUpdateCloseBtn')?.addEventListener('click', close);
