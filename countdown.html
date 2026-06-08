@@ -1357,7 +1357,7 @@
       const remainingSchoolDays = schoolDays.filter(d => d >= now.dateStr).length;
       document.getElementById("daysLeft").textContent = remainingSchoolDays;
 
-      if (isSchoolDay && now.totalSec >= firstStart && now.totalSec < lastEnd) {
+      if (isSchoolDay && !isAfterSchool && now.totalSec >= firstStart && now.totalSec < lastEnd) {
         for (let i = 0; i < blocks.length; i++) {
           const s = parseToSec(blocks[i].s), e = parseToSec(blocks[i].e);
           if (now.totalSec >= s && now.totalSec < e) {
