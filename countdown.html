@@ -1409,6 +1409,20 @@
             return;
           }
         }
+
+        // Between blocks during school hours (e.g. passing gap not covered in finals schedule)
+        const nextBlock = blocks.find(b => parseToSec(b.s) > now.totalSec);
+        if (nextBlock) {
+          const rem = parseToSec(nextBlock.s) - now.totalSec;
+          document.getElementById("blockLabel").textContent = `UP NEXT: ${nextBlock.l}`;
+          document.getElementById("timerText").textContent = formatTime(rem);
+          document.getElementById("timerText").className = "timer passing";
+          document.getElementById("subText").textContent = "Starting soon";
+          document.getElementById("waitBell").className = "wait-bell";
+          updatePeriodAlert("");
+          scheduleFitCountdownText();
+          return;
+        }
       }
 
       // Hide "WAIT FOR THE BELL" when outside active class periods
@@ -2127,12 +2141,7 @@
 
     // ── LOGO UPDATE ANNOUNCEMENT ───────────────────────────────────────────
     (function() {
-      if (!localStorage.getItem('pvhs_logo_v2b_seen')) {
-        setTimeout(() => {
-          const m = document.getElementById('logoUpdateModal');
-          if (m) m.hidden = false;
-        }, 1200);
-      }
+      // auto-show paused
       function close() {
         const m = document.getElementById('logoUpdateModal');
         if (m) m.hidden = true;
