@@ -1431,8 +1431,14 @@
       const upcomingDay = isSchoolDay && now.totalSec < firstStart
         ? now.dateStr
         : (schoolDays.find(d => d > now.dateStr) || schoolDays[schoolDays.length - 1]);
-      const nextDate = new Date(`${upcomingDay}T08:30:00`);
+      // Use actual first block start time for the upcoming day (not hardcoded 8:30)
+      const upcomingBlocks = getScheduleBlocks(upcomingDay);
+      const upcomingStartSec = parseToSec(upcomingBlocks[0].s);
+      const upHH = String(Math.floor(upcomingStartSec / 3600)).padStart(2, '0');
+      const upMM = String(Math.floor((upcomingStartSec % 3600) / 60)).padStart(2, '0');
+      const nextDate = new Date(`${upcomingDay}T${upHH}:${upMM}:00`);
       const diff = Math.max(0, Math.floor((nextDate - new Date()) / 1000));
+      const isUpcomingGrad = specialDayMap[upcomingDay]?.key === 'graduation';
       const isWeekendRecharge = now.weekday === "Saturday" || now.weekday === "Sunday" || (now.weekday === "Friday" && isAfterSchool);
 
       // Determine if we're currently IN a break (currentBreaks loaded from schedule-data.js)
@@ -1456,20 +1462,41 @@
         document.getElementById("timerText").className = "timer rest";
         document.getElementById("subText").textContent = "Enjoy your weekend!";
       } else if (!isSchoolDay) {
-        document.getElementById("blockLabel").textContent = "Day Off";
-        document.getElementById("timerText").textContent = formatTime(diff, true);
-        document.getElementById("timerText").className = "timer rest";
-        document.getElementById("subText").textContent = "Enjoy your time off!";
+        if (isUpcomingGrad) {
+          document.getElementById("blockLabel").textContent = "Graduation Tomorrow 🎓";
+          document.getElementById("timerText").textContent = formatTime(diff, true);
+          document.getElementById("timerText").className = "timer rest";
+          document.getElementById("subText").textContent = "Ceremony begins at 11:30 AM — see you there!";
+        } else {
+          document.getElementById("blockLabel").textContent = "Day Off";
+          document.getElementById("timerText").textContent = formatTime(diff, true);
+          document.getElementById("timerText").className = "timer rest";
+          document.getElementById("subText").textContent = "Enjoy your time off!";
+        }
       } else if (now.totalSec < firstStart) {
-        document.getElementById("blockLabel").textContent = "Time To Rest";
-        document.getElementById("timerText").textContent = formatTime(diff, true);
-        document.getElementById("timerText").className = "timer rest";
-        document.getElementById("subText").textContent = "School starts at 8:30 AM";
+        if (isUpcomingGrad) {
+          document.getElementById("blockLabel").textContent = "Graduation Day 🎓";
+          document.getElementById("timerText").textContent = formatTime(diff, true);
+          document.getElementById("timerText").className = "timer rest";
+          document.getElementById("subText").textContent = "Ceremony begins at 11:30 AM";
+        } else {
+          document.getElementById("blockLabel").textContent = "Time To Rest";
+          document.getElementById("timerText").textContent = formatTime(diff, true);
+          document.getElementById("timerText").className = "timer rest";
+          document.getElementById("subText").textContent = "School starts at 8:30 AM";
+        }
       } else {
-        document.getElementById("blockLabel").textContent = "Time To Rest";
-        document.getElementById("timerText").textContent = formatTime(diff, true);
-        document.getElementById("timerText").className = "timer rest";
-        document.getElementById("subText").textContent = "School's out, get some rest!";
+        if (isUpcomingGrad) {
+          document.getElementById("blockLabel").textContent = "Graduation Tomorrow 🎓";
+          document.getElementById("timerText").textContent = formatTime(diff, true);
+          document.getElementById("timerText").className = "timer rest";
+          document.getElementById("subText").textContent = "Ceremony begins at 11:30 AM — see you there!";
+        } else {
+          document.getElementById("blockLabel").textContent = "Time To Rest";
+          document.getElementById("timerText").textContent = formatTime(diff, true);
+          document.getElementById("timerText").className = "timer rest";
+          document.getElementById("subText").textContent = "School's out, get some rest!";
+        }
       }
       updatePeriodAlert("");
 
