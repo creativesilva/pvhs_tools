@@ -1463,7 +1463,7 @@
         document.getElementById("subText").textContent = "Enjoy your weekend!";
       } else if (!isSchoolDay) {
         if (isUpcomingGrad) {
-          document.getElementById("blockLabel").textContent = "Graduation Tomorrow 🎓";
+          document.getElementById("blockLabel").textContent = "Till Graduation";
           document.getElementById("timerText").textContent = formatTime(diff, true);
           document.getElementById("timerText").className = "timer rest";
           document.getElementById("subText").textContent = "Ceremony begins at 11:30 AM — see you there!";
@@ -1475,7 +1475,7 @@
         }
       } else if (now.totalSec < firstStart) {
         if (isUpcomingGrad) {
-          document.getElementById("blockLabel").textContent = "Graduation Day 🎓";
+          document.getElementById("blockLabel").textContent = "Till Graduation";
           document.getElementById("timerText").textContent = formatTime(diff, true);
           document.getElementById("timerText").className = "timer rest";
           document.getElementById("subText").textContent = "Ceremony begins at 11:30 AM";
@@ -1487,7 +1487,7 @@
         }
       } else {
         if (isUpcomingGrad) {
-          document.getElementById("blockLabel").textContent = "Graduation Tomorrow 🎓";
+          document.getElementById("blockLabel").textContent = "Till Graduation";
           document.getElementById("timerText").textContent = formatTime(diff, true);
           document.getElementById("timerText").className = "timer rest";
           document.getElementById("subText").textContent = "Ceremony begins at 11:30 AM — see you there!";
