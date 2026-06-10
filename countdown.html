@@ -848,7 +848,7 @@
         <!-- SCHEDULE QUICK-VIEW BUTTONS -->
         <div class="sched-btn-row">
           <button class="sched-btn" id="schedBtnFinals" type="button">
-            <span class="sched-btn-icon">📋</span>Finals
+            <span class="sched-btn-icon">🎓</span>Graduation
           </button>
           <button class="sched-btn" id="schedBtnWeekly" type="button">
             <span class="sched-btn-icon">📅</span>Weekly
@@ -899,7 +899,7 @@
           <div class="prog-sep"></div>
           <div class="prog-row">
             <div class="prog-meta">
-              <span class="prog-label" id="prLabel">Till Finals 📝</span>
+              <span class="prog-label" id="prLabel">Till Graduation 🎓</span>
               <span class="prog-pct" id="prPct">—</span>
             </div>
             <div class="prog-track"><div class="prog-bar prog-bar--pr" id="prFill" style="width:0%"></div></div>
@@ -1779,7 +1779,7 @@
         { name: "Presidents' Day Weekend", start: "2026-02-14", end: "2026-02-16", emoji: "🇺🇸", stretchFrom: "2026-02-10" },
         { name: "Spring Break",            start: "2026-04-03", end: "2026-04-12", emoji: "🌸", stretchFrom: "2026-02-17" },
         { name: "Memorial Day Weekend",    start: "2026-05-23", end: "2026-05-25", emoji: "🇺🇸", stretchFrom: "2026-04-13" },
-        { name: "Summer Break",            start: "2026-06-11", end: "2026-08-31", emoji: "☀️", stretchFrom: "2026-01-15" },
+        { name: "Summer Break",            start: "2026-06-12", end: "2026-08-31", emoji: "☀️", stretchFrom: "2026-01-15" },
         { name: "Juneteenth Weekend",      start: "2026-06-19", end: "2026-06-21", emoji: "✊", stretchFrom: "2026-06-11" },
         { name: "4th of July Weekend",     start: "2026-07-03", end: "2026-07-05", emoji: "🎆", stretchFrom: "2026-06-22" }
       ];
@@ -1807,9 +1807,10 @@
         setTxt('vacPct', '🎉');
       }
 
-      // ── 5. FINALS COUNTDOWN ─────────────────────────────
-      const finalsDay1 = "2026-06-08";
-      const finalsDay3 = "2026-06-10";
+      // ── 5. FINALS / GRADUATION COUNTDOWN ──────────────────
+      const finalsDay1  = "2026-06-08";
+      const finalsDay3  = "2026-06-10";
+      const graduationDay = "2026-06-11";
       const finalsStretchStart = "2026-04-13"; // spring break return
       if (dateStr < finalsDay1) {
         const totalFinalsSDs = schoolDays.filter(d => d >= finalsStretchStart && d <= finalsDay1).length;
@@ -1824,9 +1825,17 @@
         setFill('prFill', 1, 'prog-bar--pr');
         setTxt('prLabel', 'Finals Week 📝');
         setTxt('prPct',   'Good luck!');
+      } else if (dateStr < graduationDay) {
+        setFill('prFill', 1, 'prog-bar--pr');
+        setTxt('prLabel', 'Finals Done 🎓');
+        setTxt('prPct',   'Graduation Tomorrow!');
+      } else if (dateStr === graduationDay) {
+        setFill('prFill', 1, 'prog-bar--pr');
+        setTxt('prLabel', 'Graduation Day 🎓');
+        setTxt('prPct',   'Congratulations!');
       } else {
         setFill('prFill', 1, 'prog-bar--pr');
-        setTxt('prLabel', 'Finals Done ✓');
+        setTxt('prLabel', 'Graduation Done 🎓');
         setTxt('prPct',   '☀️');
       }
     }
@@ -2216,32 +2225,47 @@
       }
 
       function renderFinals() {
-        titleEl.textContent = 'Finals Schedule';
+        titleEl.textContent = 'Graduation · Jun 11';
         const now = getNow();
-        const allFinals = [
-          { label: 'Spring Finals &middot; Jun 8–10, 2026',  dates: ['2026-06-08','2026-06-09','2026-06-10'] },
-          { label: 'Fall Finals &middot; Dec 17–19, 2025',   dates: ['2025-12-17','2025-12-18','2025-12-19'] }
-        ];
+
+        // ── Graduation Day ──────────────────────────────────────────────
+        const gradSection = `<div class="sched-section">
+          <p class="sched-section-title">🎓 Graduation Day &middot; Thu, Jun 11, 2026</p>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:4px">
+            ${[
+              { time:'7:30 AM',  icon:'☕', event:'Breakfast burritos &amp; coffee at outdoor stage' },
+              { time:'8:15 AM',  icon:'🏫', event:'Staff arrival &mdash; Gate 19 open (closes 8:30)' },
+              { time:'9:15 AM',  icon:'🎒', event:'Gates open for student drop-off' },
+              { time:'10:30 AM', icon:'🏛️', event:'Teachers report to the Gym' },
+              { time:'10:50 AM', icon:'🎯', event:'Student lineup begins' },
+              { time:'11:20 AM', icon:'🚶', event:'Teachers &amp; students in staging area' },
+              { time:'11:30 AM', icon:'🎓', event:'<strong style="color:#fff">Graduation ceremony begins</strong>' }
+            ].map(r => `<div style="display:flex;align-items:baseline;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.04);border-radius:10px;border:1px solid rgba(255,255,255,0.07)">
+              <span style="font-size:11px;font-weight:700;color:#40dede;min-width:58px;flex-shrink:0">${r.time}</span>
+              <span style="font-size:14px;flex-shrink:0">${r.icon}</span>
+              <span style="font-size:11px;font-weight:500;color:#c8efef;line-height:1.4">${r.event}</span>
+            </div>`).join('')}
+          </div>
+        </div>`;
+
+        // ── Spring Finals (complete) ─────────────────────────────────────
         const dayNames = ['Day 1','Day 2','Day 3'];
         const dayKeys  = ['finals_1','finals_2','finals_3'];
-
-        const sections = allFinals.map(sem => {
-          const isPast = sem.dates[sem.dates.length - 1] < now.dateStr;
-          const days = sem.dates.map((date, i) => {
-            const d      = new Date(date + 'T12:00:00');
-            const dayStr = new Intl.DateTimeFormat('en-US', {timeZone, weekday:'short', month:'short', day:'numeric'}).format(d);
-            return `<div class="sched-finals-day">
-              <p class="sched-finals-day-title">${dayNames[i]} &middot; ${dayStr}</p>
-              ${renderTable(schedules[dayKeys[i]])}
-            </div>`;
-          }).join('');
-          return `<div class="sched-section">
-            <p class="sched-section-title" style="${isPast ? 'opacity:.45' : ''}">${sem.label}${isPast ? ' &middot; Complete' : ''}</p>
-            <div style="display:flex;flex-direction:column;gap:8px">${days}</div>
+        const springDates = ['2026-06-08','2026-06-09','2026-06-10'];
+        const springDays = springDates.map((date, i) => {
+          const d = new Date(date + 'T12:00:00');
+          const dayStr = new Intl.DateTimeFormat('en-US', {timeZone, weekday:'short', month:'short', day:'numeric'}).format(d);
+          return `<div class="sched-finals-day">
+            <p class="sched-finals-day-title">${dayNames[i]} &middot; ${dayStr}</p>
+            ${renderTable(schedules[dayKeys[i]])}
           </div>`;
         }).join('');
+        const springSection = `<div class="sched-section" style="opacity:.4">
+          <p class="sched-section-title">Spring Finals &middot; Jun 8–10, 2026 &middot; Complete</p>
+          <div style="display:flex;flex-direction:column;gap:8px">${springDays}</div>
+        </div>`;
 
-        body.innerHTML = sections;
+        body.innerHTML = gradSection + springSection;
       }
 
       function openSheet(type) {
