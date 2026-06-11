@@ -1490,7 +1490,13 @@
           document.getElementById("subText").textContent = "School starts at 8:30 AM";
         }
       } else {
-        if (isUpcomingGrad) {
+        const isGradDay = specialDayMap[now.dateStr]?.key === 'graduation';
+        if (isAfterSchool && isGradDay) {
+          document.getElementById("blockLabel").textContent = "Enjoy Summer";
+          document.getElementById("timerText").textContent = formatTime(diff, true);
+          document.getElementById("timerText").className = "timer rest";
+          document.getElementById("subText").textContent = "Rest and recharge!";
+        } else if (isUpcomingGrad) {
           document.getElementById("blockLabel").textContent = "Till Graduation";
           document.getElementById("timerText").textContent = formatTime(diff, true);
           document.getElementById("timerText").className = "timer rest";
