@@ -860,9 +860,9 @@
 
         <div class="card info-strip">
           <div class="info-cell">
-            <p class="info-label">School Days Left</p>
+            <p class="info-label" id="daysLeftLabel">School Days Left</p>
             <div class="info-number" id="daysLeft">--</div>
-            <p class="info-sub">Last Day: Jun 10</p>
+            <p class="info-sub" id="daysLeftSub">Last Day: Jun 11</p>
           </div>
           <div class="info-vert-divider"></div>
           <div class="info-cell">
@@ -1356,6 +1356,10 @@
       // Today counts as a remaining school day until midnight
       const remainingSchoolDays = schoolDays.filter(d => d >= now.dateStr).length;
       document.getElementById("daysLeft").textContent = remainingSchoolDays;
+      if (remainingSchoolDays === 1) {
+        document.getElementById("daysLeftLabel").textContent = "Graduation Day";
+        document.getElementById("daysLeftSub").textContent = "Last Day: Jun 11";
+      }
 
       if (isSchoolDay && !isAfterSchool && now.totalSec >= firstStart && now.totalSec < lastEnd) {
         for (let i = 0; i < blocks.length; i++) {
