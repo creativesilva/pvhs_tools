@@ -1440,15 +1440,38 @@
       const upcomingStartSec = parseToSec(upcomingBlocks[0].s);
       const upHH = String(Math.floor(upcomingStartSec / 3600)).padStart(2, '0');
       const upMM = String(Math.floor((upcomingStartSec % 3600) / 60)).padStart(2, '0');
-      const nextDate = new Date(`${upcomingDay}T${upHH}:${upMM}:00`);
+      // Teacher-facing override: during pre-year summer break (Jun 11 → Aug 9),
+      // target Aug 10 8:00 AM (teachers' first contracted day) instead of first student day.
+      const inPreYearSummer = now.dateStr >= "2026-06-11" && now.dateStr < teachersReturnDate;
+      const nextDate = inPreYearSummer
+        ? new Date(`${teachersReturnDate}T${teachersReturnTime}:00`)
+        : new Date(`${upcomingDay}T${upHH}:${upMM}:00`);
       const diff = Math.max(0, Math.floor((nextDate - new Date()) / 1000));
       const isUpcomingGrad = specialDayMap[upcomingDay]?.key === 'graduation';
       const isWeekendRecharge = now.weekday === "Saturday" || now.weekday === "Sunday" || (now.weekday === "Friday" && isAfterSchool);
 
       // Determine if we're currently IN a break (currentBreaks loaded from schedule-data.js)
       const activeBreak = currentBreaks.find(b => now.dateStr >= b.start && now.dateStr <= b.end);
+      // On a staff-only work day (Aug 10-12, Jan 11-13, Jun 10) — teacher-facing app should reflect this.
+      const isStaffOnlyToday = staffOnlyDays.has(now.dateStr);
 
-      if (activeBreak) {
+      if (isStaffOnlyToday) {
+        // Staff-only workday (teachers on campus, students not) — Aug 10-12, Jan 11-13, Jun 10.
+        // Schedule TBD until district publishes it.
+        document.getElementById("blockLabel").textContent = "Staff Work Day 📚";
+        document.getElementById("timerText").textContent = formatTime(diff, true);
+        document.getElementById("timerText").className = "timer rest";
+        document.getElementById("subText").textContent = "Schedule coming soon — check back once released";
+      } else if (activeBreak && inPreYearSummer) {
+        // Pre-year summer break — teacher-facing countdown to Aug 10 · 8:00 AM
+        const daysAway = Math.max(0, Math.ceil(diff / 86400));
+        document.getElementById("blockLabel").textContent = "Till Teachers Return 📚";
+        document.getElementById("timerText").textContent = formatTime(diff, true);
+        document.getElementById("timerText").className = "timer rest";
+        document.getElementById("subText").textContent = daysAway === 0
+          ? "Report today — 8:00 AM"
+          : `Report Aug 10 · 8:00 AM · ${daysAway} day${daysAway === 1 ? '' : 's'} away`;
+      } else if (activeBreak) {
         // We're IN a break — show elapsed time (not countdown, which is 200+ hrs and breaks font-fitter)
         const breakStartD = new Date(activeBreak.start + 'T00:00:00');
         const breakEndD = new Date(activeBreak.end + 'T23:59:59');
@@ -1827,7 +1850,22 @@
       const nextVac = currentlyInBreak
         ? allBreaks.find(v => v.start > currentlyInBreak.end)
         : allBreaks.find(v => dateStr < v.start);
-      if (nextVac) {
+      // Teacher-facing override: during pre-year summer break (Jun 11 → Aug 9),
+      // the "next milestone" is teachers' return day Aug 10 — bar fills based on
+      // calendar days (no school days yet) between Jun 11 and Aug 10.
+      const preYearSummerBar = dateStr >= "2026-06-11" && dateStr < teachersReturnDate;
+      if (preYearSummerBar) {
+        const summerStartD = new Date("2026-06-11T00:00:00");
+        const returnD = new Date(`${teachersReturnDate}T${teachersReturnTime}:00`);
+        const nowD = new Date();
+        const totalMs = returnD - summerStartD;
+        const passedMs = Math.max(0, Math.min(nowD - summerStartD, totalMs));
+        const summerFrac = totalMs > 0 ? passedMs / totalMs : 0;
+        const daysLeft = Math.max(0, Math.ceil((returnD - nowD) / 86400000));
+        setFill('vacFill', summerFrac, 'prog-bar--vac');
+        setTxt('vacLabel', 'Till Teachers Return 📚');
+        setTxt('vacPct', daysLeft === 0 ? '🎉 Today!' : daysLeft === 1 ? '1 Day' : `${daysLeft} Days`);
+      } else if (nextVac) {
         const { name: vacName, start: vacStart, emoji: vacEmoji } = nextVac;
         // Count school days from today (or from when school resumes) to the break start
         const schoolDaysRemaining = schoolDays.filter(d => d >= dateStr && d < vacStart).length;

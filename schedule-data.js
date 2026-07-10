@@ -62,8 +62,20 @@ const specialDayMap = {
   // "2027-06-10": { key:"graduation", label:"GRADUATION DAY 🎓" }
 };
 
+// Aug 10 = teachers' first contracted day back (staff-only, students return Aug 13).
+// This app is teacher-facing, so the summer-break countdown targets Aug 10, not Aug 13.
+const teachersReturnDate = "2026-08-10";
+const teachersReturnTime = "08:00"; // 8:00 AM report time
+
+// Staff-only days — teachers work, students do not attend. Schedule TBD until district publishes it.
+const staffOnlyDays = new Set([
+  "2026-08-10","2026-08-11","2026-08-12",  // Pre-year staff prep + workday
+  "2027-01-11","2027-01-12","2027-01-13",  // Between-semester certificated staff dev + workday
+  "2027-06-10"                              // Graduation day + staff development
+]);
+
 const currentBreaks = [
-  { name:"Summer Break",           start:"2026-06-11", end:"2026-08-12", emoji:"☀️" },
+  { name:"Summer Break",           start:"2026-06-11", end:"2026-08-09", emoji:"☀️" },
   { name:"Labor Day Weekend",      start:"2026-09-05", end:"2026-09-07", emoji:"🇺🇸" },
   { name:"Veterans Day",           start:"2026-11-11", end:"2026-11-11", emoji:"🎖️" },
   { name:"Thanksgiving Break",     start:"2026-11-21", end:"2026-11-29", emoji:"🦃" },
@@ -107,6 +119,7 @@ function isPassingBlock(label)        { return /PASSING/i.test(label); }
 function getScheduleType(dStr) {
   if (finalsDays.has(dStr)) return "FINALS SCHEDULE";
   if (specialDayMap[dStr])  return specialDayMap[dStr].label;
+  if (staffOnlyDays.has(dStr)) return "STAFF DAY — SCHEDULE COMING SOON";
   if (minimumDays.has(dStr)) return "MINIMUM DAY";
   const d  = new Date(dStr + "T12:00:00");
   const wd = new Intl.DateTimeFormat("en-US", { timeZone, weekday:"long" }).format(d);
@@ -117,6 +130,8 @@ function getScheduleType(dStr) {
 function getScheduleBlocks(dStr) {
   if (finalsMap[dStr])      return schedules[finalsMap[dStr]];
   if (specialDayMap[dStr])  return schedules[specialDayMap[dStr].key];
+  // Staff-only days: fall back to regular schedule until district publishes the staff-day schedule
+  if (staffOnlyDays.has(dStr)) return schedules.regular;
   if (minimumDays.has(dStr)) return schedules.minimum;
   const d  = new Date(dStr + "T12:00:00");
   const wd = new Intl.DateTimeFormat("en-US", { timeZone, weekday:"long" }).format(d);
