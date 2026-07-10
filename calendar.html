@@ -333,46 +333,43 @@
     // ── STATIC CALENDAR DATA ──────────────────────────────────
     const EVENTS = [
       // School Year Anchors
-      {start:'2025-08-14',end:'2025-08-14',label:'First Day of School',type:'event',emoji:'\u{1F392}'},
-      {start:'2026-01-15',end:'2026-01-15',label:'2nd Semester Begins',type:'event',emoji:'\u{1F4C5}'},
-      {start:'2026-06-10',end:'2026-06-10',label:'Last Day of School',type:'event',emoji:'\u{1F514}'},
-      {start:'2026-06-11',end:'2026-06-11',label:'Graduation',type:'event',emoji:'\u{1F393}'},
+      {start:'2026-08-13',end:'2026-08-13',label:'First Day of School',type:'event',emoji:'\u{1F392}'},
+      {start:'2027-01-14',end:'2027-01-14',label:'2nd Semester Begins',type:'event',emoji:'\u{1F4C5}'},
+      {start:'2027-06-09',end:'2027-06-09',label:'Last Day of School',type:'event',emoji:'\u{1F514}'},
+      {start:'2027-06-10',end:'2027-06-10',label:'Graduation',type:'event',emoji:'\u{1F393}'},
       // No School
-      {start:'2025-09-01',end:'2025-09-01',label:'Labor Day',type:'no-school',emoji:'\u{1F1FA}\u{1F1F8}'},
-      {start:'2025-11-11',end:'2025-11-11',label:'Veterans Day',type:'no-school',emoji:'\u{1F396}'},
-      {start:'2025-11-24',end:'2025-11-28',label:'Thanksgiving Break',type:'no-school',emoji:'\u{1F983}'},
-      {start:'2025-12-22',end:'2026-01-09',label:'Winter Break',type:'no-school',emoji:'\u{2744}\u{FE0F}'},
-      {start:'2026-01-12',end:'2026-01-14',label:'Staff Development',type:'no-school',emoji:'\u{1F4CB}'},
-      {start:'2026-01-19',end:'2026-01-19',label:'MLK Day',type:'no-school',emoji:'\u{270A}'},
-      {start:'2026-02-09',end:'2026-02-09',label:"Lincoln's Day (Observed)",type:'no-school',emoji:'\u{1F3A9}'},
-      {start:'2026-02-16',end:'2026-02-16',label:"Presidents' Day",type:'no-school',emoji:'\u{1F1FA}\u{1F1F8}'},
-      {start:'2026-04-03',end:'2026-04-03',label:'Spring Vacation Day',type:'no-school',emoji:'\u{1F324}'},
-      {start:'2026-04-06',end:'2026-04-10',label:'Spring Break',type:'no-school',emoji:'\u{1F338}'},
-      {start:'2026-05-25',end:'2026-05-25',label:'Memorial Day',type:'no-school',emoji:'\u{1F1FA}\u{1F1F8}'},
-      // Finals
-      {start:'2025-12-17',end:'2025-12-17',label:'Finals Day 1 \u2014 Periods 1, 2 & 7',type:'finals',emoji:'\u{1F4DD}'},
-      {start:'2025-12-18',end:'2025-12-18',label:'Finals Day 2 \u2014 Periods 3 & 4',type:'finals',emoji:'\u{1F4DD}'},
-      {start:'2025-12-19',end:'2025-12-19',label:'Finals Day 3 \u2014 Periods 5 & 6',type:'finals',emoji:'\u{1F4DD}'},
-      {start:'2026-06-08',end:'2026-06-08',label:'Finals Day 1 \u2014 Periods 1, 2 & 7',type:'finals',emoji:'\u{1F4DD}'},
-      {start:'2026-06-09',end:'2026-06-09',label:'Finals Day 2 \u2014 Periods 3 & 4',type:'finals',emoji:'\u{1F4DD}'},
-      {start:'2026-06-10',end:'2026-06-10',label:'Finals Day 3 \u2014 Periods 5 & 6',type:'finals',emoji:'\u{1F4DD}'},
+      {start:'2026-09-07',end:'2026-09-07',label:'Labor Day',type:'no-school',emoji:'\u{1F1FA}\u{1F1F8}'},
+      {start:'2026-11-11',end:'2026-11-11',label:'Veterans Day',type:'no-school',emoji:'\u{1F396}'},
+      {start:'2026-11-23',end:'2026-11-27',label:'Thanksgiving Break',type:'no-school',emoji:'\u{1F983}'},
+      {start:'2026-12-21',end:'2027-01-08',label:'Winter Break',type:'no-school',emoji:'\u{2744}\u{FE0F}'},
+      {start:'2027-01-11',end:'2027-01-13',label:'Staff Development',type:'no-school',emoji:'\u{1F4CB}'},
+      {start:'2027-01-18',end:'2027-01-18',label:'MLK Day',type:'no-school',emoji:'\u{270A}'},
+      {start:'2027-02-08',end:'2027-02-08',label:"Lincoln's Day (Observed)",type:'no-school',emoji:'\u{1F3A9}'},
+      {start:'2027-02-15',end:'2027-02-15',label:"Presidents' Day",type:'no-school',emoji:'\u{1F1FA}\u{1F1F8}'},
+      {start:'2027-03-26',end:'2027-03-26',label:'Spring Vacation Day',type:'no-school',emoji:'\u{1F324}'},
+      {start:'2027-03-29',end:'2027-04-02',label:'Spring Break',type:'no-school',emoji:'\u{1F338}'},
+      {start:'2027-05-31',end:'2027-05-31',label:'Memorial Day',type:'no-school',emoji:'\u{1F1FA}\u{1F1F8}'},
+      // Finals \u2014 Schedule Coming Soon (dates confirmed, period assignments TBD)
+      {start:'2026-12-16',end:'2026-12-18',label:'Finals \u2014 Schedule Coming Soon',type:'finals',emoji:'\u{1F4DD}'},
+      {start:'2027-06-07',end:'2027-06-09',label:'Finals \u2014 Schedule Coming Soon',type:'finals',emoji:'\u{1F4DD}'},
       // Grading / Progress Reports
-      {start:'2025-09-19',end:'2025-09-19',label:'Progress Reports \u2014 Q1',type:'grading',emoji:'\u{1F4CA}'},
-      {start:'2025-10-31',end:'2025-10-31',label:'Progress Reports \u2014 Q1 End',type:'grading',emoji:'\u{1F4CA}'},
-      {start:'2025-12-19',end:'2025-12-19',label:'Fall Semester Ends (Q2)',type:'grading',emoji:'\u{1F4CA}'},
-      {start:'2026-02-27',end:'2026-02-27',label:'Progress Reports \u2014 Q3',type:'grading',emoji:'\u{1F4CA}'},
-      {start:'2026-04-24',end:'2026-04-24',label:'Progress Reports \u2014 Q3 End',type:'grading',emoji:'\u{1F4CA}'},
-      {start:'2026-06-10',end:'2026-06-10',label:'Spring Semester Ends (Q4)',type:'grading',emoji:'\u{1F4CA}'},
+      {start:'2026-09-25',end:'2026-09-25',label:'Progress Reports \u2014 Q1',type:'grading',emoji:'\u{1F4CA}'},
+      {start:'2026-11-06',end:'2026-11-06',label:'Progress Reports \u2014 Q1 End',type:'grading',emoji:'\u{1F4CA}'},
+      {start:'2026-12-18',end:'2026-12-18',label:'Fall Semester Ends (Q2)',type:'grading',emoji:'\u{1F4CA}'},
+      {start:'2027-02-26',end:'2027-02-26',label:'Progress Reports \u2014 Q3',type:'grading',emoji:'\u{1F4CA}'},
+      {start:'2027-04-16',end:'2027-04-16',label:'Progress Reports \u2014 Q3 End',type:'grading',emoji:'\u{1F4CA}'},
+      {start:'2027-06-09',end:'2027-06-09',label:'Spring Semester Ends (Q4)',type:'grading',emoji:'\u{1F4CA}'},
       // Minimum Days
-      {start:'2025-08-29',end:'2025-08-29',label:'Minimum Day',type:'notable',emoji:'\u{23F0}'},
-      {start:'2026-04-02',end:'2026-04-02',label:'Minimum Day',type:'notable',emoji:'\u{23F0}'},
+      {start:'2026-08-28',end:'2026-08-28',label:'Minimum Day',type:'notable',emoji:'\u{23F0}'},
+      {start:'2027-03-25',end:'2027-03-25',label:'Spring Fair \u2014 Minimum Day',type:'notable',emoji:'\u{1F338}'},
       // School Events
-      {start:'2025-08-28',end:'2025-08-28',label:'Back to School Night',type:'event',emoji:'\u{1F3EB}'},
-      {start:'2026-01-05',end:'2026-01-09',label:'Wintersession',type:'notable',emoji:'\u{1F4DA}'},
+      {start:'2026-08-27',end:'2026-08-27',label:'Back to School Night',type:'event',emoji:'\u{1F3EB}'},
       // Staff Development
-      {start:'2025-08-07',end:'2025-08-08',label:'New Teacher Orientation',type:'notable',emoji:'\u{1F4CB}'},
-      {start:'2025-08-11',end:'2025-08-12',label:'Staff Development',type:'notable',emoji:'\u{1F4CB}'},
-      {start:'2025-08-13',end:'2025-08-13',label:'All Staff Workday',type:'notable',emoji:'\u{1F4CB}'},
+      {start:'2026-08-10',end:'2026-08-11',label:'Staff Development',type:'notable',emoji:'\u{1F4CB}'},
+      {start:'2026-08-12',end:'2026-08-12',label:'All Staff Workday',type:'notable',emoji:'\u{1F4CB}'},
+      {start:'2027-01-11',end:'2027-01-12',label:'Certificated Staff Development',type:'notable',emoji:'\u{1F4CB}'},
+      {start:'2027-01-13',end:'2027-01-13',label:'All Staff Workday',type:'notable',emoji:'\u{1F4CB}'},
+      {start:'2027-06-10',end:'2027-06-10',label:'Staff Development',type:'notable',emoji:'\u{1F4CB}'},
     ];
 
     // ── DYNAMIC EVENTS (loaded from events.json on init) ──────
@@ -381,28 +378,30 @@
     // ── SCHOOL DAYS COMPUTATION ───────────────────────────────
     const TZ = 'America/Los_Angeles';
     const NO_SCHOOL = new Set([
-      '2025-09-01',
-      '2025-11-11',
-      '2025-11-24','2025-11-25','2025-11-26','2025-11-27','2025-11-28',
-      '2025-12-22','2025-12-23','2025-12-24','2025-12-25','2025-12-26',
-      '2025-12-29','2025-12-30','2025-12-31','2026-01-01','2026-01-02',
-      '2026-01-05','2026-01-06','2026-01-07','2026-01-08','2026-01-09',
-      '2026-01-12','2026-01-13','2026-01-14',
-      '2026-01-19',
-      '2026-02-09',
-      '2026-02-16',
-      '2026-04-03',
-      '2026-04-06','2026-04-07','2026-04-08','2026-04-09','2026-04-10',
-      '2026-05-25'
+      '2026-09-07',                                     // Labor Day
+      '2026-11-11',                                     // Veterans Day
+      '2026-11-23','2026-11-24','2026-11-25','2026-11-26','2026-11-27', // Thanksgiving
+      '2026-12-21','2026-12-22','2026-12-23','2026-12-24','2026-12-25', // Winter Break
+      '2026-12-28','2026-12-29','2026-12-30','2026-12-31','2027-01-01',
+      '2027-01-04','2027-01-05','2027-01-06','2027-01-07','2027-01-08',
+      '2027-01-11','2027-01-12','2027-01-13',           // Staff Development
+      '2027-01-18',                                     // MLK Day
+      '2027-02-08',                                     // Lincoln's Day
+      '2027-02-15',                                     // Presidents' Day
+      '2027-03-26',                                     // Spring Vacation Day
+      '2027-03-29','2027-03-30','2027-03-31','2027-04-01','2027-04-02', // Spring Break
+      '2027-05-31'                                      // Memorial Day
     ]);
 
+    // Finals schedule TBD for 2026-27 — map kept empty so those days show as regular schedule
+    // Dates confirmed: Sem 1 Dec 16-18, 2026 · Sem 2 Jun 7-9, 2027
     const FINALS_MAP = new Map([
-      ['2025-12-17','finals_1'],['2025-12-18','finals_2'],['2025-12-19','finals_3'],
-      ['2026-06-08','finals_1'],['2026-06-09','finals_2'],['2026-06-10','finals_3']
+      // ['2026-12-16','finals_1'],['2026-12-17','finals_2'],['2026-12-18','finals_3'],
+      // ['2027-06-07','finals_1'],['2027-06-08','finals_2'],['2027-06-09','finals_3']
     ]);
     const MINIMUM_DAYS = new Set([
-      '2025-08-29','2025-09-19','2025-10-31',
-      '2026-02-27','2026-04-02','2026-04-24'
+      '2026-08-28','2026-09-25','2026-11-06',
+      '2027-02-26','2027-03-25','2027-04-16'
     ]);
 
     function isoDate(d) {
@@ -417,7 +416,7 @@
       }
       return out;
     }
-    const schoolDays = generateSchoolDays('2025-08-14','2026-06-10');
+    const schoolDays = generateSchoolDays('2026-08-13','2027-06-09');
     const schoolDaysSet = new Set(schoolDays);
 
     function getScheduleInfo(ds) {

@@ -1,6 +1,6 @@
 // PVHS Tools — Service Worker
 // Provides: offline caching + notification delivery support
-const CACHE = 'pvhs-v26';
+const CACHE = 'pvhs-v27';
 const PRECACHE = [
   './index.html',
   './countdown.html',
