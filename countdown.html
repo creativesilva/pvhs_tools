@@ -1458,14 +1458,14 @@
       if (isStaffOnlyToday) {
         // Staff-only workday (teachers on campus, students not) — Aug 10-12, Jan 11-13, Jun 10.
         // Schedule TBD until district publishes it.
-        document.getElementById("blockLabel").textContent = "Staff Work Day 📚";
+        document.getElementById("blockLabel").textContent = "Staff Work Day";
         document.getElementById("timerText").textContent = formatTime(diff, true);
         document.getElementById("timerText").className = "timer rest";
         document.getElementById("subText").textContent = "Schedule coming soon — check back once released";
       } else if (activeBreak && inPreYearSummer) {
         // Pre-year summer break — teacher-facing countdown to Aug 10 · 8:00 AM
         const daysAway = Math.max(0, Math.ceil(diff / 86400));
-        document.getElementById("blockLabel").textContent = "Till Teachers Return 📚";
+        document.getElementById("blockLabel").textContent = "Till Teachers Return";
         document.getElementById("timerText").textContent = formatTime(diff, true);
         document.getElementById("timerText").className = "timer rest";
         document.getElementById("subText").textContent = daysAway === 0
@@ -1863,7 +1863,7 @@
         const summerFrac = totalMs > 0 ? passedMs / totalMs : 0;
         const daysLeft = Math.max(0, Math.ceil((returnD - nowD) / 86400000));
         setFill('vacFill', summerFrac, 'prog-bar--vac');
-        setTxt('vacLabel', 'Till Teachers Return 📚');
+        setTxt('vacLabel', 'Till Teachers Return');
         setTxt('vacPct', daysLeft === 0 ? '🎉 Today!' : daysLeft === 1 ? '1 Day' : `${daysLeft} Days`);
       } else if (nextVac) {
         const { name: vacName, start: vacStart, emoji: vacEmoji } = nextVac;
