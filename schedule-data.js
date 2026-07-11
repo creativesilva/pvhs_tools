@@ -4,6 +4,30 @@
 
 const timeZone = "America/Los_Angeles";
 
+// ─────────────────────────────────────────────────────────────────────────────
+// SCHOOL YEAR ANCHORS — single source of truth for yearly rollover.
+// TO ROLL TO A NEW YEAR:
+//   1. Update SCHOOL_YEAR dates below
+//   2. Regenerate schoolDays[] from PDF (Python helper: 180 student instructional days)
+//   3. Update minimumDays / staffOnlyDays / currentBreaks arrays below
+//   4. Update calendar.html EVENTS + NO_SCHOOL set
+//   5. Update index.html daily-quote schoolDays[]
+//   6. Bump sw.js CACHE version
+// countdown.html reads all countdown targets (teachers return, fall finals,
+// spring finals, graduation) FROM this object — no more scattered date literals.
+// ─────────────────────────────────────────────────────────────────────────────
+const SCHOOL_YEAR = {
+  label: "2026-27",
+  teachersReturn:    { date: "2026-08-10", time: "08:00" }, // Contract day 1 for staff
+  firstDayStudents:  "2026-08-13",                          // Students first attend
+  lastDayStudents:   "2027-06-09",                          // Last instructional day
+  graduation:        "2027-06-10",                          // Ceremony day (staff day)
+  finals: {
+    fall:   { start: "2026-12-16", end: "2026-12-18", stretchFrom: "2026-11-30" },
+    spring: { start: "2027-06-07", end: "2027-06-09", stretchFrom: "2027-04-05" }
+  }
+};
+
 // Full 2026-27 school year: 180 days (Sem 1 Aug 13–Dec 18, 85 days · Sem 2 Jan 14–Jun 9, 95 days)
 const schoolDays = [
   // ── SEMESTER 1 (85 days) ──────────────────────────────────────────
@@ -62,10 +86,10 @@ const specialDayMap = {
   // "2027-06-10": { key:"graduation", label:"GRADUATION DAY 🎓" }
 };
 
-// Aug 10 = teachers' first contracted day back (staff-only, students return Aug 13).
-// This app is teacher-facing, so the summer-break countdown targets Aug 10, not Aug 13.
-const teachersReturnDate = "2026-08-10";
-const teachersReturnTime = "08:00"; // 8:00 AM report time
+// Aliases derived from SCHOOL_YEAR — kept as top-level bindings for legacy call sites
+// (countdown.html, canvas-card.html). All new code should read SCHOOL_YEAR directly.
+const teachersReturnDate = SCHOOL_YEAR.teachersReturn.date;
+const teachersReturnTime = SCHOOL_YEAR.teachersReturn.time;
 
 // Staff-only days — teachers work, students do not attend. Schedule TBD until district publishes it.
 const staffOnlyDays = new Set([

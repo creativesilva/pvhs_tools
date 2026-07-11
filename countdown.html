@@ -848,7 +848,7 @@
         <!-- SCHEDULE QUICK-VIEW BUTTONS -->
         <div class="sched-btn-row">
           <button class="sched-btn" id="schedBtnFinals" type="button">
-            <span class="sched-btn-icon">🎓</span>Finals
+            <span class="sched-btn-icon">📝</span>Finals
           </button>
           <button class="sched-btn" id="schedBtnWeekly" type="button">
             <span class="sched-btn-icon">📅</span>Weekly
@@ -899,7 +899,7 @@
           <div class="prog-sep"></div>
           <div class="prog-row">
             <div class="prog-meta">
-              <span class="prog-label" id="prLabel">Till Graduation 🎓</span>
+              <span class="prog-label" id="prLabel">Till Fall Finals 📝</span>
               <span class="prog-pct" id="prPct">—</span>
             </div>
             <div class="prog-track"><div class="prog-bar prog-bar--pr" id="prFill" style="width:0%"></div></div>
@@ -1884,31 +1884,49 @@
       }
 
       // ── 5. FINALS / GRADUATION COUNTDOWN ──────────────────
-      // 2026-27 Sem 2 finals + graduation. Finals period assignments not yet
-      // published; countdown to the finals week still works because the dates
-      // are confirmed even if the schedule breakdown is TBD.
-      const finalsDay1  = "2027-06-07";
-      const finalsDay3  = "2027-06-09";
-      const graduationDay = "2027-06-10";
-      const finalsStretchStart = "2027-04-05"; // spring break return
-      if (dateStr < finalsDay1) {
-        const totalFinalsSDs = schoolDays.filter(d => d >= finalsStretchStart && d <= finalsDay1).length;
-        const passedFinalsSDs = schoolDays.filter(d => d >= finalsStretchStart && d < dateStr).length;
-        const finalsFrac = totalFinalsSDs > 0 ? passedFinalsSDs / totalFinalsSDs : 0;
-        const dToFinals = schoolDays.filter(d => d >= dateStr && d < finalsDay1).length;
-        const finalsRight = dToFinals === 0 ? '🎉 Tomorrow!' : dToFinals === 1 ? '1 School Day' : `${dToFinals} School Days`;
-        setFill('prFill', finalsFrac, 'prog-bar--pr');
-        setTxt('prPct',   finalsRight);
-        setTxt('prLabel', 'Till Finals 📝');
-      } else if (dateStr <= finalsDay3) {
+      // Sequential: Fall Finals → Spring Finals → Graduation.
+      // Dates come from SCHOOL_YEAR (schedule-data.js) so yearly rollover is one edit.
+      // Finals bar uses 📝 (text/notes) throughout; 🎓 reserved for graduation states only.
+      const _sy       = SCHOOL_YEAR;
+      const fallStart  = _sy.finals.fall.start;
+      const fallEnd    = _sy.finals.fall.end;
+      const springStart = _sy.finals.spring.start;
+      const springEnd   = _sy.finals.spring.end;
+      const gradDay    = _sy.graduation;
+
+      function _finalsCountdown(stretchStart, target, label) {
+        const totalSDs  = schoolDays.filter(d => d >= stretchStart && d <  target).length || 1;
+        const passedSDs = schoolDays.filter(d => d >= stretchStart && d <  dateStr).length;
+        const frac      = Math.max(0, Math.min(1, passedSDs / totalSDs));
+        const dToTarget = schoolDays.filter(d => d >= dateStr && d < target).length;
+        const right     = dToTarget === 0 ? '🎉 Tomorrow!' : dToTarget === 1 ? '1 School Day' : `${dToTarget} School Days`;
+        setFill('prFill', frac, 'prog-bar--pr');
+        setTxt('prPct',   right);
+        setTxt('prLabel', label);
+      }
+
+      if (dateStr < fallStart) {
+        // Pre-Fall Finals: count down to Dec 16, 2026
+        _finalsCountdown(_sy.finals.fall.stretchFrom, fallStart, 'Till Fall Finals 📝');
+      } else if (dateStr <= fallEnd) {
+        // Fall Finals week (Dec 16-18)
         setFill('prFill', 1, 'prog-bar--pr');
-        setTxt('prLabel', 'Finals Week 📝');
+        setTxt('prLabel', 'Fall Finals Week 📝');
         setTxt('prPct',   'Good luck!');
-      } else if (dateStr < graduationDay) {
+      } else if (dateStr < springStart) {
+        // Between semesters: count down to Spring Finals (Jun 7, 2027)
+        _finalsCountdown(_sy.finals.spring.stretchFrom, springStart, 'Till Spring Finals 📝');
+      } else if (dateStr <= springEnd) {
+        // Spring Finals week (Jun 7-9)
+        setFill('prFill', 1, 'prog-bar--pr');
+        setTxt('prLabel', 'Spring Finals Week 📝');
+        setTxt('prPct',   'Good luck!');
+      } else if (dateStr < gradDay) {
+        // Finals done, graduation tomorrow
         setFill('prFill', 1, 'prog-bar--pr');
         setTxt('prLabel', 'Finals Done 🎓');
         setTxt('prPct',   'Graduation Tomorrow!');
-      } else if (dateStr === graduationDay) {
+      } else if (dateStr === gradDay) {
         setFill('prFill', 1, 'prog-bar--pr');
         setTxt('prLabel', 'Graduation Day 🎓');
         setTxt('prPct',   'Congratulations!');
@@ -2306,30 +2324,53 @@
       function renderFinals() {
         titleEl.textContent = 'Finals & Graduation';
 
-        // ── Finals (Coming Soon) ────────────────────────────────────────
-        const finalsSection = `<div class="sched-section">
-          <p class="sched-section-title">📝 Finals Week</p>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <div style="padding:12px;background:rgba(255,255,255,0.04);border-radius:10px;border:1px solid rgba(255,255,255,0.07);text-align:center">
-              <p style="font-size:12px;font-weight:700;color:#40dede;margin:0 0 6px;letter-spacing:.06em">Sem 1 &middot; Dec 16–18, 2026</p>
-              <p style="font-size:11px;font-weight:500;color:#c8efef;line-height:1.5;margin:0">Schedule coming soon &mdash; check back once the district publishes the period breakdown.</p>
-            </div>
-            <div style="padding:12px;background:rgba(255,255,255,0.04);border-radius:10px;border:1px solid rgba(255,255,255,0.07);text-align:center">
-              <p style="font-size:12px;font-weight:700;color:#40dede;margin:0 0 6px;letter-spacing:.06em">Sem 2 &middot; Jun 7–9, 2027</p>
-              <p style="font-size:11px;font-weight:500;color:#c8efef;line-height:1.5;margin:0">Schedule coming soon.</p>
-            </div>
+        // Format a date range from SCHOOL_YEAR into "Mon Day–Day, YYYY"
+        function _fmtRange(startISO, endISO) {
+          const s = new Date(startISO + 'T12:00:00');
+          const e = new Date(endISO + 'T12:00:00');
+          const mo = new Intl.DateTimeFormat('en-US', {timeZone, month:'short'}).format(s);
+          return `${mo} ${s.getDate()}–${e.getDate()}, ${s.getFullYear()}`;
+        }
+        function _fmtDay(iso) {
+          const d = new Date(iso + 'T12:00:00');
+          return new Intl.DateTimeFormat('en-US', {timeZone, weekday:'short', month:'short', day:'numeric', year:'numeric'}).format(d);
+        }
+
+        const fall   = SCHOOL_YEAR.finals.fall;
+        const spring = SCHOOL_YEAR.finals.spring;
+        const grad   = SCHOOL_YEAR.graduation;
+        const todayStr = getNow().dateStr;
+
+        // Determine which sections are past vs upcoming so we can dim them
+        const fallPast   = todayStr > fall.end;
+        const springPast = todayStr > spring.end;
+        const gradPast   = todayStr > grad;
+
+        // ── Fall Finals (chronological first) ──────────────────────────
+        const fallSection = `<div class="sched-section"${fallPast ? ' style="opacity:.4"' : ''}>
+          <p class="sched-section-title">📝 Fall Finals &middot; ${_fmtRange(fall.start, fall.end)}${fallPast ? ' &middot; Complete' : ''}</p>
+          <div style="padding:12px;background:rgba(255,255,255,0.04);border-radius:10px;border:1px solid rgba(255,255,255,0.07);text-align:center">
+            <p style="font-size:11px;font-weight:500;color:#c8efef;line-height:1.5;margin:0">Schedule coming soon &mdash; check back once the district publishes the period breakdown.</p>
           </div>
         </div>`;
 
-        // ── Graduation (Coming Soon) ───────────────────────────────────
-        const gradSection = `<div class="sched-section">
-          <p class="sched-section-title">🎓 Graduation Day &middot; Thu, Jun 10, 2027</p>
+        // ── Spring Finals ──────────────────────────────────────────────
+        const springSection = `<div class="sched-section"${springPast ? ' style="opacity:.4"' : ''}>
+          <p class="sched-section-title">📝 Spring Finals &middot; ${_fmtRange(spring.start, spring.end)}${springPast ? ' &middot; Complete' : ''}</p>
+          <div style="padding:12px;background:rgba(255,255,255,0.04);border-radius:10px;border:1px solid rgba(255,255,255,0.07);text-align:center">
+            <p style="font-size:11px;font-weight:500;color:#c8efef;line-height:1.5;margin:0">Schedule coming soon.</p>
+          </div>
+        </div>`;
+
+        // ── Graduation ─────────────────────────────────────────────────
+        const gradSection = `<div class="sched-section"${gradPast ? ' style="opacity:.4"' : ''}>
+          <p class="sched-section-title">🎓 Graduation Day &middot; ${_fmtDay(grad)}${gradPast ? ' &middot; Complete' : ''}</p>
           <div style="padding:12px;background:rgba(255,255,255,0.04);border-radius:10px;border:1px solid rgba(255,255,255,0.07);text-align:center">
             <p style="font-size:11px;font-weight:500;color:#c8efef;line-height:1.5;margin:0">Ceremony timeline coming soon &mdash; usually released a few weeks before graduation.</p>
           </div>
         </div>`;
 
-        body.innerHTML = finalsSection + gradSection;
+        body.innerHTML = fallSection + springSection + gradSection;
       }
 
       function openSheet(type) {
