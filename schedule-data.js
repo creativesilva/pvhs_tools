@@ -72,6 +72,35 @@ const schedules = {
     {l:"STUDENT LINEUP",           s:"10:50", e:"11:20"},
     {l:"PROCESSIONAL STAGING",     s:"11:20", e:"11:30"},
     {l:"🎓 GRADUATION CEREMONY",   s:"11:30", e:"13:00"}
+  ],
+  // ── Aug 10, 2026 · Base Camp · SMJUHSD District PD @ Santa Maria HS ──
+  basecamp: [
+    {l:"BREAKFAST & REGISTRATION",    s:"07:45", e:"08:15"},  // Ethel Pope Auditorium
+    {l:"SUPERINTENDENT'S WELCOME",    s:"08:15", e:"09:10"},  // EPA
+    {l:"KEYNOTE",                     s:"09:10", e:"10:00"},  // EPA · Wendy W. Murawski
+    {l:"BREAK",                       s:"10:00", e:"10:30"},
+    {l:"SESSION 1 BREAKOUTS",         s:"10:30", e:"11:45"},  // Building 100 & EPA
+    {l:"LUNCH · FOOD TRUCKS",         s:"11:45", e:"13:00"},
+    {l:"SESSION 2 BREAKOUTS",         s:"13:00", e:"14:15"},  // Building 100 & EPA
+    {l:"BREAK",                       s:"14:15", e:"14:30"},
+    {l:"SESSION 3 BREAKOUTS",         s:"14:30", e:"16:00"}   // Building 100, EPA, Small Gym
+  ],
+  // ── Aug 11, 2026 · PVHS PD Day @ PVHS (starts in PAC) ──
+  pvhs_pd: [
+    {l:"BREAKFAST",                   s:"08:15", e:"08:30"},  // PAC (opens at 8am)
+    {l:"ADMIN PRESENTATION",          s:"08:30", e:"09:20"},  // PAC
+    {l:"BREAK",                       s:"09:20", e:"09:40"},
+    {l:"SESSION 1 BREAKOUTS",         s:"09:40", e:"10:30"},  // PVHS Classrooms
+    {l:"BREAK",                       s:"10:30", e:"10:40"},
+    {l:"SESSION 2 BREAKOUTS",         s:"10:40", e:"11:30"},
+    {l:"BREAK",                       s:"11:30", e:"11:40"},
+    {l:"SESSION 3 BREAKOUTS",         s:"11:40", e:"12:30"},
+    {l:"LUNCH · ON YOUR OWN",         s:"12:30", e:"13:30"},
+    {l:"PLC · DEPT COLLABORATION",    s:"13:30", e:"16:00"}   // PVHS Classrooms
+  ],
+  // ── Aug 12, 2026 + other unstructured staff days · Contract hours only ──
+  workday: [
+    {l:"CONTRACT HOURS · SELF-DIRECTED", s:"08:30", e:"15:55"}
   ]
 };
 
@@ -81,8 +110,11 @@ const finalsMap = {
   // "2027-06-07":"finals_1","2027-06-08":"finals_2","2027-06-09":"finals_3"
 };
 
-// Rally + graduation schedules for 2026-27 not yet confirmed — map kept empty
+// Special days with their own schedule (rally + graduation added later once confirmed)
 const specialDayMap = {
+  "2026-08-10": { key:"basecamp", label:"BASE CAMP @ SMHS" },
+  "2026-08-11": { key:"pvhs_pd",  label:"PVHS PD DAY" },
+  "2026-08-12": { key:"workday",  label:"ALL STAFF WORKDAY" }
   // "2027-06-10": { key:"graduation", label:"GRADUATION DAY 🎓" }
 };
 
