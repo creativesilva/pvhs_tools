@@ -1720,7 +1720,12 @@
       const blks = getScheduleBlocks(dateStr);
       const firstStart = parseToSec(blks[0].s);
       const lastEnd    = parseToSec(blks[blks.length - 1].e);
-      const isSD       = schoolDays.includes(dateStr);
+      // Teacher work day = student school day OR staff-only day with a defined schedule.
+      // Applies to Aug 10-12 (Base Camp / PVHS PD / Workday), Jan 11-13, Jun 10.
+      // Used so the "This Week" and "School Day" bars count real teacher work days,
+      // not just student instructional days.
+      const isTeacherWorkDay = d => schoolDays.includes(d) || staffOnlyDays.has(d);
+      const isSD             = isTeacherWorkDay(dateStr);
       // A school day lasts until 11:59 PM — only "done" when the calendar flips
       const isAfterSchoolToday = false;
 
@@ -1785,7 +1790,7 @@
         const off = offToMon + i;
         const d   = new Date(new Date(dateStr + 'T12:00:00').getTime() + off * 86400000);
         const dStr = new Intl.DateTimeFormat('en-CA', {timeZone, year:'numeric', month:'2-digit', day:'2-digit'}).format(d);
-        if (schoolDays.includes(dStr)) weekSDs.push({ dStr, off });
+        if (isTeacherWorkDay(dStr)) weekSDs.push({ dStr, off });
       }
       if (weekSDs.length > 0) {
         const lw = weekSDs[weekSDs.length - 1];
@@ -1797,8 +1802,11 @@
         wkFrac = mondayMidnightMs < wkEnd ? (nowMs - mondayMidnightMs) / (wkEnd - mondayMidnightMs) : 0;
         if (isWeekend) {
           wkLabel = 'Back to School';
-          const nextSD = schoolDays.find(d => d > dateStr);
-          const prevSD = [...schoolDays].reverse().find(d => d < dateStr);
+          // On a weekend, "next work day" and "previous work day" both include staff-only
+          // days so Sun Aug 9 correctly points to Mon Aug 10 (Base Camp), not Thu Aug 13.
+          const allWorkDays = [...new Set([...schoolDays, ...staffOnlyDays])].sort();
+          const nextSD = allWorkDays.find(d => d > dateStr);
+          const prevSD = [...allWorkDays].reverse().find(d => d < dateStr);
           if (nextSD) {
             const cal = Math.round((new Date(nextSD + 'T12:00:00') - new Date(dateStr + 'T12:00:00')) / 86400000);
             wkRight = cal === 1 ? '1 Day' : `${cal} Days`;
