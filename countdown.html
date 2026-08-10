@@ -2385,38 +2385,26 @@
         body.innerHTML = fallSection + springSection + gradSection;
       }
 
-      // Render a rich card-by-card timeline for a special-day schedule (Base Camp, PD Day, Workday).
-      // Locations + icons come from the block itself (schedule-data.js). The block currently
-      // in progress gets a teal-highlighted card so you see at a glance where you should be.
+      // Render a card-by-card outline of the day's schedule (Base Camp, PD Day, Workday).
+      // Static overview — every card looks the same. No "NOW" tracking here (the countdown
+      // clock on the main screen already handles current-block awareness).
       function renderSpecialDay(dateStr, headerLabel) {
         titleEl.textContent = headerLabel;
         const blocks = getScheduleBlocks(dateStr);
-        const now = getNow();
-        const nowSec = dateStr === now.dateStr ? now.totalSec : -1; // only highlight if it's actually today
         const d = new Date(dateStr + 'T12:00:00');
         const dayStr = new Intl.DateTimeFormat('en-US', {timeZone, weekday:'long', month:'long', day:'numeric', year:'numeric'}).format(d);
 
         const cards = blocks.map(b => {
-          const s = parseToSec(b.s), e = parseToSec(b.e);
-          const isNow  = nowSec >= s && nowSec < e;
-          const isPast = nowSec >= e;
-          const isBreakish = /break|lunch/i.test(b.l);
-          const bg    = isNow ? 'rgba(0,180,180,0.28)' : (isBreakish ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.05)');
-          const brd   = isNow ? 'rgba(0,220,220,0.55)' : 'rgba(255,255,255,0.08)';
-          const opac  = isPast && !isNow ? '0.45' : '1';
-          const nowBadge = isNow
-            ? '<span style="font-size:9px;font-weight:800;color:#003a3a;background:#4be1e1;padding:2px 8px;border-radius:99px;letter-spacing:0.08em;margin-left:6px;vertical-align:middle">NOW</span>'
-            : '';
-          const loc   = b.loc && b.loc !== '—' ? `<p style="font-size:10.5px;color:var(--muted);margin:2px 0 0;line-height:1.35">${b.loc}</p>` : '';
-          const icon  = b.icon || '·';
-          return `<div style="display:flex;gap:10px;padding:10px 12px;background:${bg};border:1px solid ${brd};border-radius:12px;opacity:${opac}">
+          const loc  = b.loc && b.loc !== '—' ? `<p style="font-size:10.5px;color:var(--muted);margin:2px 0 0;line-height:1.35">${b.loc}</p>` : '';
+          const icon = b.icon || '·';
+          return `<div style="display:flex;gap:10px;padding:10px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:12px">
             <div style="flex-shrink:0;width:64px;text-align:right">
               <p style="font-size:10.5px;font-weight:800;color:#4be1e1;margin:0;letter-spacing:0.02em;white-space:nowrap">${fmt12(b.s)}</p>
               <p style="font-size:9px;color:var(--muted);margin:1px 0 0">–&nbsp;${fmt12(b.e)}</p>
             </div>
             <div style="flex:1;min-width:0">
               <p style="font-size:12.5px;font-weight:800;color:#fff;margin:0;line-height:1.25">
-                <span style="margin-right:5px">${icon}</span>${b.l}${nowBadge}
+                <span style="margin-right:5px">${icon}</span>${b.l}
               </p>
               ${loc}
             </div>
