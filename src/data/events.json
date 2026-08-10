@@ -1,105 +1,33 @@
 {
-  "last_updated": "2026-05-23T00:56:10Z",
+  "last_updated": "2026-08-10T20:35:14Z",
   "source": "ParentSquare",
   "events": [
     {
-      "start": "2026-05-22",
-      "end": "2026-05-22",
-      "label": "ewsletter 5/22/2026 WEEKLY UPDATE PIONEER VALLEY HIGH SCHOOL",
-      "type": "event",
-      "emoji": "📅",
-      "newsId": "81307338",
-      "url": "https://www.parentsquare.com/feeds/81307338"
-    },
-    {
-      "start": "2026-05-27",
-      "end": "2026-05-27",
-      "label": "to host a special lunchtime workshop in the Wellness Center",
-      "type": "event",
-      "emoji": "📅",
-      "newsId": "81407791",
-      "url": "https://www.parentsquare.com/feeds/81407791"
-    },
-    {
-      "start": "2026-05-27",
-      "end": "2026-05-27",
-      "label": "cial lunchtime workshop in the Wellness Center on Wednesday,",
-      "type": "event",
-      "emoji": "📅",
-      "newsId": "81407791",
-      "url": "https://www.parentsquare.com/feeds/81407791"
-    },
-    {
-      "start": "2026-05-26",
-      "end": "2026-05-26",
-      "label": "Wellness Center with Mrs. Buchan or Ms. Collins on: Tuesday,",
-      "type": "event",
-      "emoji": "📅",
-      "newsId": "81407791",
-      "url": "https://www.parentsquare.com/feeds/81407791"
-    },
-    {
-      "start": "2026-05-27",
-      "end": "2026-05-27",
-      "label": "Collins on: Tuesday, May 26 (before 9:30 AM), or Wednesday,",
-      "type": "event",
-      "emoji": "📅",
-      "newsId": "81407791",
-      "url": "https://www.parentsquare.com/feeds/81407791"
-    },
-    {
-      "start": "2026-05-26",
-      "end": "2026-05-26",
-      "label": "lEnrollment CCAP (Concurrent Enrollment) Grades Due Tuesday,",
-      "type": "event",
-      "emoji": "📅",
-      "newsId": "81182179",
-      "url": "https://www.parentsquare.com/feeds/81182179"
-    },
-    {
-      "start": "2026-05-26",
-      "end": "2026-05-26",
-      "label": "CCAP (Concurrent Enrollment) course grades are due Tuesday,",
-      "type": "event",
-      "emoji": "📅",
-      "newsId": "81182179",
-      "url": "https://www.parentsquare.com/feeds/81182179"
-    },
-    {
-      "start": "2026-05-22",
-      "end": "2026-05-22",
-      "label": "b, is excited to host our annual Mental Health Resource Fair",
+      "start": "2026-08-05",
+      "end": "2026-08-05",
+      "label": "Freshmen Parent Night",
       "type": "event",
       "emoji": "🎪",
-      "newsId": "81112642",
-      "url": "https://www.parentsquare.com/feeds/81112642"
+      "newsId": "83508758",
+      "url": "https://www.parentsquare.com/feeds/83508758"
     },
     {
-      "start": "2026-05-22",
-      "end": "2026-05-22",
-      "label": "Mental Health Resource Fair | May 22 PVHS Families: The Well",
-      "type": "event",
-      "emoji": "🎪",
-      "newsId": "81112642",
-      "url": "https://www.parentsquare.com/feeds/81112642"
+      "start": "2026-08-13",
+      "end": "2026-08-13",
+      "label": "Data Confirmation Deadline",
+      "type": "notable",
+      "emoji": "📝",
+      "newsId": "83755563",
+      "url": "https://www.parentsquare.com/feeds/83755563"
     },
     {
-      "start": "2026-05-22",
-      "end": "2026-05-22",
-      "label": "ed to host our annual Mental Health Resource Fair on Friday,",
-      "type": "event",
-      "emoji": "🎪",
-      "newsId": "81112642",
-      "url": "https://www.parentsquare.com/feeds/81112642"
-    },
-    {
-      "start": "2026-05-15",
-      "end": "2026-05-15",
-      "label": "ewsletter 5/15/2026 WEEKLY UPDATE PIONEER VALLEY HIGH SCHOOL",
-      "type": "event",
-      "emoji": "📅",
-      "newsId": "80121507",
-      "url": "https://www.parentsquare.com/feeds/80121507"
+      "start": "2026-08-13",
+      "end": "2026-08-13",
+      "label": "First Day of School",
+      "type": "notable",
+      "emoji": "🏫",
+      "newsId": "83360877",
+      "url": "https://www.parentsquare.com/feeds/83360877"
     }
   ]
 }
