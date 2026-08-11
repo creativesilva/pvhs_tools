@@ -332,46 +332,62 @@
 
     // ── STATIC CALENDAR DATA ──────────────────────────────────
     const EVENTS = [
-      // School Year Anchors
+      // ── School Year Anchors ──
       {start:'2026-08-10',end:'2026-08-10',label:'Teachers Return · Contract Day 1',type:'event',emoji:'\u{1F4DA}'},
       {start:'2026-08-13',end:'2026-08-13',label:'First Day of School (Students)',type:'event',emoji:'\u{1F392}'},
       {start:'2027-01-14',end:'2027-01-14',label:'2nd Semester Begins',type:'event',emoji:'\u{1F4C5}'},
       {start:'2027-06-09',end:'2027-06-09',label:'Last Day of School',type:'event',emoji:'\u{1F514}'},
       {start:'2027-06-10',end:'2027-06-10',label:'Graduation',type:'event',emoji:'\u{1F393}'},
-      // No School
-      {start:'2026-09-07',end:'2026-09-07',label:'Labor Day',type:'no-school',emoji:'\u{1F1FA}\u{1F1F8}'},
-      {start:'2026-11-11',end:'2026-11-11',label:'Veterans Day',type:'no-school',emoji:'\u{1F396}'},
+
+      // ── No School / Holidays ──
+      {start:'2026-07-03',end:'2026-07-03',label:'Independence Day Holiday',type:'no-school',emoji:'\u{1F1FA}\u{1F1F8}'},
+      {start:'2026-09-07',end:'2026-09-07',label:'Labor Day Holiday',type:'no-school',emoji:'\u{1F1FA}\u{1F1F8}'},
+      {start:'2026-11-11',end:'2026-11-11',label:"Veteran's Day",type:'no-school',emoji:'\u{1F396}'},
       {start:'2026-11-23',end:'2026-11-27',label:'Thanksgiving Break',type:'no-school',emoji:'\u{1F983}'},
       {start:'2026-12-21',end:'2027-01-08',label:'Winter Break',type:'no-school',emoji:'\u{2744}\u{FE0F}'},
-      {start:'2027-01-11',end:'2027-01-13',label:'Staff Development',type:'no-school',emoji:'\u{1F4CB}'},
-      {start:'2027-01-18',end:'2027-01-18',label:'MLK Day',type:'no-school',emoji:'\u{270A}'},
-      {start:'2027-02-08',end:'2027-02-08',label:"Lincoln's Day (Observed)",type:'no-school',emoji:'\u{1F3A9}'},
-      {start:'2027-02-15',end:'2027-02-15',label:"Presidents' Day",type:'no-school',emoji:'\u{1F1FA}\u{1F1F8}'},
-      {start:'2027-03-26',end:'2027-03-26',label:'Spring Vacation Day',type:'no-school',emoji:'\u{1F324}'},
+      {start:'2027-01-11',end:'2027-01-13',label:'Staff Development / Workday (No Students)',type:'no-school',emoji:'\u{1F4CB}'},
+      {start:'2027-01-18',end:'2027-01-18',label:'Martin Luther King, Jr. Day Observed',type:'no-school',emoji:'\u{270A}'},
+      {start:'2027-02-08',end:'2027-02-08',label:"Lincoln's Day",type:'no-school',emoji:'\u{1F3A9}'},
+      {start:'2027-02-15',end:'2027-02-15',label:"President's Day",type:'no-school',emoji:'\u{1F1FA}\u{1F1F8}'},
+      {start:'2027-03-26',end:'2027-03-26',label:'Spring Vacation Day Holiday',type:'no-school',emoji:'\u{1F324}'},
       {start:'2027-03-29',end:'2027-04-02',label:'Spring Break',type:'no-school',emoji:'\u{1F338}'},
-      {start:'2027-05-31',end:'2027-05-31',label:'Memorial Day',type:'no-school',emoji:'\u{1F1FA}\u{1F1F8}'},
-      // Finals \u2014 Schedule Coming Soon (dates confirmed, period assignments TBD)
-      {start:'2026-12-16',end:'2026-12-18',label:'Finals \u2014 Schedule Coming Soon',type:'finals',emoji:'\u{1F4DD}'},
-      {start:'2027-06-07',end:'2027-06-09',label:'Finals \u2014 Schedule Coming Soon',type:'finals',emoji:'\u{1F4DD}'},
-      // Grading / Progress Reports
-      {start:'2026-09-25',end:'2026-09-25',label:'Progress Reports \u2014 Q1',type:'grading',emoji:'\u{1F4CA}'},
-      {start:'2026-11-06',end:'2026-11-06',label:'Progress Reports \u2014 Q1 End',type:'grading',emoji:'\u{1F4CA}'},
-      {start:'2026-12-18',end:'2026-12-18',label:'Fall Semester Ends (Q2)',type:'grading',emoji:'\u{1F4CA}'},
-      {start:'2027-02-26',end:'2027-02-26',label:'Progress Reports \u2014 Q3',type:'grading',emoji:'\u{1F4CA}'},
-      {start:'2027-04-16',end:'2027-04-16',label:'Progress Reports \u2014 Q3 End',type:'grading',emoji:'\u{1F4CA}'},
-      {start:'2027-06-09',end:'2027-06-09',label:'Spring Semester Ends (Q4)',type:'grading',emoji:'\u{1F4CA}'},
-      // Minimum Days
+      {start:'2027-05-31',end:'2027-05-31',label:'Memorial Day Holiday',type:'no-school',emoji:'\u{1F1FA}\u{1F1F8}'},
+      {start:'2027-06-18',end:'2027-06-18',label:'Juneteenth Holiday',type:'no-school',emoji:'\u{270A}'},
+      {start:'2027-07-05',end:'2027-07-05',label:'Independence Day Holiday',type:'no-school',emoji:'\u{1F1FA}\u{1F1F8}'},
+
+      // ── Finals ── (dates confirmed by district, period-by-period schedule TBD)
+      {start:'2026-12-16',end:'2026-12-18',label:'Finals — Schedule Coming Soon',type:'finals',emoji:'\u{1F4DD}'},
+      {start:'2027-06-07',end:'2027-06-09',label:'Finals — Schedule Coming Soon',type:'finals',emoji:'\u{1F4DD}'},
+
+      // ── Grading Milestones (matches PDF "Progress Reports" + Semester Ends) ──
+      {start:'2026-09-25',end:'2026-09-25',label:'Progress Reports',type:'grading',emoji:'\u{1F4CA}'},
+      {start:'2026-11-06',end:'2026-11-06',label:'Progress Reports',type:'grading',emoji:'\u{1F4CA}'},
+      {start:'2026-12-18',end:'2026-12-18',label:'Fall Semester Ends',type:'grading',emoji:'\u{1F4CA}'},
+      {start:'2027-02-26',end:'2027-02-26',label:'Progress Reports',type:'grading',emoji:'\u{1F4CA}'},
+      {start:'2027-04-16',end:'2027-04-16',label:'Progress Reports',type:'grading',emoji:'\u{1F4CA}'},
+      {start:'2027-06-09',end:'2027-06-09',label:'Spring Semester Ends',type:'grading',emoji:'\u{1F4CA}'},
+
+      // ── Minimum Days (non-Progress-Report ones — PR minimum days are covered above) ──
       {start:'2026-08-28',end:'2026-08-28',label:'Minimum Day',type:'notable',emoji:'\u{23F0}'},
-      {start:'2027-03-25',end:'2027-03-25',label:'Spring Fair \u2014 Minimum Day',type:'notable',emoji:'\u{1F338}'},
-      // School Events
+      {start:'2027-03-25',end:'2027-03-25',label:'Spring Fair — Minimum Day',type:'notable',emoji:'\u{1F338}'},
+
+      // ── School Events ──
       {start:'2026-08-27',end:'2026-08-27',label:'Back to School Night',type:'event',emoji:'\u{1F3EB}'},
-      // Staff Development
+
+      // ── Staff Development / Workdays ──
+      {start:'2026-08-03',end:'2026-08-07',label:'New Teacher Orientation',type:'notable',emoji:'\u{1F393}'},
       {start:'2026-08-10',end:'2026-08-10',label:'Base Camp — District PD @ SMHS (Ethel Pope · Breakfast 7:45am)',type:'notable',emoji:'\u{1F3D5}\u{FE0F}'},
       {start:'2026-08-11',end:'2026-08-11',label:'PVHS PD Day — Breakfast 8am @ PAC, sessions all day',type:'notable',emoji:'\u{1F4CB}'},
       {start:'2026-08-12',end:'2026-08-12',label:'All Staff Workday — Contract hours 8:30–3:55, self-directed',type:'notable',emoji:'\u{1F4CB}'},
       {start:'2027-01-11',end:'2027-01-12',label:'Certificated Staff Development',type:'notable',emoji:'\u{1F4CB}'},
       {start:'2027-01-13',end:'2027-01-13',label:'All Staff Workday',type:'notable',emoji:'\u{1F4CB}'},
-      {start:'2027-06-10',end:'2027-06-10',label:'Staff Development',type:'notable',emoji:'\u{1F4CB}'},
+      {start:'2027-06-10',end:'2027-06-10',label:'Graduation / Staff Development',type:'notable',emoji:'\u{1F4CB}'},
+
+      // ── Wintersession & Summer School (district-run, informational) ──
+      {start:'2027-01-04',end:'2027-01-08',label:'Wintersession',type:'notable',emoji:'\u{2744}\u{FE0F}'},
+      {start:'2026-07-10',end:'2026-07-10',label:'Summer School Ends (2025-26 Session)',type:'notable',emoji:'\u{2600}\u{FE0F}'},
+      {start:'2027-06-14',end:'2027-06-14',label:'Summer School Begins',type:'notable',emoji:'\u{2600}\u{FE0F}'},
+      {start:'2027-07-09',end:'2027-07-09',label:'Summer School Ends',type:'notable',emoji:'\u{2600}\u{FE0F}'},
     ];
 
     // ── DYNAMIC EVENTS (loaded from events.json on init) ──────
