@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PVHS Tools">
+  <meta name="theme-color" content="#007474">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="PV_AppIcon.png">
+  <link rel="icon" type="image/png" href="PV_AppIcon.png">
+  <title>Panther Prompts</title>
+
+  <style>
+    :root {
+      --teal:#007474; --white:#f7fbfb; --muted:#cfe3e3;
+      --shadow:0 20px 46px rgba(0,0,0,0.30);
+      --card-hover:rgba(255,255,255,0.12); --app-spacing:16px; --radius:34px;
+    }
+    * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; margin:0; padding:0; }
+    html { height:-webkit-fill-available; }
+    html, body { width:100%; height:100%; min-height:100%; background:#021414; overflow:hidden; }
+    body { min-height:100vh; min-height:100dvh; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+           color:var(--white); touch-action:none; user-select:none; -webkit-font-smoothing:antialiased; }
+
+    .frame { width:100%; height:100dvh; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:10px; }
+    .app {
+      width:430px; height:880px; max-width:100%; max-height:100%;
+      border-radius:var(--radius); overflow:hidden; position:relative;
+      box-shadow:var(--shadow); border:1px solid rgba(255,255,255,0.12);
+      background:linear-gradient(168deg, rgba(6,28,28,0.97) 0%, rgba(4,24,24,0.95) 30%, rgba(0,72,72,0.92) 60%, rgba(0,100,100,0.96) 82%, rgba(4,30,30,0.97) 100%);
+      display:flex; flex-direction:column; padding:14px var(--app-spacing) var(--app-spacing);
+    }
+    .app::before {
+      content:""; position:absolute; inset:0; pointer-events:none;
+      background: radial-gradient(ellipse at 50% 20%, rgba(0,116,116,0.18) 0%, transparent 60%),
+                  radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 50%);
+      z-index:0;
+    }
+    .ghost-logo { position:absolute; top:56%; left:50%; width:120%; opacity:0.05; transform:translate(-50%,-50%); filter:grayscale(100%); pointer-events:none; z-index:0; }
+    .content { position:relative; z-index:1; width:100%; flex:1; min-height:0; display:flex; flex-direction:column; overflow:hidden; }
+
+    /* Top row */
+    .top-row { display:flex; align-items:center; justify-content:space-between; width:100%; gap:10px; height:44px; flex-shrink:0; margin-bottom:8px; position:relative; }
+    .logo-clear { width:38px; height:38px; object-fit:contain; filter:drop-shadow(0 8px 18px rgba(0,0,0,0.24)); }
+    .page-title { position:absolute; left:0; right:0; text-align:center; font-size:15px; font-weight:700; color:#dff7f7; text-transform:uppercase; margin:0; letter-spacing:0.14em; pointer-events:none; }
+    .nav-menu-btn { appearance:none; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.13); border-radius:12px; color:rgba(255,255,255,0.92); width:34px; height:34px; font-size:14px; font-weight:900; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+
+    /* Nav dropdown */
+    .nav-menu { position:fixed; z-index:9999; min-width:180px; background:rgba(3,20,20,0.58); border:1px solid rgba(255,255,255,0.16); border-radius:16px; padding:5px; box-shadow:0 14px 44px rgba(0,0,0,0.52); backdrop-filter:blur(26px); -webkit-backdrop-filter:blur(26px); transform-origin:top right; transform:scale(0.88) translateY(-8px); opacity:0; pointer-events:none; transition:opacity 0.17s ease, transform 0.19s cubic-bezier(0.34,1.4,0.64,1); }
+    .nav-menu.is-open { opacity:1; transform:scale(1) translateY(0); pointer-events:auto; }
+    .nav-menu-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:11px; text-decoration:none; color:#eaf8f8; background:transparent; font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; border:none; cursor:pointer; width:100%; }
+    .nav-menu-item:active { background:rgba(255,255,255,0.1); }
+    .nav-menu-icon { font-size:14px; }
+
+    /* Views */
+    .pp-view { flex:1; min-height:0; display:flex; flex-direction:column; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+    .pp-view[hidden] { display:none; }
+
+    /* Home hero */
+    .pp-hero { text-align:center; padding:26px 12px 20px; }
+    .pp-emoji { font-size:72px; line-height:1; filter:drop-shadow(0 8px 24px rgba(75,225,225,0.35)); }
+    .pp-hero h1 { font-size:26px; font-weight:900; letter-spacing:0.02em; margin:12px 0 4px; color:#fff; }
+    .pp-hero-sub { font-size:12px; color:var(--muted); font-weight:600; letter-spacing:0.06em; opacity:0.85; }
+
+    /* Section titles + pill rows */
+    .pp-section { padding:8px 4px 14px; }
+    .pp-section-title { font-size:10px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:0.14em; text-align:center; margin-bottom:9px; opacity:0.85; }
+    .pp-pills { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; }
+    .pp-pill { appearance:none; padding:9px 14px; border-radius:99px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.05); color:#eaf8f8; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.18s; display:inline-flex; align-items:center; gap:6px; }
+    .pp-pill:active { transform:scale(0.97); }
+    .pp-pill.is-active { background:rgba(0,180,180,0.28); border-color:rgba(0,220,220,0.55); color:#fff; box-shadow:0 4px 14px rgba(0,180,180,0.18); }
+
+    /* Start button */
+    .pp-start-wrap { padding:14px 8px 10px; margin-top:auto; }
+    .pp-start { appearance:none; width:100%; padding:18px; border-radius:16px; border:1px solid rgba(75,225,225,0.4); background:linear-gradient(180deg, rgba(0,180,180,0.35), rgba(0,140,140,0.25)); color:#fff; font-size:15px; font-weight:900; letter-spacing:0.14em; text-transform:uppercase; cursor:pointer; box-shadow:0 8px 24px rgba(0,140,140,0.24); }
+    .pp-start:active { transform:scale(0.98); }
+    .pp-start:disabled { opacity:0.4; cursor:not-allowed; }
+
+    /* Game view */
+    .pp-bar { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:6px 0 12px; flex-shrink:0; }
+    .pp-bar-btn { appearance:none; width:36px; height:36px; border-radius:12px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.06); color:#eaf8f8; font-size:16px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+    .pp-bar-btn:active { background:rgba(255,255,255,0.14); }
+    .pp-progress { flex:1; text-align:center; }
+    .pp-progress-count { font-size:11px; font-weight:800; color:var(--muted); letter-spacing:0.14em; text-transform:uppercase; }
+    .pp-progress-bar { margin-top:5px; height:4px; border-radius:99px; background:rgba(255,255,255,0.1); overflow:hidden; }
+    .pp-progress-fill { height:100%; background:linear-gradient(90deg, #4be1e1, #007474); border-radius:99px; transition:width 0.28s cubic-bezier(0.34,1.2,0.64,1); }
+    .pp-lang-mini { appearance:none; padding:6px 10px; border-radius:99px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.05); color:#eaf8f8; font-size:11px; font-weight:700; cursor:pointer; }
+
+    /* Prompt card */
+    .pp-card-wrap { flex:1; min-height:0; display:flex; align-items:center; justify-content:center; padding:6px 0 12px; }
+    .pp-card {
+      width:100%; max-width:390px; min-height:280px;
+      background:linear-gradient(160deg, rgba(0,116,116,0.32) 0%, rgba(0,74,74,0.42) 100%);
+      border:1px solid rgba(75,225,225,0.35); border-radius:24px;
+      padding:24px 20px; display:flex; flex-direction:column; justify-content:center;
+      box-shadow:0 16px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08);
+      backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+      transition:opacity 0.22s ease, transform 0.28s cubic-bezier(0.34,1.2,0.64,1);
+    }
+    .pp-card.is-swapping { opacity:0; transform:translateY(10px); }
+    .pp-card-cat { align-self:flex-start; padding:5px 11px; border-radius:99px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.14); font-size:10px; font-weight:800; letter-spacing:0.12em; text-transform:uppercase; color:#4be1e1; display:inline-flex; align-items:center; gap:5px; margin-bottom:16px; }
+    .pp-card-q { font-size:22px; line-height:1.32; font-weight:700; color:#fff; margin:0; text-align:left; letter-spacing:-0.005em; }
+
+    /* Controls */
+    .pp-controls { display:flex; gap:8px; flex-shrink:0; padding-top:8px; }
+    .pp-ctrl { flex:1; appearance:none; padding:14px; border-radius:14px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.06); color:#eaf8f8; font-size:12px; font-weight:800; letter-spacing:0.12em; text-transform:uppercase; cursor:pointer; }
+    .pp-ctrl:active { transform:scale(0.98); }
+    .pp-ctrl.is-primary { background:linear-gradient(180deg, rgba(0,180,180,0.4), rgba(0,140,140,0.28)); border-color:rgba(75,225,225,0.4); color:#fff; }
+    .pp-ctrl:disabled { opacity:0.35; cursor:not-allowed; }
+
+    .footer-note { text-align:center; font-size:9.5px; color:#b5d4d4; font-weight:600; padding:8px 0 3px; margin-top:auto; flex-shrink:0; opacity:0.75; }
+    .footer-version { text-align:center; font-size:8.5px; color:#b5d4d4; opacity:0.55; padding:0 0 6px; font-weight:500; letter-spacing:0.04em; }
+
+    /* Standalone */
+    body.is-standalone { background:#021414; }
+    body.is-standalone::before { content:""; position:fixed; inset:0; background:#021414; pointer-events:none; z-index:0; }
+    body.is-standalone .frame { position:fixed; inset:0; width:100%; height:100%; padding:0 8px max(24px,calc(env(safe-area-inset-bottom) + 8px)) 8px; z-index:1; }
+    body.is-standalone .app { position:relative; width:100%; height:100%; max-width:100%; max-height:100%; border-radius:34px; padding-top:max(10px,env(safe-area-inset-top)); padding-right:max(var(--app-spacing),env(safe-area-inset-right)); padding-bottom:18px; padding-left:max(var(--app-spacing),env(safe-area-inset-left)); }
+    @media (max-width:430px) {
+      body:not(.is-standalone) .frame { padding:env(safe-area-inset-top) 12px env(safe-area-inset-bottom) 12px; }
+      body:not(.is-standalone) .app { width:100%; height:100%; max-height:100%; border-radius:var(--radius); }
+      body { touch-action:pan-y; }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <div class="app">
+      <img class="ghost-logo" src="PV_Logo.png" alt="">
+      <div class="content">
+
+        <!-- Top row -->
+        <div class="top-row">
+          <a href="index.html" class="nav-link" aria-label="Home"><img src="PV_Logo.png" class="logo-clear" alt="PVHS"></a>
+          <h1 class="page-title">Panther Prompts</h1>
+          <button class="nav-menu-btn" id="navMenuBtn" type="button" aria-label="Menu">···</button>
+        </div>
+
+        <!-- HOME VIEW -->
+        <div id="ppHome" class="pp-view">
+          <div class="pp-hero">
+            <div class="pp-emoji">🧊</div>
+            <h1 id="ppTitle">Panther Prompts</h1>
+            <p class="pp-hero-sub" id="ppSub">Conversation starters for your class</p>
+          </div>
+
+          <div class="pp-section">
+            <p class="pp-section-title" id="ppLangLabel">Choose your language</p>
+            <div class="pp-pills" id="ppLangPills">
+              <button class="pp-pill" data-lang="en">🇺🇸 English</button>
+              <button class="pp-pill" data-lang="es">🇪🇸 Español</button>
+              <button class="pp-pill" data-lang="fr">🇫🇷 Français</button>
+            </div>
+          </div>
+
+          <div class="pp-section">
+            <p class="pp-section-title" id="ppCatLabel">Choose a vibe</p>
+            <div class="pp-pills" id="ppCatPills"></div>
+          </div>
+
+          <div class="pp-start-wrap">
+            <button class="pp-start" id="ppStart">Start ▶</button>
+          </div>
+        </div>
+
+        <!-- GAME VIEW -->
+        <div id="ppGame" class="pp-view" hidden>
+          <div class="pp-bar">
+            <button class="pp-bar-btn" id="ppHomeBtn" aria-label="Home">←</button>
+            <div class="pp-progress">
+              <div class="pp-progress-count" id="ppCount">1 / 50</div>
+              <div class="pp-progress-bar"><div class="pp-progress-fill" id="ppFill" style="width:2%"></div></div>
+            </div>
+            <button class="pp-lang-mini" id="ppLangMini">🇺🇸 EN</button>
+            <button class="pp-bar-btn" id="ppShuffle" aria-label="Shuffle">🔀</button>
+          </div>
+
+          <div class="pp-card-wrap">
+            <div class="pp-card" id="ppCard">
+              <span class="pp-card-cat" id="ppCardCat">😄 FUN</span>
+              <p class="pp-card-q" id="ppCardQ">—</p>
+            </div>
+          </div>
+
+          <div class="pp-controls">
+            <button class="pp-ctrl" id="ppBack">← Back</button>
+            <button class="pp-ctrl is-primary" id="ppNext">Next →</button>
+          </div>
+        </div>
+
+        <div class="footer-note">By: <a href="https://www.creativesilva.com" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">CreativeSilva</a></div>
+        <div class="footer-version">Panther Prompts · v1 · Updated Aug 12, 2026</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nav dropdown -->
+  <nav class="nav-menu" id="navMenu" role="menu">
+    <a href="index.html"            class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">🏠</span>Home</a>
+    <a href="countdown.html"        class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">⏱</span>Countdown</a>
+    <a href="calendar.html"         class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">📅</span>Calendar</a>
+    <a href="extension_search.html" class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">🔍</span>Directory</a>
+    <a href="panther_prompts.html"  class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">🧊</span>Panther Prompts</a>
+  </nav>
+
+  <script>
+    // ─────────────────────────────────────────────────────────────────────────
+    // PANTHER PROMPTS · v1 · Aug 12, 2026
+    // 50 conversation starters, teacher-facing, EN/ES/FR, 5 categories.
+    // To add a language: extend each PROMPT with the new key + T strings + CATS
+    // labels + <button data-lang="xx"> to home. Question count stays at 50.
+    // ─────────────────────────────────────────────────────────────────────────
+
+    // Category metadata: emoji + trilingual label
+    const CATS = {
+      fun:  { emoji:'😄', en:'Fun',              es:'Divertidas',       fr:'Fun' },
+      deep: { emoji:'🤔', en:'Deep',             es:'Profundas',        fr:'Profondes' },
+      wyr:  { emoji:'⚖️', en:'Would You Rather', es:'¿Qué Preferirías?', fr:'Tu Préfères' },
+      you:  { emoji:'🎯', en:'About You',        es:'Sobre Ti',         fr:'À Propos de Toi' },
+      hypo: { emoji:'🌈', en:'Hypothetical',     es:'Hipotéticas',      fr:'Hypothétiques' }
+    };
+
+    // UI strings
+    const T = {
+      title:      { en:'Panther Prompts',   es:'Panther Prompts',    fr:'Panther Prompts' },
+      sub:        { en:'Conversation starters for your class',
+                    es:'Iniciadores de conversación para tu clase',
+                    fr:'Amorces de conversation pour ta classe' },
+      langLabel:  { en:'Choose your language', es:'Elige tu idioma',   fr:'Choisis ta langue' },
+      catLabel:   { en:'Choose a vibe',        es:'Elige un ambiente', fr:'Choisis une ambiance' },
+      all:        { en:'All',                  es:'Todas',             fr:'Toutes' },
+      start:      { en:'Start ▶',              es:'Empezar ▶',         fr:'Commencer ▶' },
+      back:       { en:'← Back',               es:'← Atrás',           fr:'← Retour' },
+      next:       { en:'Next →',               es:'Siguiente →',       fr:'Suivant →' },
+      done:       { en:'Done ✓',               es:'Listo ✓',           fr:'Terminé ✓' },
+      counter:    { en:'of',                   es:'de',                fr:'sur' }
+    };
+
+    // 50 PROMPTS — EN/ES/FR, categorized
+    const PROMPTS = [
+      // ─── FUN (10) ───
+      {cat:'fun', en:"What's a small thing that always makes you smile?",
+                  es:"¿Qué pequeña cosa siempre te hace sonreír?",
+                  fr:"Quelle petite chose te fait toujours sourire ?"},
+      {cat:'fun', en:"If you had a warning label, what would it say?",
+                  es:"Si tuvieras una etiqueta de advertencia, ¿qué diría?",
+                  fr:"Si tu avais une étiquette d'avertissement, qu'est-ce qu'elle dirait ?"},
+      {cat:'fun', en:"What's the most useless talent you have?",
+                  es:"¿Cuál es el talento más inútil que tienes?",
+                  fr:"Quel est le talent le plus inutile que tu as ?"},
+      {cat:'fun', en:"What song do you always end up singing in the shower?",
+                  es:"¿Qué canción siempre terminas cantando en la ducha?",
+                  fr:"Quelle chanson finis-tu toujours par chanter sous la douche ?"},
+      {cat:'fun', en:"What emoji do you overuse?",
+                  es:"¿Qué emoji usas demasiado?",
+                  fr:"Quel emoji utilises-tu trop souvent ?"},
+      {cat:'fun', en:"If your life was a movie, what would the title be?",
+                  es:"Si tu vida fuera una película, ¿cuál sería el título?",
+                  fr:"Si ta vie était un film, quel en serait le titre ?"},
+      {cat:'fun', en:"What's the weirdest food combination you actually like?",
+                  es:"¿Cuál es la combinación de comida más rara que en realidad te gusta?",
+                  fr:"Quelle est la combinaison alimentaire la plus bizarre que tu aimes vraiment ?"},
+      {cat:'fun', en:"What's a random fun fact you know that no one asked for?",
+                  es:"¿Cuál es un dato curioso que sabes y que nadie te preguntó?",
+                  fr:"Quel fait amusant connais-tu que personne ne t'a demandé ?"},
+      {cat:'fun', en:"If you had to eat one meal for a week straight, what would it be?",
+                  es:"Si tuvieras que comer la misma comida por una semana entera, ¿cuál sería?",
+                  fr:"Si tu devais manger le même repas pendant une semaine entière, ce serait quoi ?"},
+      {cat:'fun', en:"What song always puts you in a good mood?",
+                  es:"¿Qué canción siempre te pone de buen humor?",
+                  fr:"Quelle chanson te met toujours de bonne humeur ?"},
+
+      // ─── DEEP (10) ───
+      {cat:'deep', en:"What's something you believed as a kid that turned out to be wrong?",
+                   es:"¿Qué creías cuando eras niño o niña que resultó ser falso?",
+                   fr:"Qu'est-ce que tu croyais quand tu étais enfant qui s'est révélé faux ?"},
+      {cat:'deep', en:"If you could tell your younger self one thing, what would it be?",
+                   es:"Si pudieras decirle una cosa a tu yo del pasado, ¿qué sería?",
+                   fr:"Si tu pouvais dire une chose à ton toi plus jeune, ce serait quoi ?"},
+      {cat:'deep', en:"What's a lesson you learned the hard way?",
+                   es:"¿Qué lección aprendiste a la mala?",
+                   fr:"Quelle leçon as-tu apprise à tes dépens ?"},
+      {cat:'deep', en:"What does success look like to you — not to your parents or teachers?",
+                   es:"¿Cómo se ve el éxito para ti — no para tus papás o maestros?",
+                   fr:"À quoi ressemble la réussite pour toi — pas pour tes parents ou tes profs ?"},
+      {cat:'deep', en:"What's something you're proud of but don't usually talk about?",
+                   es:"¿De qué estás orgulloso u orgullosa pero normalmente no hablas?",
+                   fr:"De quoi es-tu fier ou fière mais dont tu ne parles pas souvent ?"},
+      {cat:'deep', en:"When do you feel most like yourself?",
+                   es:"¿Cuándo te sientes más como tú mismo o tú misma?",
+                   fr:"Quand te sens-tu le plus toi-même ?"},
+      {cat:'deep', en:"What's something you wish more people understood about you?",
+                   es:"¿Qué te gustaría que más personas entendieran sobre ti?",
+                   fr:"Qu'aimerais-tu que plus de gens comprennent sur toi ?"},
+      {cat:'deep', en:"What advice would you give to a freshman on day one?",
+                   es:"¿Qué consejo le darías a un estudiante nuevo en su primer día?",
+                   fr:"Quel conseil donnerais-tu à un élève de première année le jour de la rentrée ?"},
+      {cat:'deep', en:"What's a fear you've overcome?",
+                   es:"¿Qué miedo has superado?",
+                   fr:"Quelle peur as-tu surmontée ?"},
+      {cat:'deep', en:"What's something you'd want to be remembered for?",
+                   es:"¿Por qué te gustaría ser recordado o recordada?",
+                   fr:"Pour quoi aimerais-tu qu'on se souvienne de toi ?"},
+
+      // ─── WOULD YOU RATHER (10) ───
+      {cat:'wyr', en:"Would you rather have unlimited free time or unlimited money?",
+                  es:"¿Preferirías tener tiempo libre ilimitado o dinero ilimitado?",
+                  fr:"Préférerais-tu avoir du temps libre illimité ou de l'argent illimité ?"},
+      {cat:'wyr', en:"Would you rather speak every language or play every instrument?",
+                  es:"¿Preferirías poder hablar todos los idiomas o tocar todos los instrumentos?",
+                  fr:"Préférerais-tu parler toutes les langues ou jouer de tous les instruments ?"},
+      {cat:'wyr', en:"Would you rather always know when someone is lying or always get away with lying?",
+                  es:"¿Preferirías siempre saber cuándo alguien miente o siempre poder mentir sin que te descubran?",
+                  fr:"Préférerais-tu toujours savoir quand quelqu'un ment ou toujours pouvoir mentir sans être découvert ?"},
+      {cat:'wyr', en:"Would you rather have a rewind button for your life or a pause button?",
+                  es:"¿Preferirías tener un botón de retroceso en tu vida o un botón de pausa?",
+                  fr:"Préférerais-tu avoir un bouton pour revenir en arrière dans ta vie ou un bouton pause ?"},
+      {cat:'wyr', en:"Would you rather live without music or without movies?",
+                  es:"¿Preferirías vivir sin música o sin películas?",
+                  fr:"Préférerais-tu vivre sans musique ou sans films ?"},
+      {cat:'wyr', en:"Would you rather be famous for something you didn't do or unknown for something amazing you did?",
+                  es:"¿Preferirías ser famoso o famosa por algo que no hiciste, o desconocido por algo increíble que sí hiciste?",
+                  fr:"Préférerais-tu être célèbre pour quelque chose que tu n'as pas fait ou inconnu pour quelque chose d'incroyable que tu as fait ?"},
+      {cat:'wyr', en:"Would you rather be able to teleport anywhere or read minds?",
+                  es:"¿Preferirías poder teletransportarte a cualquier lugar o leer mentes?",
+                  fr:"Préférerais-tu pouvoir te téléporter n'importe où ou lire dans les pensées ?"},
+      {cat:'wyr', en:"Would you rather always have to sing instead of speak or dance everywhere you go?",
+                  es:"¿Preferirías siempre tener que cantar en lugar de hablar o bailar en todos lados a los que vayas?",
+                  fr:"Préférerais-tu toujours chanter au lieu de parler ou danser partout où tu vas ?"},
+      {cat:'wyr', en:"Would you rather have no internet or no air conditioning?",
+                  es:"¿Preferirías no tener internet o no tener aire acondicionado?",
+                  fr:"Préférerais-tu ne pas avoir Internet ou pas de climatisation ?"},
+      {cat:'wyr', en:"Would you rather be the funniest person in the room or the smartest?",
+                  es:"¿Preferirías ser la persona más graciosa del cuarto o la más inteligente?",
+                  fr:"Préférerais-tu être la personne la plus drôle de la pièce ou la plus intelligente ?"},
+
+      // ─── ABOUT YOU (10) ───
+      {cat:'you', en:"What's your favorite way to spend a Saturday?",
+                  es:"¿Cuál es tu forma favorita de pasar un sábado?",
+                  fr:"Quelle est ta façon préférée de passer un samedi ?"},
+      {cat:'you', en:"What's something you're really into right now?",
+                  es:"¿En qué estás muy interesado o interesada en este momento?",
+                  fr:"Qu'est-ce qui te passionne en ce moment ?"},
+      {cat:'you', en:"Who's someone in your life you'd call for advice?",
+                  es:"¿A quién en tu vida llamarías para pedir consejos?",
+                  fr:"Qui dans ta vie appellerais-tu pour demander conseil ?"},
+      {cat:'you', en:"What's a class you'd love to see added to school?",
+                  es:"¿Qué clase te encantaría que se agregara a la escuela?",
+                  fr:"Quel cours aimerais-tu voir ajouter à l'école ?"},
+      {cat:'you', en:"What's your favorite place to eat around here?",
+                  es:"¿Cuál es tu lugar favorito para comer por aquí?",
+                  fr:"Quel est ton endroit préféré pour manger par ici ?"},
+      {cat:'you', en:"What's the last show or movie you couldn't stop thinking about?",
+                  es:"¿Cuál fue la última serie o película en la que no podías dejar de pensar?",
+                  fr:"Quelle est la dernière série ou le dernier film auquel tu n'arrêtais pas de penser ?"},
+      {cat:'you', en:"What's a skill you'd love to learn this year?",
+                  es:"¿Qué habilidad te encantaría aprender este año?",
+                  fr:"Quelle compétence aimerais-tu apprendre cette année ?"},
+      {cat:'you', en:"What's a family tradition you actually like?",
+                  es:"¿Qué tradición familiar en verdad te gusta?",
+                  fr:"Quelle tradition familiale aimes-tu vraiment ?"},
+      {cat:'you', en:"What's your favorite subject and why — no wrong answer?",
+                  es:"¿Cuál es tu materia favorita y por qué — no hay respuesta incorrecta?",
+                  fr:"Quelle est ta matière préférée et pourquoi — il n'y a pas de mauvaise réponse ?"},
+      {cat:'you', en:"If you had to describe your energy today with a weather forecast, what would it be?",
+                  es:"Si tuvieras que describir tu energía de hoy con un pronóstico del clima, ¿cuál sería?",
+                  fr:"Si tu devais décrire ton énergie d'aujourd'hui avec un bulletin météo, ce serait quoi ?"},
+
+      // ─── HYPOTHETICAL (10) ───
+      {cat:'hypo', en:"If you could add one holiday to the school year, what would it celebrate?",
+                   es:"Si pudieras agregar un día festivo al año escolar, ¿qué celebraría?",
+                   fr:"Si tu pouvais ajouter un jour férié à l'année scolaire, qu'est-ce qu'il célébrerait ?"},
+      {cat:'hypo', en:"If you could have dinner with anyone — alive, dead, or fictional — who?",
+                   es:"Si pudieras cenar con quien fuera — vivo, muerto o ficticio — ¿con quién?",
+                   fr:"Si tu pouvais dîner avec n'importe qui — vivant, mort ou fictif — qui choisirais-tu ?"},
+      {cat:'hypo', en:"If your school could add one thing tomorrow, what should it be?",
+                   es:"Si tu escuela pudiera agregar una sola cosa mañana, ¿qué sería?",
+                   fr:"Si ton école pouvait ajouter une seule chose demain, qu'est-ce que ce serait ?"},
+      {cat:'hypo', en:"If you could master any one thing overnight, what would you pick?",
+                   es:"Si pudieras dominar una sola cosa de la noche a la mañana, ¿qué escogerías?",
+                   fr:"Si tu pouvais maîtriser une seule chose du jour au lendemain, qu'est-ce que tu choisirais ?"},
+      {cat:'hypo', en:"If you could time travel for one day, which day and why?",
+                   es:"Si pudieras viajar en el tiempo por un día, ¿a qué día y por qué?",
+                   fr:"Si tu pouvais voyager dans le temps pour une journée, quel jour et pourquoi ?"},
+      {cat:'hypo', en:"If you could switch lives with one person for 24 hours, who?",
+                   es:"Si pudieras intercambiar tu vida con una persona por 24 horas, ¿con quién?",
+                   fr:"Si tu pouvais échanger ta vie avec quelqu'un pendant 24 heures, avec qui ?"},
+      {cat:'hypo', en:"If you could invent one class rule everyone had to follow, what would it be?",
+                   es:"Si pudieras inventar una regla de clase que todos tuvieran que seguir, ¿cuál sería?",
+                   fr:"Si tu pouvais inventer une règle de classe que tout le monde devrait suivre, quelle serait-elle ?"},
+      {cat:'hypo', en:"If you could go anywhere for spring break, where and with who?",
+                   es:"Si pudieras ir a cualquier lugar en las vacaciones de primavera, ¿a dónde y con quién?",
+                   fr:"Si tu pouvais aller n'importe où pour les vacances de printemps, où et avec qui ?"},
+      {cat:'hypo', en:"If money and grades didn't matter, what would you spend the school year doing?",
+                   es:"Si el dinero y las calificaciones no importaran, ¿qué harías durante el año escolar?",
+                   fr:"Si l'argent et les notes n'avaient pas d'importance, à quoi passerais-tu ton année scolaire ?"},
+      {cat:'hypo', en:"If you had to give a TED talk tomorrow, what would it be about?",
+                   es:"Si tuvieras que dar una charla TED mañana, ¿de qué sería?",
+                   fr:"Si tu devais donner une conférence TED demain, ce serait sur quoi ?"}
+    ];
+
+    // ── STATE ──
+    const LANG_KEY = 'pp_lang', CAT_KEY = 'pp_cat';
+    let lang = localStorage.getItem(LANG_KEY) || 'en';
+    let cat  = localStorage.getItem(CAT_KEY)  || 'all';
+    let deck = [];        // shuffled indices into PROMPTS
+    let idx  = 0;         // current position in deck
+
+    // ── DOM ──
+    const $ = id => document.getElementById(id);
+    const home = $('ppHome'), game = $('ppGame');
+    const langPills = $('ppLangPills'), catPills = $('ppCatPills');
+
+    // Standalone class
+    if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+      document.body.classList.add('is-standalone');
+    }
+
+    // ── I18N HELPERS ──
+    function t(key) { return T[key][lang] || T[key].en; }
+    function catLabel(k) { return CATS[k][lang] || CATS[k].en; }
+    function langFlag(l) { return {en:'🇺🇸 EN', es:'🇪🇸 ES', fr:'🇫🇷 FR'}[l]; }
+
+    // ── RENDER HOME ──
+    function renderHome() {
+      $('ppTitle').textContent = t('title');
+      $('ppSub').textContent   = t('sub');
+      $('ppLangLabel').textContent = t('langLabel');
+      $('ppCatLabel').textContent  = t('catLabel');
+      $('ppStart').textContent     = t('start');
+
+      // Language pills active state
+      langPills.querySelectorAll('.pp-pill').forEach(p => {
+        p.classList.toggle('is-active', p.dataset.lang === lang);
+      });
+
+      // Category pills (rebuild each render so labels reflect current language)
+      catPills.innerHTML = '';
+      const cats = [['all', null]].concat(Object.entries(CATS).map(([k, v]) => [k, v]));
+      cats.forEach(([k, meta]) => {
+        const btn = document.createElement('button');
+        btn.className = 'pp-pill' + (k === cat ? ' is-active' : '');
+        btn.dataset.cat = k;
+        btn.innerHTML = k === 'all' ? t('all') : `${meta.emoji} ${catLabel(k)}`;
+        catPills.appendChild(btn);
+      });
+    }
+
+    // ── DECK ──
+    function buildDeck() {
+      const pool = PROMPTS.map((_, i) => i).filter(i => cat === 'all' || PROMPTS[i].cat === cat);
+      // Fisher-Yates
+      for (let i = pool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
+      }
+      deck = pool;
+      idx = 0;
+    }
+
+    // ── RENDER GAME CARD ──
+    function renderCard() {
+      const p = PROMPTS[deck[idx]];
+      const cat = CATS[p.cat];
+      const catEl = $('ppCardCat');
+      const qEl   = $('ppCardQ');
+      const card  = $('ppCard');
+      // Fade swap
+      card.classList.add('is-swapping');
+      setTimeout(() => {
+        catEl.textContent = `${cat.emoji} ${catLabel(p.cat).toUpperCase()}`;
+        qEl.textContent   = p[lang] || p.en;
+        card.classList.remove('is-swapping');
+      }, 160);
+
+      // Counter + fill
+      const total = deck.length;
+      $('ppCount').textContent = `${idx + 1} ${t('counter')} ${total}`;
+      $('ppFill').style.width = `${((idx + 1) / total) * 100}%`;
+
+      // Controls
+      $('ppBack').textContent = t('back');
+      $('ppBack').disabled = idx === 0;
+      const isLast = idx === total - 1;
+      $('ppNext').textContent = isLast ? t('done') : t('next');
+
+      // Mini lang pill
+      $('ppLangMini').textContent = langFlag(lang);
+    }
+
+    // ── VIEW SWITCHING ──
+    function showHome() { home.hidden = false; game.hidden = true; renderHome(); }
+    function showGame() { home.hidden = true;  game.hidden = false; renderCard(); }
+
+    function startGame() {
+      buildDeck();
+      if (deck.length === 0) return;
+      showGame();
+    }
+
+    // ── HANDLERS ──
+    langPills.addEventListener('click', e => {
+      const p = e.target.closest('.pp-pill'); if (!p) return;
+      lang = p.dataset.lang;
+      localStorage.setItem(LANG_KEY, lang);
+      renderHome();
+    });
+    catPills.addEventListener('click', e => {
+      const p = e.target.closest('.pp-pill'); if (!p) return;
+      cat = p.dataset.cat;
+      localStorage.setItem(CAT_KEY, cat);
+      renderHome();
+    });
+    $('ppStart').addEventListener('click', startGame);
+    $('ppHomeBtn').addEventListener('click', showHome);
+    $('ppShuffle').addEventListener('click', () => { buildDeck(); renderCard(); });
+    $('ppBack').addEventListener('click', () => { if (idx > 0) { idx--; renderCard(); } });
+    $('ppNext').addEventListener('click', () => {
+      if (idx < deck.length - 1) { idx++; renderCard(); }
+      else { showHome(); }  // "Done" on last card returns to home
+    });
+    // Tap card = next (also intuitive)
+    $('ppCard').addEventListener('click', () => {
+      if (idx < deck.length - 1) { idx++; renderCard(); }
+    });
+    // Mini lang cycles EN → ES → FR → EN
+    $('ppLangMini').addEventListener('click', () => {
+      const order = ['en','es','fr'];
+      lang = order[(order.indexOf(lang) + 1) % order.length];
+      localStorage.setItem(LANG_KEY, lang);
+      renderCard();
+    });
+
+    // Nav menu
+    const navMenu = $('navMenu'), navMenuBtn = $('navMenuBtn');
+    navMenuBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      const r = navMenuBtn.getBoundingClientRect();
+      navMenu.style.top   = (r.bottom + 6) + 'px';
+      navMenu.style.right = (window.innerWidth - r.right) + 'px';
+      navMenu.classList.toggle('is-open');
+    });
+    document.addEventListener('click', e => {
+      if (!navMenu.contains(e.target) && e.target !== navMenuBtn) navMenu.classList.remove('is-open');
+    });
+
+    // Home logo — force in-app navigation (PWA)
+    document.querySelector('.top-row a[aria-label="Home"]').addEventListener('click', e => {
+      e.preventDefault(); window.location.href = 'index.html';
+    });
+
+    // Service worker
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+
+    // ── INIT ──
+    renderHome();
+  </script>
+</body>
+</html>
