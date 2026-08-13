@@ -212,7 +212,7 @@
         </div>
 
         <div class="footer-note">By: <a href="https://www.creativesilva.com" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">CreativeSilva</a></div>
-        <div class="footer-version">Panther Prompts · v1.2 · Updated Aug 12, 2026</div>
+        <div class="footer-version">Panther Prompts · v1.3 · Updated Aug 12, 2026</div>
       </div>
     </div>
   </div>
@@ -261,7 +261,7 @@
 
     // 50 PROMPTS — EN/ES/FR, categorized
     const PROMPTS = [
-      // ─── FUN (10) ───
+      // ─── FUN (15) ───
       {cat:'fun', en:"What's a small thing that always makes you smile?",
                   es:"¿Qué pequeña cosa siempre te hace sonreír?",
                   fr:"Quelle petite chose te fait toujours sourire ?"},
@@ -293,7 +293,23 @@
                   es:"¿Qué canción siempre te pone de buen humor?",
                   fr:"Quelle chanson te met toujours de bonne humeur ?"},
 
-      // ─── DEEP (10) ───
+      {cat:'fun', en:"What's a hill you'd die on that's completely unimportant?",
+                  es:"¿Cuál es una opinión sin importancia que defenderías con todo?",
+                  fr:"Quelle est une opinion sans importance que tu défends bec et ongles ?"},
+      {cat:'fun', en:"What's your comfort show — the one you rewatch?",
+                  es:"¿Cuál es tu serie de confort — la que ves una y otra vez?",
+                  fr:"Quelle est ta série doudou — celle que tu regardes encore et encore ?"},
+      {cat:'fun', en:"If you could rename yourself, what would you pick?",
+                  es:"Si pudieras cambiarte el nombre, ¿cuál escogerías?",
+                  fr:"Si tu pouvais changer de prénom, lequel choisirais-tu ?"},
+      {cat:'fun', en:"What sound do you actually enjoy that most people hate?",
+                  es:"¿Qué sonido realmente disfrutas que a la mayoría no le gusta?",
+                  fr:"Quel son aimes-tu vraiment que la plupart des gens détestent ?"},
+      {cat:'fun', en:"What's a random skill you're weirdly good at?",
+                  es:"¿En qué habilidad rara eres inesperadamente bueno o buena?",
+                  fr:"Quelle compétence bizarre maîtrises-tu étonnamment bien ?"},
+
+      // ─── DEEP (15) ───
       {cat:'deep', en:"What's something you believed as a kid that turned out to be wrong?",
                    es:"¿Qué creías cuando eras niño o niña que resultó ser falso?",
                    fr:"Qu'est-ce que tu croyais quand tu étais enfant qui s'est révélé faux ?"},
@@ -325,7 +341,23 @@
                    es:"¿Por qué te gustaría ser recordado o recordada?",
                    fr:"Pour quoi aimerais-tu qu'on se souvienne de toi ?"},
 
-      // ─── WOULD YOU RATHER (10) ───
+      {cat:'deep', en:"What's a compliment you got that stuck with you?",
+                  es:"¿Qué cumplido recibiste que se te quedó grabado?",
+                  fr:"Quel compliment as-tu reçu qui t'est resté ?"},
+      {cat:'deep', en:"What's something you thought would be a big deal but wasn't?",
+                  es:"¿Qué pensaste que sería un gran problema pero no lo fue?",
+                  fr:"Qu'as-tu cru être un gros problème mais qui ne l'était pas ?"},
+      {cat:'deep', en:"What's one way school could be better for students like you?",
+                  es:"¿De qué manera podría mejorar la escuela para estudiantes como tú?",
+                  fr:"Comment l'école pourrait-elle être meilleure pour des élèves comme toi ?"},
+      {cat:'deep', en:"What's something you've changed your mind about in the last year?",
+                  es:"¿Sobre qué has cambiado de opinión en el último año?",
+                  fr:"Sur quoi as-tu changé d'avis au cours de la dernière année ?"},
+      {cat:'deep', en:"What quality do you look for in a good friend?",
+                  es:"¿Qué cualidad buscas en un buen amigo o buena amiga?",
+                  fr:"Quelle qualité recherches-tu chez un bon ami ou une bonne amie ?"},
+
+      // ─── WOULD YOU RATHER (15) ───
       {cat:'wyr', en:"Would you rather have unlimited free time or unlimited money?",
                   es:"¿Preferirías tener tiempo libre ilimitado o dinero ilimitado?",
                   fr:"Préférerais-tu avoir du temps libre illimité ou de l'argent illimité ?"},
@@ -357,7 +389,23 @@
                   es:"¿Preferirías ser la persona más graciosa del cuarto o la más inteligente?",
                   fr:"Préférerais-tu être la personne la plus drôle de la pièce ou la plus intelligente ?"},
 
-      // ─── ABOUT YOU (10) ───
+      {cat:'wyr', en:"Would you rather speak to animals or fluently speak 5 human languages?",
+                  es:"¿Preferirías poder hablar con animales o hablar 5 idiomas humanos con fluidez?",
+                  fr:"Préférerais-tu parler aux animaux ou parler couramment 5 langues humaines ?"},
+      {cat:'wyr', en:"Would you rather always be 10 minutes late or 20 minutes early to everything?",
+                  es:"¿Preferirías siempre llegar 10 minutos tarde o 20 minutos temprano a todo?",
+                  fr:"Préférerais-tu toujours arriver 10 minutes en retard ou 20 minutes en avance partout ?"},
+      {cat:'wyr', en:"Would you rather have a personal chef or a personal driver?",
+                  es:"¿Preferirías tener un chef personal o un chofer personal?",
+                  fr:"Préférerais-tu avoir un chef personnel ou un chauffeur personnel ?"},
+      {cat:'wyr', en:"Would you rather never lose your phone again or never lose your keys again?",
+                  es:"¿Preferirías nunca volver a perder tu celular o nunca volver a perder tus llaves?",
+                  fr:"Préférerais-tu ne jamais reperdre ton téléphone ou ne jamais reperdre tes clés ?"},
+      {cat:'wyr', en:"Would you rather explore the deep ocean or outer space?",
+                  es:"¿Preferirías explorar las profundidades del océano o el espacio exterior?",
+                  fr:"Préférerais-tu explorer les profondeurs de l'océan ou l'espace ?"},
+
+      // ─── ABOUT YOU (15) ───
       {cat:'you', en:"What's your favorite way to spend a Saturday?",
                   es:"¿Cuál es tu forma favorita de pasar un sábado?",
                   fr:"Quelle est ta façon préférée de passer un samedi ?"},
@@ -389,7 +437,23 @@
                   es:"Si tuvieras que describir tu energía de hoy con un pronóstico del clima, ¿cuál sería?",
                   fr:"Si tu devais décrire ton énergie d'aujourd'hui avec un bulletin météo, ce serait quoi ?"},
 
-      // ─── HYPOTHETICAL (10) ───
+      {cat:'you', en:"What app do you spend the most time on?",
+                  es:"¿En qué aplicación pasas más tiempo?",
+                  fr:"Sur quelle application passes-tu le plus de temps ?"},
+      {cat:'you', en:"What's a hidden gem in this town most people don't know about?",
+                  es:"¿Cuál es un lugar escondido de este pueblo que la mayoría no conoce?",
+                  fr:"Quel est un endroit méconnu de cette ville que la plupart des gens ignorent ?"},
+      {cat:'you', en:"Who's an artist or creator you'd recommend to me?",
+                  es:"¿Qué artista o creador me recomendarías?",
+                  fr:"Quel artiste ou créateur me recommanderais-tu ?"},
+      {cat:'you', en:"What's something you looked forward to as a kid that you miss now?",
+                  es:"¿Qué esperabas con emoción cuando eras niño o niña y ahora extrañas?",
+                  fr:"Qu'attendais-tu avec impatience quand tu étais enfant et qui te manque maintenant ?"},
+      {cat:'you', en:"What's your go-to snack right now?",
+                  es:"¿Cuál es tu snack favorito en este momento?",
+                  fr:"Quel est ton en-cas préféré en ce moment ?"},
+
+      // ─── HYPOTHETICAL (15) ───
       {cat:'hypo', en:"If you could add one holiday to the school year, what would it celebrate?",
                    es:"Si pudieras agregar un día festivo al año escolar, ¿qué celebraría?",
                    fr:"Si tu pouvais ajouter un jour férié à l'année scolaire, qu'est-ce qu'il célébrerait ?"},
@@ -419,7 +483,23 @@
                    fr:"Si l'argent et les notes n'avaient pas d'importance, à quoi passerais-tu ton année scolaire ?"},
       {cat:'hypo', en:"If you had to give a TED talk tomorrow, what would it be about?",
                    es:"Si tuvieras que dar una charla TED mañana, ¿de qué sería?",
-                   fr:"Si tu devais donner une conférence TED demain, ce serait sur quoi ?"}
+                   fr:"Si tu devais donner une conférence TED demain, ce serait sur quoi ?"},
+      {cat:'hypo', en:"If your class had to solve one real-world problem this year, what would you pick?",
+                  es:"Si tu clase tuviera que resolver un problema del mundo real este año, ¿cuál escogerías?",
+                  fr:"Si ta classe devait résoudre un problème réel cette année, lequel choisirais-tu ?"},
+      {cat:'hypo', en:"If you had to teach a one-hour class on anything, what would it be?",
+                  es:"Si tuvieras que enseñar una clase de una hora sobre cualquier tema, ¿cuál sería?",
+                  fr:"Si tu devais donner un cours d'une heure sur n'importe quel sujet, ce serait quoi ?"},
+      {cat:'hypo', en:"If you could design the perfect lunch break, what would it look like?",
+                  es:"Si pudieras diseñar la hora del almuerzo perfecta, ¿cómo sería?",
+                  fr:"Si tu pouvais concevoir la pause déjeuner parfaite, à quoi ressemblerait-elle ?"},
+      {cat:'hypo', en:"If everyone in the world had to move to one city, which one and why?",
+                  es:"Si todo el mundo tuviera que mudarse a una sola ciudad, ¿cuál y por qué?",
+                  fr:"Si tout le monde devait déménager dans une seule ville, laquelle et pourquoi ?"},
+      {cat:'hypo', en:"If you had a superpower that only worked on Mondays, what would it be?",
+                  es:"Si tuvieras un superpoder que solo funcionara los lunes, ¿cuál sería?",
+                  fr:"Si tu avais un super-pouvoir qui ne fonctionnait que le lundi, ce serait lequel ?"},
+
     ];
 
     // ── STATE ──
