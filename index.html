@@ -1329,7 +1329,7 @@
         <a href="extension_search.html" class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">🔍</span>Staff Search</a>
         <a href="panther_prompts.html"  class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">❓</span>Panther Prompts</a>
         <a href="map.html"              class="nav-menu-item nav-link" role="menuitem" hidden><span class="nav-menu-icon">🗺️</span>Campus Map</a>
-        <button id="newsMenuBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon">📰</span>News</button>
+        <a href="https://www.parentsquare.com/" target="_blank" rel="noopener" class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">📰</span>News</a>
         <div id="popoutMenuSep" class="nav-menu-sep"></div>
         <button id="popoutBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon">🪟</span>Pop Out</button>
         <div id="embedMenuSep" class="nav-menu-sep" style="display:none"></div>
@@ -1923,18 +1923,26 @@
     // ── NEWS CHOOSER ────────────────────────────────────────────
     (function() {
       const newsChooser = document.getElementById('newsChooser');
+      const PARENTSQUARE_URL = 'https://www.parentsquare.com/';
       function openChooser() { if (newsChooser) newsChooser.hidden = false; }
       function closeChooser() { if (newsChooser) newsChooser.hidden = true; }
-      // News button goes straight to Current Events (toggle inside modal handles switching)
-      document.getElementById('newsBtn')?.addEventListener('click', function() { openNewsModal('events'); });
+      // News (both the removed home tile and the nav dropdown link) now points
+      // directly at ParentSquare — no custom in-app news feed anymore. Athletics
+      // still uses the in-app modal (openNewsModal('athletics')).
       document.getElementById('athBtn')?.addEventListener('click', function() { openNewsModal('athletics'); });
-      document.getElementById('newsMenuBtn')?.addEventListener('click', function() {
-        navMenu?.classList.remove('is-open');
-        navMenuBtn?.classList.remove('is-open');
-        openNewsModal('events');
-      });
       document.getElementById('newsChooserClose')?.addEventListener('click', closeChooser);
       document.getElementById('newsChooserBackdrop')?.addEventListener('click', closeChooser);
+      // Athletics-modal "Current Events" toggle → ParentSquare (external, new tab)
+      document.getElementById('toggleEvents')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.open(PARENTSQUARE_URL, '_blank', 'noopener');
+      });
+      // Legacy news-chooser popup: Current Events option also → ParentSquare
+      document.getElementById('newsChooserEvents')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.open(PARENTSQUARE_URL, '_blank', 'noopener');
+        closeChooser();
+      });
 
       // Directory chooser (Staff Search vs Campus Map)
       // DIRECTORY CHOOSER — shelved until campus map is complete; restore when ready
@@ -1992,10 +2000,10 @@
           toggleAthleticsBtn.classList.remove('is-active');
         }
       }
-      toggleEventsBtn?.addEventListener('click', function() { openNewsModal('events'); });
+      // toggleEventsBtn is wired above to open ParentSquare externally (in-app news feed retired).
       toggleAthleticsBtn?.addEventListener('click', function() { openNewsModal('athletics'); });
 
-      document.getElementById('newsChooserEvents')?.addEventListener('click', function() { openNewsModal('events'); });
+      // newsChooserEvents is wired above to open ParentSquare externally.
       document.getElementById('newsChooserAthletics')?.addEventListener('click', function() { openNewsModal('athletics'); });
       document.getElementById('newsClose')?.addEventListener('click', closeNews);
       document.getElementById('newsBack')?.addEventListener('click', showList);
@@ -2487,13 +2495,14 @@
       // Also check on page load for background alerts
       checkAthGameDay();
 
-      // ── DEEP-LINK: #news or #news-<id> ────────────────────────
+      // ── DEEP-LINK: #news or #news-<id> → ParentSquare (external) ─────
+      // In-app news feed retired; any legacy #news deep-link now redirects
+      // to ParentSquare in a new tab. Article-specific IDs can't be resolved
+      // to ParentSquare URLs, so all variants land on the main feed.
       var _dlHash = window.location.hash;
       if (_dlHash === '#news' || _dlHash.startsWith('#news-')) {
-        var _dlNewsId = _dlHash.startsWith('#news-') ? _dlHash.slice(6) : null;
-        if (_dlNewsId) _pendingNewsId = _dlNewsId;
-        openNewsModal('events');
         history.replaceState(null, '', window.location.pathname + window.location.search);
+        window.open('https://www.parentsquare.com/', '_blank', 'noopener');
       }
 
     })();
