@@ -128,6 +128,106 @@
     .footer-note { text-align:center; font-size:9.5px; color:#b5d4d4; font-weight:600; padding:8px 0 3px; margin-top:auto; flex-shrink:0; opacity:0.75; }
     .footer-version { text-align:center; font-size:8.5px; color:#b5d4d4; opacity:0.55; padding:0 0 6px; font-weight:500; letter-spacing:0.04em; }
 
+    /* ── EMBED MODE ─────────────────────────────────────────
+       Rendered inside an iframe (?mode=embed): strip chrome
+       that only makes sense on the standalone page.            */
+    body.is-embed .nav-menu-btn { display:none; }
+    body.is-embed .footer-note,
+    body.is-embed .footer-version { display:none; }
+    html.is-embed-root,
+    html.is-embed-root body {
+      background:transparent !important;
+    }
+    body.is-embed .frame {
+      padding:0; height:100dvh; min-height:100vh;
+    }
+    body.is-embed .app {
+      width:100%; height:100%; max-width:100%; max-height:100%;
+      border-radius:20px;
+    }
+
+    /* Embed setup modal — matches the countdown modal styling */
+    .embed-modal[hidden] { display:none; }
+    .embed-modal {
+      position:fixed; inset:0; z-index:10000;
+      display:flex; align-items:center; justify-content:center;
+      padding:20px;
+    }
+    .embed-backdrop {
+      position:absolute; inset:0;
+      background:rgba(0,10,10,0.65);
+      backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+    }
+    .embed-dialog {
+      position:relative; z-index:1;
+      width:min(520px, 100%); max-height:90vh; overflow:auto;
+      background:linear-gradient(168deg, rgba(6,28,28,0.98) 0%, rgba(0,72,72,0.92) 100%);
+      border:1px solid rgba(255,255,255,0.16); border-radius:20px;
+      padding:22px; color:var(--white);
+      box-shadow:0 24px 60px rgba(0,0,0,0.55);
+    }
+    .embed-header {
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; margin-bottom:6px;
+    }
+    .embed-title {
+      font-size:16px; font-weight:900;
+      letter-spacing:0.08em; text-transform:uppercase;
+      color:#dff7f7; margin:0;
+    }
+    .embed-close {
+      appearance:none; background:rgba(255,255,255,0.08);
+      border:1px solid rgba(255,255,255,0.14); border-radius:10px;
+      color:#eaf8f8; padding:6px 12px; font-size:11px; font-weight:800;
+      letter-spacing:0.1em; text-transform:uppercase; cursor:pointer;
+    }
+    .embed-close:active { background:rgba(255,255,255,0.14); }
+    .embed-note {
+      font-size:12px; color:var(--muted); line-height:1.4;
+      margin:6px 0 14px;
+    }
+    .embed-presets {
+      display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;
+    }
+    .embed-preset {
+      appearance:none; flex:1 1 auto;
+      padding:10px 14px; border-radius:12px;
+      border:1px solid rgba(255,255,255,0.14);
+      background:rgba(255,255,255,0.05); color:#eaf8f8;
+      font-size:11px; font-weight:800; letter-spacing:0.1em;
+      text-transform:uppercase; cursor:pointer;
+      transition:background 0.15s, border-color 0.15s;
+    }
+    .embed-preset:hover { background:rgba(255,255,255,0.1); }
+    .embed-preset.is-active {
+      background:linear-gradient(180deg, rgba(0,180,180,0.4), rgba(0,140,140,0.28));
+      border-color:rgba(75,225,225,0.5);
+      color:#fff;
+    }
+    .embed-code {
+      width:100%; min-height:110px;
+      padding:12px; border-radius:12px;
+      border:1px solid rgba(255,255,255,0.14);
+      background:rgba(0,0,0,0.25); color:#eaf8f8;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+      font-size:11.5px; line-height:1.4; resize:vertical;
+    }
+    .embed-actions {
+      display:flex; align-items:center; gap:12px; margin-top:12px;
+    }
+    .embed-copy {
+      appearance:none;
+      padding:10px 16px; border-radius:12px;
+      border:1px solid rgba(75,225,225,0.4);
+      background:linear-gradient(180deg, rgba(0,180,180,0.4), rgba(0,140,140,0.28));
+      color:#fff; font-size:11px; font-weight:900;
+      letter-spacing:0.12em; text-transform:uppercase; cursor:pointer;
+    }
+    .embed-copy:active { transform:scale(0.98); }
+    .embed-status {
+      font-size:11px; color:var(--muted); opacity:0.85;
+    }
+
     /* Standalone */
     body.is-standalone { background:#021414; }
     body.is-standalone::before { content:""; position:fixed; inset:0; background:#021414; pointer-events:none; z-index:0; }
@@ -168,6 +268,7 @@
                 <option value="en">🇺🇸  English</option>
                 <option value="es">🇪🇸  Español</option>
                 <option value="fr">🇫🇷  Français</option>
+                <option value="it">🇮🇹  Italiano</option>
               </select>
               <span class="pp-select-chevron" aria-hidden="true">▾</span>
             </div>
@@ -212,7 +313,7 @@
         </div>
 
         <div class="footer-note">By: <a href="https://www.creativesilva.com" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">CreativeSilva</a></div>
-        <div class="footer-version">Panther Prompts · v1.3 · Updated Aug 12, 2026</div>
+        <div class="footer-version">Panther Prompts · v1.4 · Updated Aug 20, 2026</div>
       </div>
     </div>
   </div>
@@ -224,39 +325,62 @@
     <a href="calendar.html"         class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">📅</span>Calendar</a>
     <a href="extension_search.html" class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">🔍</span>Directory</a>
     <a href="panther_prompts.html"  class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">❓</span>Panther Prompts</a>
+    <button id="embedBtn" class="nav-menu-item" type="button" role="menuitem" style="display:none"><span class="nav-menu-icon">📋</span>Embed</button>
   </nav>
+
+  <!-- Embed setup modal (hidden until 'Embed' clicked) -->
+  <div id="embedModal" class="embed-modal" hidden>
+    <div class="embed-backdrop" id="embedBackdrop"></div>
+    <div class="embed-dialog" role="dialog" aria-modal="true" aria-labelledby="embedTitle">
+      <div class="embed-header">
+        <h2 id="embedTitle" class="embed-title">Embed Panther Prompts</h2>
+        <button id="embedCloseBtn" class="embed-close" type="button">Close</button>
+      </div>
+      <p class="embed-note">Pick a preset, then copy the clean embed code for a Canvas page or a ClassroomScreen widget. Students tap the card to draw the next prompt.</p>
+      <div class="embed-presets">
+        <button class="embed-preset is-active" type="button" data-embed-target="canvas">Canvas</button>
+        <button class="embed-preset" type="button" data-embed-target="classroomscreen">ClassroomScreen</button>
+      </div>
+      <textarea id="embedCode" class="embed-code" readonly></textarea>
+      <div class="embed-actions">
+        <button id="copyEmbedBtn" class="embed-copy" type="button">Copy Code</button>
+        <span id="embedStatus" class="embed-status">Canvas preset selected.</span>
+      </div>
+    </div>
+  </div>
 
   <script>
     // ─────────────────────────────────────────────────────────────────────────
-    // PANTHER PROMPTS · v1 · Aug 12, 2026
-    // 50 conversation starters, teacher-facing, EN/ES/FR, 5 categories.
+    // PANTHER PROMPTS · v1.4 · Aug 20, 2026
+    // 75 conversation starters, teacher-facing, EN/ES/FR/IT, 5 categories.
     // To add a language: extend each PROMPT with the new key + T strings + CATS
-    // labels + <button data-lang="xx"> to home. Question count stays at 50.
+    // labels + <option value="xx"> to the language <select>. Question count is 75.
     // ─────────────────────────────────────────────────────────────────────────
 
-    // Category metadata: emoji + trilingual label
+    // Category metadata: emoji + quadrilingual label (EN/ES/FR/IT)
     const CATS = {
-      fun:  { emoji:'😄', en:'Fun',              es:'Divertidas',       fr:'Fun' },
-      deep: { emoji:'🤔', en:'Deep',             es:'Profundas',        fr:'Profondes' },
-      wyr:  { emoji:'⚖️', en:'Would You Rather', es:'¿Qué Preferirías?', fr:'Tu Préfères' },
-      you:  { emoji:'🎯', en:'About You',        es:'Sobre Ti',         fr:'À Propos de Toi' },
-      hypo: { emoji:'🌈', en:'Hypothetical',     es:'Hipotéticas',      fr:'Hypothétiques' }
+      fun:  { emoji:'😄', en:'Fun',              es:'Divertidas',       fr:'Fun',             it:'Divertenti'    },
+      deep: { emoji:'🤔', en:'Deep',             es:'Profundas',        fr:'Profondes',       it:'Profonde'      },
+      wyr:  { emoji:'⚖️', en:'Would You Rather', es:'¿Qué Preferirías?', fr:'Tu Préfères',    it:'Preferiresti'  },
+      you:  { emoji:'🎯', en:'About You',        es:'Sobre Ti',         fr:'À Propos de Toi', it:'Su di Te'      },
+      hypo: { emoji:'🌈', en:'Hypothetical',     es:'Hipotéticas',      fr:'Hypothétiques',   it:'Ipotetiche'    }
     };
 
     // UI strings
     const T = {
-      title:      { en:'Panther Prompts',   es:'Panther Prompts',    fr:'Panther Prompts' },
+      title:      { en:'Panther Prompts',   es:'Panther Prompts',    fr:'Panther Prompts',   it:'Panther Prompts' },
       sub:        { en:'Conversation starters for your class',
                     es:'Iniciadores de conversación para tu clase',
-                    fr:'Amorces de conversation pour ta classe' },
-      langLabel:  { en:'Choose your language', es:'Elige tu idioma',   fr:'Choisis ta langue' },
-      catLabel:   { en:'Choose a vibe',        es:'Elige un ambiente', fr:'Choisis une ambiance' },
-      all:        { en:'All',                  es:'Todas',             fr:'Toutes' },
-      start:      { en:'Start ▶',              es:'Empezar ▶',         fr:'Commencer ▶' },
-      back:       { en:'← Back',               es:'← Atrás',           fr:'← Retour' },
-      next:       { en:'Next →',               es:'Siguiente →',       fr:'Suivant →' },
-      done:       { en:'Done ✓',               es:'Listo ✓',           fr:'Terminé ✓' },
-      counter:    { en:'of',                   es:'de',                fr:'sur' }
+                    fr:'Amorces de conversation pour ta classe',
+                    it:'Spunti di conversazione per la tua classe' },
+      langLabel:  { en:'Choose your language', es:'Elige tu idioma',   fr:'Choisis ta langue',    it:'Scegli la tua lingua' },
+      catLabel:   { en:'Choose a vibe',        es:'Elige un ambiente', fr:'Choisis une ambiance', it:"Scegli un'atmosfera"  },
+      all:        { en:'All',                  es:'Todas',             fr:'Toutes',               it:'Tutte'                },
+      start:      { en:'Start ▶',              es:'Empezar ▶',         fr:'Commencer ▶',          it:'Inizia ▶'             },
+      back:       { en:'← Back',               es:'← Atrás',           fr:'← Retour',             it:'← Indietro'           },
+      next:       { en:'Next →',               es:'Siguiente →',       fr:'Suivant →',            it:'Avanti →'             },
+      done:       { en:'Done ✓',               es:'Listo ✓',           fr:'Terminé ✓',            it:'Fatto ✓'              },
+      counter:    { en:'of',                   es:'de',                fr:'sur',                  it:'di'                   }
     };
 
     // 50 PROMPTS — EN/ES/FR, categorized
@@ -264,241 +388,316 @@
       // ─── FUN (15) ───
       {cat:'fun', en:"What's a small thing that always makes you smile?",
                   es:"¿Qué pequeña cosa siempre te hace sonreír?",
-                  fr:"Quelle petite chose te fait toujours sourire ?"},
+                  fr:"Quelle petite chose te fait toujours sourire ?",
+                  it:"Qual è una piccola cosa che ti fa sempre sorridere?"},
       {cat:'fun', en:"If you had a warning label, what would it say?",
                   es:"Si tuvieras una etiqueta de advertencia, ¿qué diría?",
-                  fr:"Si tu avais une étiquette d'avertissement, qu'est-ce qu'elle dirait ?"},
+                  fr:"Si tu avais une étiquette d'avertissement, qu'est-ce qu'elle dirait ?",
+                  it:"Se avessi un'etichetta di avvertimento, cosa direbbe?"},
       {cat:'fun', en:"What's the most useless talent you have?",
                   es:"¿Cuál es el talento más inútil que tienes?",
-                  fr:"Quel est le talent le plus inutile que tu as ?"},
+                  fr:"Quel est le talent le plus inutile que tu as ?",
+                  it:"Qual è il talento più inutile che hai?"},
       {cat:'fun', en:"What song do you always end up singing in the shower?",
                   es:"¿Qué canción siempre terminas cantando en la ducha?",
-                  fr:"Quelle chanson finis-tu toujours par chanter sous la douche ?"},
+                  fr:"Quelle chanson finis-tu toujours par chanter sous la douche ?",
+                  it:"Quale canzone finisci sempre per cantare sotto la doccia?"},
       {cat:'fun', en:"What emoji do you overuse?",
                   es:"¿Qué emoji usas demasiado?",
-                  fr:"Quel emoji utilises-tu trop souvent ?"},
+                  fr:"Quel emoji utilises-tu trop souvent ?",
+                  it:"Quale emoji usi troppo spesso?"},
       {cat:'fun', en:"If your life was a movie, what would the title be?",
                   es:"Si tu vida fuera una película, ¿cuál sería el título?",
-                  fr:"Si ta vie était un film, quel en serait le titre ?"},
+                  fr:"Si ta vie était un film, quel en serait le titre ?",
+                  it:"Se la tua vita fosse un film, quale sarebbe il titolo?"},
       {cat:'fun', en:"What's the weirdest food combination you actually like?",
                   es:"¿Cuál es la combinación de comida más rara que en realidad te gusta?",
-                  fr:"Quelle est la combinaison alimentaire la plus bizarre que tu aimes vraiment ?"},
+                  fr:"Quelle est la combinaison alimentaire la plus bizarre que tu aimes vraiment ?",
+                  it:"Qual è la combinazione di cibi più strana che ti piace davvero?"},
       {cat:'fun', en:"What's a random fun fact you know that no one asked for?",
                   es:"¿Cuál es un dato curioso que sabes y que nadie te preguntó?",
-                  fr:"Quel fait amusant connais-tu que personne ne t'a demandé ?"},
+                  fr:"Quel fait amusant connais-tu que personne ne t'a demandé ?",
+                  it:"Qual è una curiosità che conosci e che nessuno ti ha chiesto?"},
       {cat:'fun', en:"If you had to eat one meal for a week straight, what would it be?",
                   es:"Si tuvieras que comer la misma comida por una semana entera, ¿cuál sería?",
-                  fr:"Si tu devais manger le même repas pendant une semaine entière, ce serait quoi ?"},
+                  fr:"Si tu devais manger le même repas pendant une semaine entière, ce serait quoi ?",
+                  it:"Se dovessi mangiare lo stesso pasto per una settimana intera, quale sarebbe?"},
       {cat:'fun', en:"What song always puts you in a good mood?",
                   es:"¿Qué canción siempre te pone de buen humor?",
-                  fr:"Quelle chanson te met toujours de bonne humeur ?"},
+                  fr:"Quelle chanson te met toujours de bonne humeur ?",
+                  it:"Quale canzone ti mette sempre di buon umore?"},
 
       {cat:'fun', en:"What's a hill you'd die on that's completely unimportant?",
                   es:"¿Cuál es una opinión sin importancia que defenderías con todo?",
-                  fr:"Quelle est une opinion sans importance que tu défends bec et ongles ?"},
+                  fr:"Quelle est une opinion sans importance que tu défends bec et ongles ?",
+                  it:"Qual è un'opinione senza importanza che difenderesti a spada tratta?"},
       {cat:'fun', en:"What's your comfort show — the one you rewatch?",
                   es:"¿Cuál es tu serie de confort — la que ves una y otra vez?",
-                  fr:"Quelle est ta série doudou — celle que tu regardes encore et encore ?"},
+                  fr:"Quelle est ta série doudou — celle que tu regardes encore et encore ?",
+                  it:"Qual è la tua serie del cuore — quella che riguardi sempre?"},
       {cat:'fun', en:"If you could rename yourself, what would you pick?",
                   es:"Si pudieras cambiarte el nombre, ¿cuál escogerías?",
-                  fr:"Si tu pouvais changer de prénom, lequel choisirais-tu ?"},
+                  fr:"Si tu pouvais changer de prénom, lequel choisirais-tu ?",
+                  it:"Se potessi cambiare il tuo nome, quale sceglieresti?"},
       {cat:'fun', en:"What sound do you actually enjoy that most people hate?",
                   es:"¿Qué sonido realmente disfrutas que a la mayoría no le gusta?",
-                  fr:"Quel son aimes-tu vraiment que la plupart des gens détestent ?"},
+                  fr:"Quel son aimes-tu vraiment que la plupart des gens détestent ?",
+                  it:"Quale suono ti piace davvero che la maggior parte delle persone odia?"},
       {cat:'fun', en:"What's a random skill you're weirdly good at?",
                   es:"¿En qué habilidad rara eres inesperadamente bueno o buena?",
-                  fr:"Quelle compétence bizarre maîtrises-tu étonnamment bien ?"},
+                  fr:"Quelle compétence bizarre maîtrises-tu étonnamment bien ?",
+                  it:"In quale abilità strana sei sorprendentemente bravo o brava?"},
 
       // ─── DEEP (15) ───
       {cat:'deep', en:"What's something you believed as a kid that turned out to be wrong?",
                    es:"¿Qué creías cuando eras niño o niña que resultó ser falso?",
-                   fr:"Qu'est-ce que tu croyais quand tu étais enfant qui s'est révélé faux ?"},
+                   fr:"Qu'est-ce que tu croyais quand tu étais enfant qui s'est révélé faux ?",
+                   it:"Cosa credevi da bambino o bambina che si è rivelato falso?"},
       {cat:'deep', en:"If you could tell your younger self one thing, what would it be?",
                    es:"Si pudieras decirle una cosa a tu yo del pasado, ¿qué sería?",
-                   fr:"Si tu pouvais dire une chose à ton toi plus jeune, ce serait quoi ?"},
+                   fr:"Si tu pouvais dire une chose à ton toi plus jeune, ce serait quoi ?",
+                   it:"Se potessi dire una cosa al te stesso del passato, cosa sarebbe?"},
       {cat:'deep', en:"What's a lesson you learned the hard way?",
                    es:"¿Qué lección aprendiste a la mala?",
-                   fr:"Quelle leçon as-tu apprise à tes dépens ?"},
+                   fr:"Quelle leçon as-tu apprise à tes dépens ?",
+                   it:"Qual è una lezione che hai imparato nel modo più duro?"},
       {cat:'deep', en:"What does success look like to you — not to your parents or teachers?",
                    es:"¿Cómo se ve el éxito para ti — no para tus papás o maestros?",
-                   fr:"À quoi ressemble la réussite pour toi — pas pour tes parents ou tes profs ?"},
+                   fr:"À quoi ressemble la réussite pour toi — pas pour tes parents ou tes profs ?",
+                   it:"Come appare il successo per te — non per i tuoi genitori o insegnanti?"},
       {cat:'deep', en:"What's something you're proud of but don't usually talk about?",
                    es:"¿De qué estás orgulloso u orgullosa pero normalmente no hablas?",
-                   fr:"De quoi es-tu fier ou fière mais dont tu ne parles pas souvent ?"},
+                   fr:"De quoi es-tu fier ou fière mais dont tu ne parles pas souvent ?",
+                   it:"Di cosa sei orgoglioso o orgogliosa ma di solito non parli?"},
       {cat:'deep', en:"When do you feel most like yourself?",
                    es:"¿Cuándo te sientes más como tú mismo o tú misma?",
-                   fr:"Quand te sens-tu le plus toi-même ?"},
+                   fr:"Quand te sens-tu le plus toi-même ?",
+                   it:"Quando ti senti più te stesso o te stessa?"},
       {cat:'deep', en:"What's something you wish more people understood about you?",
                    es:"¿Qué te gustaría que más personas entendieran sobre ti?",
-                   fr:"Qu'aimerais-tu que plus de gens comprennent sur toi ?"},
+                   fr:"Qu'aimerais-tu que plus de gens comprennent sur toi ?",
+                   it:"Cosa vorresti che più persone capissero di te?"},
       {cat:'deep', en:"What advice would you give to a freshman on day one?",
                    es:"¿Qué consejo le darías a un estudiante nuevo en su primer día?",
-                   fr:"Quel conseil donnerais-tu à un élève de première année le jour de la rentrée ?"},
+                   fr:"Quel conseil donnerais-tu à un élève de première année le jour de la rentrée ?",
+                   it:"Quale consiglio daresti a uno studente del primo anno il primo giorno?"},
       {cat:'deep', en:"What's a fear you've overcome?",
                    es:"¿Qué miedo has superado?",
-                   fr:"Quelle peur as-tu surmontée ?"},
+                   fr:"Quelle peur as-tu surmontée ?",
+                   it:"Quale paura hai superato?"},
       {cat:'deep', en:"What's something you'd want to be remembered for?",
                    es:"¿Por qué te gustaría ser recordado o recordada?",
-                   fr:"Pour quoi aimerais-tu qu'on se souvienne de toi ?"},
+                   fr:"Pour quoi aimerais-tu qu'on se souvienne de toi ?",
+                   it:"Per cosa vorresti essere ricordato o ricordata?"},
 
       {cat:'deep', en:"What's a compliment you got that stuck with you?",
                   es:"¿Qué cumplido recibiste que se te quedó grabado?",
-                  fr:"Quel compliment as-tu reçu qui t'est resté ?"},
+                  fr:"Quel compliment as-tu reçu qui t'est resté ?",
+                  it:"Quale complimento hai ricevuto che ti è rimasto impresso?"},
       {cat:'deep', en:"What's something you thought would be a big deal but wasn't?",
                   es:"¿Qué pensaste que sería un gran problema pero no lo fue?",
-                  fr:"Qu'as-tu cru être un gros problème mais qui ne l'était pas ?"},
+                  fr:"Qu'as-tu cru être un gros problème mais qui ne l'était pas ?",
+                  it:"Cosa pensavi sarebbe stato un grosso problema ma non lo è stato?"},
       {cat:'deep', en:"What's one way school could be better for students like you?",
                   es:"¿De qué manera podría mejorar la escuela para estudiantes como tú?",
-                  fr:"Comment l'école pourrait-elle être meilleure pour des élèves comme toi ?"},
+                  fr:"Comment l'école pourrait-elle être meilleure pour des élèves comme toi ?",
+                  it:"In che modo la scuola potrebbe essere migliore per studenti come te?"},
       {cat:'deep', en:"What's something you've changed your mind about in the last year?",
                   es:"¿Sobre qué has cambiado de opinión en el último año?",
-                  fr:"Sur quoi as-tu changé d'avis au cours de la dernière année ?"},
+                  fr:"Sur quoi as-tu changé d'avis au cours de la dernière année ?",
+                  it:"Su cosa hai cambiato idea nell'ultimo anno?"},
       {cat:'deep', en:"What quality do you look for in a good friend?",
                   es:"¿Qué cualidad buscas en un buen amigo o buena amiga?",
-                  fr:"Quelle qualité recherches-tu chez un bon ami ou une bonne amie ?"},
+                  fr:"Quelle qualité recherches-tu chez un bon ami ou une bonne amie ?",
+                  it:"Quale qualità cerchi in un buon amico o una buona amica?"},
 
       // ─── WOULD YOU RATHER (15) ───
       {cat:'wyr', en:"Would you rather have unlimited free time or unlimited money?",
                   es:"¿Preferirías tener tiempo libre ilimitado o dinero ilimitado?",
-                  fr:"Préférerais-tu avoir du temps libre illimité ou de l'argent illimité ?"},
+                  fr:"Préférerais-tu avoir du temps libre illimité ou de l'argent illimité ?",
+                  it:"Preferiresti avere tempo libero illimitato o denaro illimitato?"},
       {cat:'wyr', en:"Would you rather speak every language or play every instrument?",
                   es:"¿Preferirías poder hablar todos los idiomas o tocar todos los instrumentos?",
-                  fr:"Préférerais-tu parler toutes les langues ou jouer de tous les instruments ?"},
+                  fr:"Préférerais-tu parler toutes les langues ou jouer de tous les instruments ?",
+                  it:"Preferiresti parlare tutte le lingue o suonare tutti gli strumenti?"},
       {cat:'wyr', en:"Would you rather always know when someone is lying or always get away with lying?",
                   es:"¿Preferirías siempre saber cuándo alguien miente o siempre poder mentir sin que te descubran?",
-                  fr:"Préférerais-tu toujours savoir quand quelqu'un ment ou toujours pouvoir mentir sans être découvert ?"},
+                  fr:"Préférerais-tu toujours savoir quand quelqu'un ment ou toujours pouvoir mentir sans être découvert ?",
+                  it:"Preferiresti sapere sempre quando qualcuno mente o riuscire sempre a mentire senza essere scoperto?"},
       {cat:'wyr', en:"Would you rather have a rewind button for your life or a pause button?",
                   es:"¿Preferirías tener un botón de retroceso en tu vida o un botón de pausa?",
-                  fr:"Préférerais-tu avoir un bouton pour revenir en arrière dans ta vie ou un bouton pause ?"},
+                  fr:"Préférerais-tu avoir un bouton pour revenir en arrière dans ta vie ou un bouton pause ?",
+                  it:"Preferiresti avere un pulsante per riavvolgere la tua vita o un pulsante di pausa?"},
       {cat:'wyr', en:"Would you rather live without music or without movies?",
                   es:"¿Preferirías vivir sin música o sin películas?",
-                  fr:"Préférerais-tu vivre sans musique ou sans films ?"},
+                  fr:"Préférerais-tu vivre sans musique ou sans films ?",
+                  it:"Preferiresti vivere senza musica o senza film?"},
       {cat:'wyr', en:"Would you rather be famous for something you didn't do or unknown for something amazing you did?",
                   es:"¿Preferirías ser famoso o famosa por algo que no hiciste, o desconocido por algo increíble que sí hiciste?",
-                  fr:"Préférerais-tu être célèbre pour quelque chose que tu n'as pas fait ou inconnu pour quelque chose d'incroyable que tu as fait ?"},
+                  fr:"Préférerais-tu être célèbre pour quelque chose que tu n'as pas fait ou inconnu pour quelque chose d'incroyable que tu as fait ?",
+                  it:"Preferiresti essere famoso per qualcosa che non hai fatto o sconosciuto per qualcosa di straordinario che hai fatto?"},
       {cat:'wyr', en:"Would you rather be able to teleport anywhere or read minds?",
                   es:"¿Preferirías poder teletransportarte a cualquier lugar o leer mentes?",
-                  fr:"Préférerais-tu pouvoir te téléporter n'importe où ou lire dans les pensées ?"},
+                  fr:"Préférerais-tu pouvoir te téléporter n'importe où ou lire dans les pensées ?",
+                  it:"Preferiresti poterti teletrasportare ovunque o leggere nel pensiero?"},
       {cat:'wyr', en:"Would you rather always have to sing instead of speak or dance everywhere you go?",
                   es:"¿Preferirías siempre tener que cantar en lugar de hablar o bailar en todos lados a los que vayas?",
-                  fr:"Préférerais-tu toujours chanter au lieu de parler ou danser partout où tu vas ?"},
+                  fr:"Préférerais-tu toujours chanter au lieu de parler ou danser partout où tu vas ?",
+                  it:"Preferiresti dover sempre cantare invece di parlare o ballare ovunque tu vada?"},
       {cat:'wyr', en:"Would you rather have no internet or no air conditioning?",
                   es:"¿Preferirías no tener internet o no tener aire acondicionado?",
-                  fr:"Préférerais-tu ne pas avoir Internet ou pas de climatisation ?"},
+                  fr:"Préférerais-tu ne pas avoir Internet ou pas de climatisation ?",
+                  it:"Preferiresti non avere Internet o non avere l'aria condizionata?"},
       {cat:'wyr', en:"Would you rather be the funniest person in the room or the smartest?",
                   es:"¿Preferirías ser la persona más graciosa del cuarto o la más inteligente?",
-                  fr:"Préférerais-tu être la personne la plus drôle de la pièce ou la plus intelligente ?"},
+                  fr:"Préférerais-tu être la personne la plus drôle de la pièce ou la plus intelligente ?",
+                  it:"Preferiresti essere la persona più divertente della stanza o la più intelligente?"},
 
       {cat:'wyr', en:"Would you rather speak to animals or fluently speak 5 human languages?",
                   es:"¿Preferirías poder hablar con animales o hablar 5 idiomas humanos con fluidez?",
-                  fr:"Préférerais-tu parler aux animaux ou parler couramment 5 langues humaines ?"},
+                  fr:"Préférerais-tu parler aux animaux ou parler couramment 5 langues humaines ?",
+                  it:"Preferiresti parlare con gli animali o parlare correntemente 5 lingue umane?"},
       {cat:'wyr', en:"Would you rather always be 10 minutes late or 20 minutes early to everything?",
                   es:"¿Preferirías siempre llegar 10 minutos tarde o 20 minutos temprano a todo?",
-                  fr:"Préférerais-tu toujours arriver 10 minutes en retard ou 20 minutes en avance partout ?"},
+                  fr:"Préférerais-tu toujours arriver 10 minutes en retard ou 20 minutes en avance partout ?",
+                  it:"Preferiresti arrivare sempre 10 minuti in ritardo o 20 minuti in anticipo a tutto?"},
       {cat:'wyr', en:"Would you rather have a personal chef or a personal driver?",
                   es:"¿Preferirías tener un chef personal o un chofer personal?",
-                  fr:"Préférerais-tu avoir un chef personnel ou un chauffeur personnel ?"},
+                  fr:"Préférerais-tu avoir un chef personnel ou un chauffeur personnel ?",
+                  it:"Preferiresti avere uno chef personale o un autista personale?"},
       {cat:'wyr', en:"Would you rather never lose your phone again or never lose your keys again?",
                   es:"¿Preferirías nunca volver a perder tu celular o nunca volver a perder tus llaves?",
-                  fr:"Préférerais-tu ne jamais reperdre ton téléphone ou ne jamais reperdre tes clés ?"},
+                  fr:"Préférerais-tu ne jamais reperdre ton téléphone ou ne jamais reperdre tes clés ?",
+                  it:"Preferiresti non perdere mai più il telefono o non perdere mai più le chiavi?"},
       {cat:'wyr', en:"Would you rather explore the deep ocean or outer space?",
                   es:"¿Preferirías explorar las profundidades del océano o el espacio exterior?",
-                  fr:"Préférerais-tu explorer les profondeurs de l'océan ou l'espace ?"},
+                  fr:"Préférerais-tu explorer les profondeurs de l'océan ou l'espace ?",
+                  it:"Preferiresti esplorare le profondità dell'oceano o lo spazio?"},
 
       // ─── ABOUT YOU (15) ───
       {cat:'you', en:"What's your favorite way to spend a Saturday?",
                   es:"¿Cuál es tu forma favorita de pasar un sábado?",
-                  fr:"Quelle est ta façon préférée de passer un samedi ?"},
+                  fr:"Quelle est ta façon préférée de passer un samedi ?",
+                  it:"Qual è il tuo modo preferito di passare un sabato?"},
       {cat:'you', en:"What's something you're really into right now?",
                   es:"¿En qué estás muy interesado o interesada en este momento?",
-                  fr:"Qu'est-ce qui te passionne en ce moment ?"},
+                  fr:"Qu'est-ce qui te passionne en ce moment ?",
+                  it:"Cosa ti appassiona davvero in questo momento?"},
       {cat:'you', en:"Who's someone in your life you'd call for advice?",
                   es:"¿A quién en tu vida llamarías para pedir consejos?",
-                  fr:"Qui dans ta vie appellerais-tu pour demander conseil ?"},
+                  fr:"Qui dans ta vie appellerais-tu pour demander conseil ?",
+                  it:"Chi nella tua vita chiameresti per chiedere un consiglio?"},
       {cat:'you', en:"What's a class you'd love to see added to school?",
                   es:"¿Qué clase te encantaría que se agregara a la escuela?",
-                  fr:"Quel cours aimerais-tu voir ajouter à l'école ?"},
+                  fr:"Quel cours aimerais-tu voir ajouter à l'école ?",
+                  it:"Quale materia ti piacerebbe vedere aggiunta a scuola?"},
       {cat:'you', en:"What's your favorite place to eat around here?",
                   es:"¿Cuál es tu lugar favorito para comer por aquí?",
-                  fr:"Quel est ton endroit préféré pour manger par ici ?"},
+                  fr:"Quel est ton endroit préféré pour manger par ici ?",
+                  it:"Qual è il tuo posto preferito per mangiare da queste parti?"},
       {cat:'you', en:"What's the last show or movie you couldn't stop thinking about?",
                   es:"¿Cuál fue la última serie o película en la que no podías dejar de pensar?",
-                  fr:"Quelle est la dernière série ou le dernier film auquel tu n'arrêtais pas de penser ?"},
+                  fr:"Quelle est la dernière série ou le dernier film auquel tu n'arrêtais pas de penser ?",
+                  it:"Qual è l'ultima serie o film a cui non riuscivi a smettere di pensare?"},
       {cat:'you', en:"What's a skill you'd love to learn this year?",
                   es:"¿Qué habilidad te encantaría aprender este año?",
-                  fr:"Quelle compétence aimerais-tu apprendre cette année ?"},
+                  fr:"Quelle compétence aimerais-tu apprendre cette année ?",
+                  it:"Quale abilità ti piacerebbe imparare quest'anno?"},
       {cat:'you', en:"What's a family tradition you actually like?",
                   es:"¿Qué tradición familiar en verdad te gusta?",
-                  fr:"Quelle tradition familiale aimes-tu vraiment ?"},
+                  fr:"Quelle tradition familiale aimes-tu vraiment ?",
+                  it:"Quale tradizione familiare ti piace davvero?"},
       {cat:'you', en:"What's your favorite subject and why — no wrong answer?",
                   es:"¿Cuál es tu materia favorita y por qué — no hay respuesta incorrecta?",
-                  fr:"Quelle est ta matière préférée et pourquoi — il n'y a pas de mauvaise réponse ?"},
+                  fr:"Quelle est ta matière préférée et pourquoi — il n'y a pas de mauvaise réponse ?",
+                  it:"Qual è la tua materia preferita e perché — non c'è una risposta sbagliata?"},
       {cat:'you', en:"If you had to describe your energy today with a weather forecast, what would it be?",
                   es:"Si tuvieras que describir tu energía de hoy con un pronóstico del clima, ¿cuál sería?",
-                  fr:"Si tu devais décrire ton énergie d'aujourd'hui avec un bulletin météo, ce serait quoi ?"},
+                  fr:"Si tu devais décrire ton énergie d'aujourd'hui avec un bulletin météo, ce serait quoi ?",
+                  it:"Se dovessi descrivere la tua energia di oggi con un bollettino meteo, quale sarebbe?"},
 
       {cat:'you', en:"What app do you spend the most time on?",
                   es:"¿En qué aplicación pasas más tiempo?",
-                  fr:"Sur quelle application passes-tu le plus de temps ?"},
+                  fr:"Sur quelle application passes-tu le plus de temps ?",
+                  it:"Su quale app passi più tempo?"},
       {cat:'you', en:"What's a hidden gem in this town most people don't know about?",
                   es:"¿Cuál es un lugar escondido de este pueblo que la mayoría no conoce?",
-                  fr:"Quel est un endroit méconnu de cette ville que la plupart des gens ignorent ?"},
+                  fr:"Quel est un endroit méconnu de cette ville que la plupart des gens ignorent ?",
+                  it:"Qual è un posto nascosto in questa città che pochi conoscono?"},
       {cat:'you', en:"Who's an artist or creator you'd recommend to me?",
                   es:"¿Qué artista o creador me recomendarías?",
-                  fr:"Quel artiste ou créateur me recommanderais-tu ?"},
+                  fr:"Quel artiste ou créateur me recommanderais-tu ?",
+                  it:"Quale artista o creatore mi consiglieresti?"},
       {cat:'you', en:"What's something you looked forward to as a kid that you miss now?",
                   es:"¿Qué esperabas con emoción cuando eras niño o niña y ahora extrañas?",
-                  fr:"Qu'attendais-tu avec impatience quand tu étais enfant et qui te manque maintenant ?"},
+                  fr:"Qu'attendais-tu avec impatience quand tu étais enfant et qui te manque maintenant ?",
+                  it:"Cosa aspettavi con entusiasmo da bambino o bambina che ora ti manca?"},
       {cat:'you', en:"What's your go-to snack right now?",
                   es:"¿Cuál es tu snack favorito en este momento?",
-                  fr:"Quel est ton en-cas préféré en ce moment ?"},
+                  fr:"Quel est ton en-cas préféré en ce moment ?",
+                  it:"Qual è il tuo spuntino preferito in questo momento?"},
 
       // ─── HYPOTHETICAL (15) ───
       {cat:'hypo', en:"If you could add one holiday to the school year, what would it celebrate?",
                    es:"Si pudieras agregar un día festivo al año escolar, ¿qué celebraría?",
-                   fr:"Si tu pouvais ajouter un jour férié à l'année scolaire, qu'est-ce qu'il célébrerait ?"},
+                   fr:"Si tu pouvais ajouter un jour férié à l'année scolaire, qu'est-ce qu'il célébrerait ?",
+                   it:"Se potessi aggiungere una festa all'anno scolastico, cosa celebrerebbe?"},
       {cat:'hypo', en:"If you could have dinner with anyone — alive, dead, or fictional — who?",
                    es:"Si pudieras cenar con quien fuera — vivo, muerto o ficticio — ¿con quién?",
-                   fr:"Si tu pouvais dîner avec n'importe qui — vivant, mort ou fictif — qui choisirais-tu ?"},
+                   fr:"Si tu pouvais dîner avec n'importe qui — vivant, mort ou fictif — qui choisirais-tu ?",
+                   it:"Se potessi cenare con chiunque — vivo, morto o immaginario — con chi?"},
       {cat:'hypo', en:"If your school could add one thing tomorrow, what should it be?",
                    es:"Si tu escuela pudiera agregar una sola cosa mañana, ¿qué sería?",
-                   fr:"Si ton école pouvait ajouter une seule chose demain, qu'est-ce que ce serait ?"},
+                   fr:"Si ton école pouvait ajouter une seule chose demain, qu'est-ce que ce serait ?",
+                   it:"Se la tua scuola potesse aggiungere una sola cosa domani, cosa dovrebbe essere?"},
       {cat:'hypo', en:"If you could master any one thing overnight, what would you pick?",
                    es:"Si pudieras dominar una sola cosa de la noche a la mañana, ¿qué escogerías?",
-                   fr:"Si tu pouvais maîtriser une seule chose du jour au lendemain, qu'est-ce que tu choisirais ?"},
+                   fr:"Si tu pouvais maîtriser une seule chose du jour au lendemain, qu'est-ce que tu choisirais ?",
+                   it:"Se potessi padroneggiare una sola cosa da un giorno all'altro, cosa sceglieresti?"},
       {cat:'hypo', en:"If you could time travel for one day, which day and why?",
                    es:"Si pudieras viajar en el tiempo por un día, ¿a qué día y por qué?",
-                   fr:"Si tu pouvais voyager dans le temps pour une journée, quel jour et pourquoi ?"},
+                   fr:"Si tu pouvais voyager dans le temps pour une journée, quel jour et pourquoi ?",
+                   it:"Se potessi viaggiare nel tempo per un giorno, quale giorno e perché?"},
       {cat:'hypo', en:"If you could switch lives with one person for 24 hours, who?",
                    es:"Si pudieras intercambiar tu vida con una persona por 24 horas, ¿con quién?",
-                   fr:"Si tu pouvais échanger ta vie avec quelqu'un pendant 24 heures, avec qui ?"},
+                   fr:"Si tu pouvais échanger ta vie avec quelqu'un pendant 24 heures, avec qui ?",
+                   it:"Se potessi scambiare la tua vita con una persona per 24 ore, con chi?"},
       {cat:'hypo', en:"If you could invent one class rule everyone had to follow, what would it be?",
                    es:"Si pudieras inventar una regla de clase que todos tuvieran que seguir, ¿cuál sería?",
-                   fr:"Si tu pouvais inventer une règle de classe que tout le monde devrait suivre, quelle serait-elle ?"},
+                   fr:"Si tu pouvais inventer une règle de classe que tout le monde devrait suivre, quelle serait-elle ?",
+                   it:"Se potessi inventare una regola di classe che tutti dovessero seguire, quale sarebbe?"},
       {cat:'hypo', en:"If you could go anywhere for spring break, where and with who?",
                    es:"Si pudieras ir a cualquier lugar en las vacaciones de primavera, ¿a dónde y con quién?",
-                   fr:"Si tu pouvais aller n'importe où pour les vacances de printemps, où et avec qui ?"},
+                   fr:"Si tu pouvais aller n'importe où pour les vacances de printemps, où et avec qui ?",
+                   it:"Se potessi andare ovunque per le vacanze di primavera, dove e con chi?"},
       {cat:'hypo', en:"If money and grades didn't matter, what would you spend the school year doing?",
                    es:"Si el dinero y las calificaciones no importaran, ¿qué harías durante el año escolar?",
-                   fr:"Si l'argent et les notes n'avaient pas d'importance, à quoi passerais-tu ton année scolaire ?"},
+                   fr:"Si l'argent et les notes n'avaient pas d'importance, à quoi passerais-tu ton année scolaire ?",
+                   it:"Se i soldi e i voti non contassero, come passeresti l'anno scolastico?"},
       {cat:'hypo', en:"If you had to give a TED talk tomorrow, what would it be about?",
                    es:"Si tuvieras que dar una charla TED mañana, ¿de qué sería?",
-                   fr:"Si tu devais donner une conférence TED demain, ce serait sur quoi ?"},
+                   fr:"Si tu devais donner une conférence TED demain, ce serait sur quoi ?",
+                   it:"Se dovessi tenere un TED talk domani, di cosa parleresti?"},
       {cat:'hypo', en:"If your class had to solve one real-world problem this year, what would you pick?",
                   es:"Si tu clase tuviera que resolver un problema del mundo real este año, ¿cuál escogerías?",
-                  fr:"Si ta classe devait résoudre un problème réel cette année, lequel choisirais-tu ?"},
+                  fr:"Si ta classe devait résoudre un problème réel cette année, lequel choisirais-tu ?",
+                  it:"Se la tua classe dovesse risolvere un problema del mondo reale quest'anno, quale sceglieresti?"},
       {cat:'hypo', en:"If you had to teach a one-hour class on anything, what would it be?",
                   es:"Si tuvieras que enseñar una clase de una hora sobre cualquier tema, ¿cuál sería?",
-                  fr:"Si tu devais donner un cours d'une heure sur n'importe quel sujet, ce serait quoi ?"},
+                  fr:"Si tu devais donner un cours d'une heure sur n'importe quel sujet, ce serait quoi ?",
+                  it:"Se dovessi insegnare una lezione di un'ora su qualsiasi argomento, quale sarebbe?"},
       {cat:'hypo', en:"If you could design the perfect lunch break, what would it look like?",
                   es:"Si pudieras diseñar la hora del almuerzo perfecta, ¿cómo sería?",
-                  fr:"Si tu pouvais concevoir la pause déjeuner parfaite, à quoi ressemblerait-elle ?"},
+                  fr:"Si tu pouvais concevoir la pause déjeuner parfaite, à quoi ressemblerait-elle ?",
+                  it:"Se potessi progettare la pausa pranzo perfetta, come sarebbe?"},
       {cat:'hypo', en:"If everyone in the world had to move to one city, which one and why?",
                   es:"Si todo el mundo tuviera que mudarse a una sola ciudad, ¿cuál y por qué?",
-                  fr:"Si tout le monde devait déménager dans une seule ville, laquelle et pourquoi ?"},
+                  fr:"Si tout le monde devait déménager dans une seule ville, laquelle et pourquoi ?",
+                  it:"Se tutti nel mondo dovessero trasferirsi in una sola città, quale e perché?"},
       {cat:'hypo', en:"If you had a superpower that only worked on Mondays, what would it be?",
                   es:"Si tuvieras un superpoder que solo funcionara los lunes, ¿cuál sería?",
-                  fr:"Si tu avais un super-pouvoir qui ne fonctionnait que le lundi, ce serait lequel ?"},
+                  fr:"Si tu avais un super-pouvoir qui ne fonctionnait que le lundi, ce serait lequel ?",
+                  it:"Se avessi un superpotere che funzionasse solo di lunedì, quale sarebbe?"},
 
     ];
 
@@ -514,15 +713,27 @@
     const home = $('ppHome'), game = $('ppGame');
     const langSelect = $('ppLangSelect'), catSelect = $('ppCatSelect');
 
+    // Mode + environment detection
+    const urlParams = new URLSearchParams(window.location.search);
+    const isEmbed = urlParams.get('mode') === 'embed';
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const isStandalone = window.navigator.standalone === true
+                      || window.matchMedia('(display-mode: standalone)').matches;
+
     // Standalone class
-    if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+    if (isStandalone) {
       document.body.classList.add('is-standalone');
+    }
+    // Embed class (strips chrome that only makes sense on the full page)
+    if (isEmbed) {
+      document.documentElement.classList.add('is-embed-root');
+      document.body.classList.add('is-embed');
     }
 
     // ── I18N HELPERS ──
     function t(key) { return T[key][lang] || T[key].en; }
     function catLabel(k) { return CATS[k][lang] || CATS[k].en; }
-    function langFlag(l) { return {en:'🇺🇸 EN', es:'🇪🇸 ES', fr:'🇫🇷 FR'}[l]; }
+    function langFlag(l) { return {en:'🇺🇸 EN', es:'🇪🇸 ES', fr:'🇫🇷 FR', it:'🇮🇹 IT'}[l]; }
 
     // ── RENDER HOME ──
     function renderHome() {
@@ -624,9 +835,9 @@
     $('ppCard').addEventListener('click', () => {
       if (idx < deck.length - 1) { idx++; renderCard(); }
     });
-    // Mini lang cycles EN → ES → FR → EN
+    // Mini lang cycles EN → ES → FR → IT → EN
     $('ppLangMini').addEventListener('click', () => {
-      const order = ['en','es','fr'];
+      const order = ['en','es','fr','it'];
       lang = order[(order.indexOf(lang) + 1) % order.length];
       localStorage.setItem(LANG_KEY, lang);
       renderCard();
@@ -643,6 +854,84 @@
     });
     document.addEventListener('click', e => {
       if (!navMenu.contains(e.target) && e.target !== navMenuBtn) navMenu.classList.remove('is-open');
+    });
+
+    // ── EMBED SETUP ──
+    // Show Embed menu item only on desktop non-embed non-standalone (matches
+    // countdown.html gating — the embed code is only useful when authoring
+    // a Canvas / ClassroomScreen page from a real browser).
+    const embedBtn      = $('embedBtn');
+    const embedModal    = $('embedModal');
+    const embedBackdrop = $('embedBackdrop');
+    const embedCloseBtn = $('embedCloseBtn');
+    const embedCodeEl   = $('embedCode');
+    const copyEmbedBtn  = $('copyEmbedBtn');
+    const embedStatusEl = $('embedStatus');
+    const embedPresets  = document.querySelectorAll('.embed-preset');
+
+    const embedConfig = {
+      canvas:          { label:'Canvas',          height:760 },
+      classroomscreen: { label:'ClassroomScreen', height:640 }
+    };
+    let activeEmbedTarget = 'canvas';
+
+    function buildEmbedCode(targetKey) {
+      const config = embedConfig[targetKey] || embedConfig.canvas;
+      const src = new URL('panther_prompts.html?mode=embed', window.location.href);
+      const style = 'border:0;overflow:hidden;background:transparent;';
+      return `<iframe src="${src.toString()}" title="PVHS Panther Prompts" width="100%" height="${config.height}" style="${style}" loading="lazy" scrolling="no" allowtransparency="true" allowfullscreen></iframe>`;
+    }
+
+    function updateEmbedCode(targetKey = activeEmbedTarget) {
+      activeEmbedTarget = targetKey;
+      if (embedCodeEl) embedCodeEl.value = buildEmbedCode(targetKey);
+      if (embedStatusEl) {
+        const config = embedConfig[targetKey] || embedConfig.canvas;
+        embedStatusEl.textContent = `${config.label} preset selected. Adjust the height later if needed.`;
+      }
+      embedPresets.forEach(btn => {
+        btn.classList.toggle('is-active', btn.dataset.embedTarget === targetKey);
+      });
+    }
+
+    function openEmbedModal() {
+      if (!embedModal) return;
+      updateEmbedCode(activeEmbedTarget);
+      embedModal.hidden = false;
+      document.body.style.overflow = 'hidden';
+    }
+    function closeEmbedModal() {
+      if (!embedModal) return;
+      embedModal.hidden = true;
+      document.body.style.overflow = '';
+    }
+
+    if (!isMobile && !isStandalone && !isEmbed && embedBtn) {
+      embedBtn.style.display = 'flex';
+      embedBtn.addEventListener('click', () => {
+        navMenu.classList.remove('is-open');
+        openEmbedModal();
+      });
+    }
+
+    embedCloseBtn?.addEventListener('click', closeEmbedModal);
+    embedBackdrop?.addEventListener('click', closeEmbedModal);
+    embedPresets.forEach(btn => {
+      btn.addEventListener('click', () => updateEmbedCode(btn.dataset.embedTarget));
+    });
+    copyEmbedBtn?.addEventListener('click', async () => {
+      const code = embedCodeEl.value;
+      try {
+        await navigator.clipboard.writeText(code);
+        embedStatusEl.textContent = 'Copied — paste into Canvas or ClassroomScreen.';
+      } catch {
+        embedCodeEl.select(); embedCodeEl.setSelectionRange(0, code.length);
+        embedStatusEl.textContent = 'Press ⌘/Ctrl+C to copy the selected code.';
+      }
+    });
+    // Escape closes the modal
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && embedModal && !embedModal.hidden) closeEmbedModal();
     });
 
     // Home logo — force in-app navigation (PWA)
