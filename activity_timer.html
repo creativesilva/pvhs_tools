@@ -177,14 +177,13 @@
     .at-input:focus { background:rgba(255,255,255,0.1); border-color:rgba(75,225,225,0.4); }
     .at-input::placeholder { color:rgba(255,255,255,0.32); font-weight:500; font-style:italic; }
 
-    /* Start button: half-width + centered so its footprint matches the
-       Reset button on the run view exactly. Same paddings + border-radius
-       as .at-ctrl / .at-controls, so tapping Start looks like the button
-       lands in the same spot on the next screen. Green tone marks it as
-       the 'go' action, distinct from the teal Reset. */
+    /* Start button: half-width + centered, sits directly under the
+       activity-name field (no margin-top:auto anymore — Chris felt it
+       looked forgotten at the bottom with a big gap). Green tone marks
+       it as the 'go' action, distinct from the teal Reset. */
     .at-start-wrap {
       display:flex; justify-content:center;
-      padding:12px 6px 6px; margin-top:auto; flex-shrink:0; width:100%;
+      padding:16px 6px 6px; flex-shrink:0; width:100%;
     }
     .at-start {
       appearance:none;
