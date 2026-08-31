@@ -52,7 +52,7 @@
                   radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 50%);
       z-index:0;
     }
-    .ghost-logo { position:absolute; top:56%; left:50%; width:120%; opacity:0.05; transform:translate(-50%,-50%); filter:grayscale(100%); pointer-events:none; z-index:0; }
+    .ghost-logo { position:absolute; top:56%; left:50%; width:85%; opacity:0.05; transform:translate(-50%,-50%); filter:grayscale(100%); pointer-events:none; z-index:0; }
     .content { position:relative; z-index:1; width:100%; flex:1; min-height:0; display:flex; flex-direction:column; overflow:hidden; }
 
     /* Top row */
@@ -223,6 +223,8 @@
       display:flex; align-items:center; justify-content:center;
     }
     .at-clock-label {
+      /* Always says 'Time Remaining' (or 'Time's Up' on finish) —
+         the custom task title lives OUTSIDE and ABOVE the ring instead. */
       margin-top:10px;
       font-size:11px; font-weight:800;
       color:var(--muted); letter-spacing:0.2em; text-transform:uppercase;
@@ -230,12 +232,23 @@
       max-width:82%; text-align:center;
       overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
     }
-    /* When the task name is set, bump size a hair and warm the color slightly */
-    .at-clock-label.is-named {
-      font-size:12px;
-      color:#e4faff;
-      opacity:1;
+
+    /* Custom task title (large, above the ring, outside the circle) */
+    .at-task-title {
+      width:100%;
+      font-size:26px; font-weight:900;
+      color:#fff;
+      text-align:center;
+      padding:2px 16px 14px;
+      letter-spacing:0.01em;
+      line-height:1.15;
+      /* Truncate very long titles rather than wrap and push the ring down */
+      max-width:100%;
+      overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+      flex-shrink:0;
     }
+    /* When no task name is set, collapse the slot so the ring centers naturally */
+    .at-task-title:empty { display:none; }
 
     .at-controls { display:flex; gap:10px; padding:12px 6px 6px; width:100%; }
     .at-ctrl { flex:1; appearance:none; padding:15px; border-radius:14px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.06); color:#eaf8f8; font-size:12px; font-weight:900; letter-spacing:0.12em; text-transform:uppercase; cursor:pointer; }
@@ -335,6 +348,9 @@
 
         <!-- RUN VIEW -->
         <div id="atRun" class="at-view at-run" hidden>
+          <!-- Custom task title, above the ring & OUTSIDE the circle.
+               Empty → collapses; shown large + centered when set. -->
+          <div class="at-task-title" id="atTaskTitle"></div>
           <div class="at-ring-wrap">
             <svg class="at-ring" viewBox="0 0 200 200" aria-hidden="true">
               <circle class="at-ring-track" cx="100" cy="100" r="88"/>
@@ -345,6 +361,7 @@
                 <span class="at-clock-ghost" id="atGhost">88:88</span>
                 <span class="at-clock-live"  id="atDigits">5:00</span>
               </div>
+              <!-- Inside-ring label: ALWAYS 'Time Remaining' (or 'Time's Up' on finish). -->
               <div class="at-clock-label" id="atClockLabel">Time Remaining</div>
             </div>
           </div>
@@ -404,6 +421,7 @@
     const digitsEl = $('atDigits'), ghostEl = $('atGhost');
     const ringFill = $('atRingFill');
     const labelEl  = $('atClockLabel');
+    const titleEl  = $('atTaskTitle');
     const pauseBtn = $('atPause'), resetBtn = $('atReset');
     const flashEl  = $('atFlash');
     const wheel    = $('tpWheel');
@@ -584,14 +602,16 @@
     function stopTick()  { if (tickId) { clearTimeout(tickId); tickId = null; } running = false; }
 
     // ── ACTIONS ──
-    function setLabel(text, isNamed) {
-      labelEl.textContent = text;
-      labelEl.classList.toggle('is-named', !!isNamed);
-    }
+    // Two separate slots now:
+    //   setTaskTitle → the LARGE title above/outside the circle
+    //   setStatusLabel → the small label INSIDE the circle (Time Remaining / Time's Up)
+    function setTaskTitle(text)   { titleEl.textContent = text || ''; }
+    function setStatusLabel(text) { labelEl.textContent = text; }
     function startTimer() {
       ensureAudio();
       const name = taskInput.value.trim();
-      setLabel(name || 'Time Remaining', !!name);
+      setTaskTitle(name);          // above ring (collapses when empty)
+      setStatusLabel('Time Remaining');   // always this inside the ring
 
       remainingSec = durationSec;
       endMs = Date.now() + durationSec * 1000;
@@ -620,6 +640,10 @@
       remainingSec = 0;
       currentStopIdx = -1;
       render();
+      // Clear the run-view labels so a next Start doesn't briefly show
+      // the previous task's title/status before the new one paints.
+      setTaskTitle('');
+      setStatusLabel('Time Remaining');
       run.hidden = true; home.hidden = false;
       pauseBtn.textContent = 'Pause';
     }
@@ -628,7 +652,7 @@
       render();
       flashEl.classList.add('is-firing');
       app.classList.add('is-done');
-      setLabel("Time's Up", false);
+      setStatusLabel("Time's Up");   // keeps task title visible above, updates the inside label
       try { playChime(); } catch {}
       try { if ('vibrate' in navigator) navigator.vibrate([120, 60, 120]); } catch {}
       setTimeout(() => flashEl.classList.remove('is-firing'), 1000);
