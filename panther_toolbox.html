@@ -12,7 +12,10 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="PV_AppIcon.png">
   <link rel="icon" type="image/png" href="PV_AppIcon.png">
-  <title>Panther Toolbox</title>
+  <title>Teacher Toolbox</title>
+  <!-- EmailJS — same account as calendar.html's Share Feedback pipe -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>emailjs.init('68UkiTjqHIKZMkeCC');</script>
 
   <style>
     :root {
@@ -81,7 +84,7 @@
     .tb-tile-label { margin-top:12px; font-size:13px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:#fff; }
     .tb-tile-sub { margin-top:5px; font-size:10px; font-weight:600; color:var(--muted); opacity:0.85; letter-spacing:0.05em; }
 
-    /* Coming-soon tile (dashed, dimmer) — keeps the grid balanced when odd count of live tiles */
+    /* Coming-soon tile (dashed, dimmer) — kept in case a future variant needs it */
     .tb-tile.is-soon {
       background:rgba(255,255,255,0.03);
       border:1px dashed rgba(255,255,255,0.16);
@@ -90,6 +93,71 @@
     }
     .tb-tile.is-soon:active { transform:none; background:rgba(255,255,255,0.03); }
     .tb-tile.is-soon .tb-tile-emoji { filter:grayscale(1) opacity(0.7); }
+
+    /* Idea tile — <button>, so reset default UA styling */
+    .tb-tile-idea { appearance:none; font-family:inherit; text-align:center; }
+    /* Slightly warmer background so it reads as "the differently-colored one" */
+    .tb-tile.tb-tile-idea {
+      background:linear-gradient(160deg, rgba(255,206,75,0.14) 0%, rgba(255,138,60,0.16) 100%);
+      border:1px solid rgba(255,206,75,0.32);
+    }
+    .tb-tile.tb-tile-idea:active {
+      background:linear-gradient(160deg, rgba(255,206,75,0.22) 0%, rgba(255,138,60,0.26) 100%);
+    }
+    .tb-tile.tb-tile-idea .tb-tile-emoji { filter:drop-shadow(0 6px 14px rgba(255,206,75,0.4)); }
+
+    /* ── SUGGEST-A-MINI-APP MODAL ────────────────────────────
+       Reuses the calendar.html Share Feedback aesthetic + EmailJS pipe.
+       Emails go through service_4mhkbik / template_fd0suj3 to Chris.  */
+    .sg-modal[hidden] { display:none; }
+    .sg-modal { position:fixed; inset:0; z-index:10000; display:flex; align-items:center; justify-content:center; padding:20px; }
+    .sg-backdrop { position:absolute; inset:0; background:rgba(1,12,12,0.82); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
+    .sg-dialog {
+      position:relative; z-index:1;
+      width:min(100%, 380px); max-height:calc(100% - 20px); overflow-y:auto;
+      border-radius:24px; border:1px solid rgba(255,255,255,0.14);
+      background:rgba(6,26,26,0.92);
+      box-shadow:0 26px 48px rgba(0,0,0,0.5);
+      padding:20px;
+      display:flex; flex-direction:column; gap:12px;
+    }
+    .sg-header { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .sg-title { font-size:13px; font-weight:900; color:#fff; text-transform:uppercase; letter-spacing:0.12em; margin:0; }
+    .sg-close { appearance:none; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); color:rgba(255,255,255,0.6); border-radius:99px; width:28px; height:28px; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+    .sg-sub { font-size:12px; color:var(--muted); line-height:1.4; margin:-2px 0 4px; opacity:0.9; }
+    .sg-field { display:flex; flex-direction:column; gap:5px; }
+    .sg-label { font-size:9.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.15em; color:var(--muted); opacity:0.85; padding-left:2px; }
+    .sg-input, .sg-textarea {
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.1);
+      border-radius:14px;
+      color:#f7fbfb;
+      font-size:13px; font-weight:500; font-family:inherit;
+      padding:11px 14px;
+      outline:none;
+      transition:background 0.15s, border-color 0.15s;
+    }
+    .sg-input::placeholder, .sg-textarea::placeholder { color:rgba(255,255,255,0.28); font-style:italic; }
+    .sg-input:focus, .sg-textarea:focus { background:rgba(255,255,255,0.1); border-color:rgba(75,225,225,0.4); }
+    .sg-textarea { min-height:90px; line-height:1.4; resize:vertical; }
+    .sg-hint { font-size:9.5px; color:var(--muted); opacity:0.65; padding-left:2px; margin-top:-2px; }
+    .sg-submit {
+      appearance:none; width:100%;
+      padding:14px; border-radius:14px; border:none;
+      background:linear-gradient(135deg, #007474 0%, #00a0a0 100%);
+      color:#fff; font-size:12px; font-weight:900;
+      letter-spacing:0.14em; text-transform:uppercase; cursor:pointer;
+    }
+    .sg-submit:active { opacity:0.86; }
+    .sg-submit:disabled { opacity:0.4; cursor:not-allowed; }
+    .sg-status {
+      font-size:11px; text-align:center; min-height:14px;
+      opacity:0; transition:opacity 0.2s;
+      margin-top:-2px; letter-spacing:0.04em;
+    }
+    .sg-status.is-shown { opacity:1; }
+    .sg-status.is-ok    { color:#4be1e1; }
+    .sg-status.is-err   { color:#ff8a8a; }
 
     .footer-note { text-align:center; font-size:9.5px; color:#b5d4d4; font-weight:600; padding:8px 0 3px; flex-shrink:0; opacity:0.75; }
     .footer-version { text-align:center; font-size:8.5px; color:#b5d4d4; opacity:0.55; padding:0 0 6px; font-weight:500; letter-spacing:0.04em; flex-shrink:0; }
@@ -115,14 +183,14 @@
         <!-- Top row -->
         <div class="top-row">
           <a href="index.html" class="nav-link" aria-label="Home"><img src="PV_Logo2.png" class="logo-clear" alt="PVHS"></a>
-          <h1 class="page-title">Panther Toolbox</h1>
+          <h1 class="page-title">Teacher Toolbox</h1>
           <button class="nav-menu-btn" id="navMenuBtn" type="button" aria-label="Menu">···</button>
         </div>
 
         <!-- Hero -->
         <div class="tb-hero">
           <div class="tb-emoji">🧰</div>
-          <h1>Panther Toolbox</h1>
+          <h1>Teacher Toolbox</h1>
           <p class="tb-hero-sub">Mini apps for your classroom</p>
         </div>
 
@@ -143,15 +211,44 @@
             <div class="tb-tile-label">Group Maker</div>
             <div class="tb-tile-sub">Grouping strategies</div>
           </a>
-          <div class="tb-tile is-soon">
-            <div class="tb-tile-emoji">✨</div>
-            <div class="tb-tile-label">More Soon</div>
-            <div class="tb-tile-sub">Coming this year</div>
-          </div>
+          <!-- Tile #4 collects mini-app ideas from teachers and emails them to Chris -->
+          <button class="tb-tile tb-tile-idea" id="ideaTile" type="button">
+            <div class="tb-tile-emoji">💡</div>
+            <div class="tb-tile-label">Got an Idea?</div>
+            <div class="tb-tile-sub">Suggest a mini app</div>
+          </button>
         </div>
 
         <div class="footer-note">By: <a href="https://www.creativesilva.com" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">CreativeSilva</a></div>
       </div>
+    </div>
+  </div>
+
+  <!-- Suggest-a-mini-app modal -->
+  <div class="sg-modal" id="sgModal" hidden>
+    <div class="sg-backdrop" id="sgBackdrop"></div>
+    <div class="sg-dialog" role="dialog" aria-modal="true" aria-labelledby="sgTitle">
+      <div class="sg-header">
+        <h2 id="sgTitle" class="sg-title">Suggest a Mini App</h2>
+        <button class="sg-close" id="sgClose" type="button" aria-label="Close">&#x2715;</button>
+      </div>
+      <p class="sg-sub">Have an idea for a classroom tool that should live here? Send it my way.</p>
+
+      <div class="sg-field">
+        <label class="sg-label" for="sgName">Your name (optional)</label>
+        <input class="sg-input" id="sgName" type="text" placeholder="Anonymous is fine" maxlength="60" autocomplete="name">
+      </div>
+      <div class="sg-field">
+        <label class="sg-label" for="sgEmail">Email (optional)</label>
+        <input class="sg-input" id="sgEmail" type="email" placeholder="Only if you want a reply" maxlength="120" autocomplete="email">
+        <div class="sg-hint">Leave blank to stay anonymous.</div>
+      </div>
+      <div class="sg-field">
+        <label class="sg-label" for="sgIdea">Your idea</label>
+        <textarea class="sg-textarea" id="sgIdea" placeholder="e.g. a random student picker, a class noise meter, a Pomodoro timer…" maxlength="1000"></textarea>
+      </div>
+      <button class="sg-submit" id="sgSubmit" type="button">Send Idea</button>
+      <div class="sg-status" id="sgStatus" role="status" aria-live="polite">&nbsp;</div>
     </div>
   </div>
 
@@ -189,6 +286,86 @@
     // Home logo — force in-app navigation (PWA)
     document.querySelector('.top-row a[aria-label="Home"]').addEventListener('click', e => {
       e.preventDefault(); window.location.href = 'index.html';
+    });
+
+    // ── SUGGEST A MINI APP ──
+    // Emails Chris via the same EmailJS pipe calendar.html's Share Feedback
+    // uses (service_4mhkbik / template_fd0suj3). Tagged '[Toolbox Suggestion]'
+    // so it's filterable in the inbox. The template only supports {{from_name}}
+    // and {{message}}, so we pack the reply email into the message body.
+    const sgModal    = document.getElementById('sgModal');
+    const sgBackdrop = document.getElementById('sgBackdrop');
+    const sgClose    = document.getElementById('sgClose');
+    const sgName     = document.getElementById('sgName');
+    const sgEmail    = document.getElementById('sgEmail');
+    const sgIdea     = document.getElementById('sgIdea');
+    const sgSubmit   = document.getElementById('sgSubmit');
+    const sgStatus   = document.getElementById('sgStatus');
+
+    function openIdeaModal() {
+      if (!sgModal) return;
+      sgStatus.textContent = ' ';
+      sgStatus.className   = 'sg-status';
+      sgSubmit.disabled    = false;
+      sgSubmit.textContent = 'Send Idea';
+      sgModal.hidden = false;
+      setTimeout(() => sgIdea.focus(), 60);
+    }
+    function closeIdeaModal() {
+      if (!sgModal) return;
+      sgModal.hidden = true;
+    }
+    document.getElementById('ideaTile').addEventListener('click', openIdeaModal);
+    sgClose?.addEventListener('click', closeIdeaModal);
+    sgBackdrop?.addEventListener('click', closeIdeaModal);
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && sgModal && !sgModal.hidden) closeIdeaModal();
+    });
+
+    sgSubmit.addEventListener('click', async () => {
+      const idea  = sgIdea.value.trim();
+      const name  = sgName.value.trim() || 'Anonymous';
+      const email = sgEmail.value.trim();
+
+      if (!idea) {
+        sgStatus.textContent = 'Please write an idea first.';
+        sgStatus.className   = 'sg-status is-shown is-err';
+        sgIdea.focus();
+        return;
+      }
+
+      sgSubmit.disabled = true;
+      sgSubmit.textContent = 'Sending…';
+      sgStatus.textContent = ' ';
+      sgStatus.className   = 'sg-status';
+
+      // Compose the message body — includes reply email in body since the
+      // shared EmailJS template only exposes {{from_name}} + {{message}}.
+      const messageBody =
+        '[Toolbox Suggestion]\n\n' +
+        idea + '\n\n' +
+        '— from ' + name + (email ? ' <' + email + '>' : ' (no email)');
+
+      try {
+        await emailjs.send('service_4mhkbik', 'template_fd0suj3', {
+          from_name: '[Toolbox Suggestion] ' + name,
+          message:   messageBody
+        });
+        // Success → toast, then close + reset
+        sgStatus.textContent = '✓ Sent — thanks!';
+        sgStatus.className   = 'sg-status is-shown is-ok';
+        setTimeout(() => {
+          closeIdeaModal();
+          sgIdea.value  = '';
+          sgName.value  = '';
+          sgEmail.value = '';
+        }, 1600);
+      } catch (err) {
+        sgSubmit.disabled = false;
+        sgSubmit.textContent = 'Send Idea';
+        sgStatus.textContent = "Couldn't send — check your connection and try again.";
+        sgStatus.className   = 'sg-status is-shown is-err';
+      }
     });
 
     // Service worker

@@ -307,6 +307,80 @@
     .footer-note { text-align:center; font-size:9.5px; color:#b5d4d4; font-weight:600; padding:6px 0 2px; margin-top:auto; flex-shrink:0; opacity:0.75; }
     .footer-version { text-align:center; font-size:8.5px; color:#b5d4d4; opacity:0.55; padding:0 0 4px; font-weight:500; letter-spacing:0.04em; flex-shrink:0; }
 
+    /* ── EMBED MODE ─────────────────────────────────────────
+       Rendered inside an iframe (?mode=embed) → strip chrome
+       so the widget fits cleanly in Canvas / ClassroomScreen. */
+    body.is-embed .nav-menu-btn,
+    body.is-embed .footer-note   { display:none; }
+    html.is-embed-root,
+    html.is-embed-root body { background:transparent !important; }
+    body.is-embed .frame { padding:0; height:100dvh; min-height:100vh; }
+    body.is-embed .app {
+      width:100%; height:100%; max-width:100%; max-height:100%;
+      border-radius:20px;
+    }
+
+    /* Embed setup modal — same styling as Panther Prompts's embed dialog */
+    .embed-modal[hidden] { display:none; }
+    .embed-modal {
+      position:fixed; inset:0; z-index:10000;
+      display:flex; align-items:center; justify-content:center;
+      padding:20px;
+    }
+    .embed-backdrop {
+      position:absolute; inset:0;
+      background:rgba(0,10,10,0.65);
+      backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+    }
+    .embed-dialog {
+      position:relative; z-index:1;
+      width:min(520px, 100%); max-height:90vh; overflow:auto;
+      background:linear-gradient(168deg, rgba(6,28,28,0.98) 0%, rgba(0,72,72,0.92) 100%);
+      border:1px solid rgba(255,255,255,0.16); border-radius:20px;
+      padding:22px; color:var(--white);
+      box-shadow:0 24px 60px rgba(0,0,0,0.55);
+    }
+    .embed-header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:6px; }
+    .embed-title { font-size:16px; font-weight:900; letter-spacing:0.08em; text-transform:uppercase; color:#dff7f7; margin:0; }
+    .embed-close { appearance:none; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.14); border-radius:10px; color:#eaf8f8; padding:6px 12px; font-size:11px; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; }
+    .embed-close:active { background:rgba(255,255,255,0.14); }
+    .embed-note { font-size:12px; color:var(--muted); line-height:1.4; margin:6px 0 14px; }
+    .embed-presets { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+    .embed-preset {
+      appearance:none; flex:1 1 auto;
+      padding:10px 14px; border-radius:12px;
+      border:1px solid rgba(255,255,255,0.14);
+      background:rgba(255,255,255,0.05); color:#eaf8f8;
+      font-size:11px; font-weight:800; letter-spacing:0.1em;
+      text-transform:uppercase; cursor:pointer;
+      transition:background 0.15s, border-color 0.15s;
+    }
+    .embed-preset:hover { background:rgba(255,255,255,0.1); }
+    .embed-preset.is-active {
+      background:linear-gradient(180deg, rgba(0,180,180,0.4), rgba(0,140,140,0.28));
+      border-color:rgba(75,225,225,0.5);
+      color:#fff;
+    }
+    .embed-code {
+      width:100%; min-height:110px;
+      padding:12px; border-radius:12px;
+      border:1px solid rgba(255,255,255,0.14);
+      background:rgba(0,0,0,0.25); color:#eaf8f8;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+      font-size:11.5px; line-height:1.4; resize:vertical;
+    }
+    .embed-actions { display:flex; align-items:center; gap:12px; margin-top:12px; }
+    .embed-copy {
+      appearance:none;
+      padding:10px 16px; border-radius:12px;
+      border:1px solid rgba(75,225,225,0.4);
+      background:linear-gradient(180deg, rgba(0,180,180,0.4), rgba(0,140,140,0.28));
+      color:#fff; font-size:11px; font-weight:900;
+      letter-spacing:0.12em; text-transform:uppercase; cursor:pointer;
+    }
+    .embed-copy:active { transform:scale(0.98); }
+    .embed-status { font-size:11px; color:var(--muted); opacity:0.85; }
+
     /* Standalone */
     body.is-standalone { background:#021414; }
     body.is-standalone::before { content:""; position:fixed; inset:0; background:#021414; pointer-events:none; z-index:0; }
@@ -409,13 +483,36 @@
   <!-- Nav dropdown -->
   <nav class="nav-menu" id="navMenu" role="menu">
     <a href="index.html"            class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">🏠</span>Home</a>
-    <a href="panther_toolbox.html"  class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">🧰</span>Panther Toolbox</a>
+    <a href="panther_toolbox.html"  class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">🧰</span>Teacher Toolbox</a>
     <a href="countdown.html"        class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">⏱</span>Countdown</a>
     <a href="calendar.html"         class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">📅</span>Calendar</a>
     <a href="extension_search.html" class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">🔍</span>Directory</a>
     <a href="panther_prompts.html"  class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">❓</span>Panther Prompts</a>
     <a href="group_maker.html"      class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">👥</span>Group Maker</a>
+    <!-- 📋 Embed shows only on desktop non-standalone non-embed (matches countdown / prompts gating) -->
+    <button id="embedBtn" class="nav-menu-item" type="button" role="menuitem" style="display:none"><span class="nav-menu-icon">📋</span>Embed</button>
   </nav>
+
+  <!-- Embed setup modal -->
+  <div id="embedModal" class="embed-modal" hidden>
+    <div class="embed-backdrop" id="embedBackdrop"></div>
+    <div class="embed-dialog" role="dialog" aria-modal="true" aria-labelledby="embedTitle">
+      <div class="embed-header">
+        <h2 id="embedTitle" class="embed-title">Embed Activity Timer</h2>
+        <button id="embedCloseBtn" class="embed-close" type="button">Close</button>
+      </div>
+      <p class="embed-note">Pick a preset, then copy the clean embed code for a Canvas page or a ClassroomScreen widget. Teachers still set duration + activity name inside the iframe.</p>
+      <div class="embed-presets">
+        <button class="embed-preset is-active" type="button" data-embed-target="canvas">Canvas</button>
+        <button class="embed-preset" type="button" data-embed-target="classroomscreen">ClassroomScreen</button>
+      </div>
+      <textarea id="embedCode" class="embed-code" readonly></textarea>
+      <div class="embed-actions">
+        <button id="copyEmbedBtn" class="embed-copy" type="button">Copy Code</button>
+        <span id="embedStatus" class="embed-status">Canvas preset selected.</span>
+      </div>
+    </div>
+  </div>
 
   <script>
     // ─────────────────────────────────────────────────────────
@@ -465,9 +562,18 @@
     let audioCtx = null;
     let currentStopIdx = -1;   // remember active RING_STOPS entry to avoid redundant writes
 
-    // Standalone
-    if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+    // Environment detection (standalone PWA, embed iframe, mobile UA)
+    const urlParams  = new URLSearchParams(window.location.search);
+    const isEmbed    = urlParams.get('mode') === 'embed';
+    const isMobile   = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const isStandalone = window.navigator.standalone === true
+                      || window.matchMedia('(display-mode: standalone)').matches;
+    if (isStandalone) {
       document.body.classList.add('is-standalone');
+    }
+    if (isEmbed) {
+      document.documentElement.classList.add('is-embed-root');
+      document.body.classList.add('is-embed');
     }
 
     // Restore last duration (falls back to 5 if saved value not in MINUTES)
@@ -684,6 +790,12 @@
       // the previous task's title/status before the new one paints.
       setTaskTitle('');
       setStatusLabel('Time Remaining');
+      // Clear the activity-name input + its saved value so the teacher can
+      // type a fresh name for the next activity without backspacing the old
+      // one. Reset means "going back to plan a new run", so a blank slate
+      // is the right default here. (Chris's request.)
+      taskInput.value = '';
+      localStorage.removeItem(TASK_KEY);
       run.hidden = true; home.hidden = false;
       pauseBtn.textContent = 'Pause';
     }
@@ -732,6 +844,79 @@
     // Re-render on tab restore so digits catch up to wall-clock instantly
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden && running) render();
+    });
+
+    // ── EMBED SETUP ──
+    // 📋 Embed nav item + modal. Shows only on desktop non-standalone non-embed
+    // (same gating countdown.html and panther_prompts.html use), because the
+    // iframe code is only useful when authoring a Canvas / ClassroomScreen page.
+    const embedBtn      = document.getElementById('embedBtn');
+    const embedModal    = document.getElementById('embedModal');
+    const embedBackdrop = document.getElementById('embedBackdrop');
+    const embedCloseBtn = document.getElementById('embedCloseBtn');
+    const embedCodeEl   = document.getElementById('embedCode');
+    const copyEmbedBtn  = document.getElementById('copyEmbedBtn');
+    const embedStatusEl = document.getElementById('embedStatus');
+    const embedPresets  = document.querySelectorAll('.embed-preset');
+
+    const embedConfig = {
+      canvas:          { label:'Canvas',          height:760 },
+      classroomscreen: { label:'ClassroomScreen', height:640 }
+    };
+    let activeEmbedTarget = 'canvas';
+
+    function buildEmbedCode(targetKey) {
+      const config = embedConfig[targetKey] || embedConfig.canvas;
+      const src = new URL('activity_timer.html?mode=embed', window.location.href);
+      const style = 'border:0;overflow:hidden;background:transparent;';
+      return `<iframe src="${src.toString()}" title="PVHS Activity Timer" width="100%" height="${config.height}" style="${style}" loading="lazy" scrolling="no" allowtransparency="true" allowfullscreen></iframe>`;
+    }
+    function updateEmbedCode(targetKey = activeEmbedTarget) {
+      activeEmbedTarget = targetKey;
+      if (embedCodeEl) embedCodeEl.value = buildEmbedCode(targetKey);
+      if (embedStatusEl) {
+        const config = embedConfig[targetKey] || embedConfig.canvas;
+        embedStatusEl.textContent = `${config.label} preset selected. Adjust the height later if needed.`;
+      }
+      embedPresets.forEach(btn => {
+        btn.classList.toggle('is-active', btn.dataset.embedTarget === targetKey);
+      });
+    }
+    function openEmbedModal() {
+      if (!embedModal) return;
+      updateEmbedCode(activeEmbedTarget);
+      embedModal.hidden = false;
+    }
+    function closeEmbedModal() {
+      if (!embedModal) return;
+      embedModal.hidden = true;
+    }
+
+    if (!isMobile && !isStandalone && !isEmbed && embedBtn) {
+      embedBtn.style.display = 'flex';
+      embedBtn.addEventListener('click', () => {
+        navMenu.classList.remove('is-open');
+        openEmbedModal();
+      });
+    }
+
+    embedCloseBtn?.addEventListener('click', closeEmbedModal);
+    embedBackdrop?.addEventListener('click', closeEmbedModal);
+    embedPresets.forEach(btn => {
+      btn.addEventListener('click', () => updateEmbedCode(btn.dataset.embedTarget));
+    });
+    copyEmbedBtn?.addEventListener('click', async () => {
+      const code = embedCodeEl.value;
+      try {
+        await navigator.clipboard.writeText(code);
+        embedStatusEl.textContent = 'Copied — paste into Canvas or ClassroomScreen.';
+      } catch {
+        embedCodeEl.select(); embedCodeEl.setSelectionRange(0, code.length);
+        embedStatusEl.textContent = 'Press ⌘/Ctrl+C to copy the selected code.';
+      }
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && embedModal && !embedModal.hidden) closeEmbedModal();
     });
 
     // Service worker
