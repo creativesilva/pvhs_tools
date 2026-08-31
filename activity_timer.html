@@ -177,8 +177,25 @@
     .at-input:focus { background:rgba(255,255,255,0.1); border-color:rgba(75,225,225,0.4); }
     .at-input::placeholder { color:rgba(255,255,255,0.32); font-weight:500; font-style:italic; }
 
-    .at-start-wrap { padding:14px 8px 6px; margin-top:auto; flex-shrink:0; }
-    .at-start { appearance:none; width:100%; padding:16px; border-radius:16px; border:1px solid rgba(75,225,225,0.4); background:linear-gradient(180deg, rgba(0,180,180,0.35), rgba(0,140,140,0.25)); color:#fff; font-size:15px; font-weight:900; letter-spacing:0.14em; text-transform:uppercase; cursor:pointer; box-shadow:0 8px 24px rgba(0,140,140,0.24); }
+    /* Start button: half-width + centered so its footprint matches the
+       Reset button on the run view exactly. Same paddings + border-radius
+       as .at-ctrl / .at-controls, so tapping Start looks like the button
+       lands in the same spot on the next screen. Green tone marks it as
+       the 'go' action, distinct from the teal Reset. */
+    .at-start-wrap {
+      display:flex; justify-content:center;
+      padding:12px 6px 6px; margin-top:auto; flex-shrink:0; width:100%;
+    }
+    .at-start {
+      appearance:none;
+      flex:0 1 calc(50% - 5px);          /* half of the two-button row on run view (10px gap → 5px per side) */
+      padding:15px; border-radius:14px;
+      border:1px solid rgba(90,220,150,0.5);
+      background:linear-gradient(180deg, rgba(50,190,120,0.4), rgba(20,150,90,0.28));
+      color:#fff; font-size:12px; font-weight:900;
+      letter-spacing:0.12em; text-transform:uppercase; cursor:pointer;
+      box-shadow:0 8px 24px rgba(30,170,100,0.22);
+    }
     .at-start:active { transform:scale(0.98); }
 
     /* ── RUN VIEW (full-screen countdown w/ DSEG7 digits) ── */
@@ -584,11 +601,12 @@
         durationSec = saved * 60;
       }
     }
-    // Restore last activity name (blank if none)
-    taskInput.value = localStorage.getItem(TASK_KEY) || '';
-    taskInput.addEventListener('input', () => {
-      localStorage.setItem(TASK_KEY, taskInput.value.trim());
-    });
+    // Activity name is intentionally NOT persisted across page loads.
+    // Every refresh starts with a blank field — teachers get a fresh
+    // slate for the next activity (Chris's request). Duration DOES
+    // persist since teachers reuse a common length across the day.
+    // TASK_KEY is still cleared on Reset just to purge any legacy
+    // value from before this change.
 
     // Initial ring geometry
     ringFill.setAttribute('stroke-dasharray', RING_C);
