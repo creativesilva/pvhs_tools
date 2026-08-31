@@ -114,6 +114,7 @@
     .nav-menu-item:active { background: rgba(255,255,255,0.1); }
     .nav-menu-item[hidden] { display: none; }
     .nav-menu-icon { font-size: 14px; flex-shrink: 0; }
+    img.nav-menu-icon { width:18px; height:18px; object-fit:contain; display:block; }
     .nav-menu-sep { height: 1px; background: rgba(255,255,255,0.09); margin: 3px 6px; }
 
     .embed-modal[hidden] { display: none; }
@@ -252,6 +253,7 @@
     }
     .primary-btn:active { transform: scale(0.97); background: rgba(0,180,180,0.14); }
     .primary-btn .quick-link-icon { font-size: 20px; }
+    img.quick-link-icon { width:22px; height:22px; object-fit:contain; display:inline-block; vertical-align:middle; }
     .primary-btn .quick-link-label { font-size: 10px; font-weight: 800; letter-spacing: 0.13em; color: #b8f4f4; }
 
     .section-label { width: 100%; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.18em; color: var(--muted); opacity: 0.65; margin-bottom: 4px; text-align: center; }
@@ -1067,7 +1069,7 @@
           <p class="greeting" id="greetingText">Welcome</p>
         </div>
         <div class="primary-nav">
-          <a class="primary-btn nav-link" href="countdown.html"><span class="quick-link-icon">⏱️</span><p class="quick-link-label">Countdown</p></a>
+          <a class="primary-btn nav-link" href="countdown.html"><img class="quick-link-icon" src="assets/stopwatch.png" alt=""><p class="quick-link-label">Countdown</p></a>
           <a class="primary-btn nav-link" id="directoryBtn" href="extension_search.html"><span class="quick-link-icon">🔍</span><p class="quick-link-label">Directory</p></a>
         </div>
         <p class="section-label">Quick Links</p>
@@ -1325,7 +1327,7 @@
       <!-- NAV DROPDOWN -->
       <div id="navMenu" class="nav-menu" role="menu">
         <a href="calendar.html"         class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">📅</span>Calendar</a>
-        <a href="countdown.html"       class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">⏱️</span>Countdown</a>
+        <a href="countdown.html"       class="nav-menu-item nav-link" role="menuitem"><img class="nav-menu-icon" src="assets/stopwatch.png" alt="">Countdown</a>
         <a href="extension_search.html" class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">🔍</span>Staff Search</a>
         <a href="panther_toolbox.html"  class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">🧰</span>Teacher Toolbox</a>
         <a href="map.html"              class="nav-menu-item nav-link" role="menuitem" hidden><span class="nav-menu-icon">🗺️</span>Campus Map</a>

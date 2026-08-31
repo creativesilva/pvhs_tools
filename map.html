@@ -65,6 +65,7 @@
     .nav-menu-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 11px; text-decoration: none; color: #eaf8f8; background: transparent; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; border: none; cursor: pointer; width: 100%; transition: background 0.13s; }
     .nav-menu-item:active { background: rgba(255,255,255,0.1); }
     .nav-menu-icon { font-size: 14px; flex-shrink: 0; }
+    img.nav-menu-icon { width:18px; height:18px; object-fit:contain; display:block; }
     .nav-menu-sep { height: 1px; background: rgba(255,255,255,0.09); margin: 3px 6px; }
 
     /* ── SEARCH BAR ── */
@@ -275,7 +276,7 @@
   <!-- Nav Dropdown -->
   <nav class="nav-menu" id="navMenu" role="menu" aria-hidden="true">
     <a href="index.html" class="nav-menu-item nav-link"><span class="nav-menu-icon">&#x1F3E0;</span> Home</a>
-    <a href="countdown.html" class="nav-menu-item nav-link"><span class="nav-menu-icon">⏱️</span> Countdown</a>
+    <a href="countdown.html" class="nav-menu-item nav-link"><img class="nav-menu-icon" src="assets/stopwatch.png" alt="">Countdown</a>
     <a href="extension_search.html" class="nav-menu-item nav-link"><span class="nav-menu-icon">&#x1F50D;</span> Staff Search</a>
     <a href="map.html" class="nav-menu-item nav-link"><span class="nav-menu-icon">&#x1F5FA;</span> Campus Map</a>
     <a href="calendar.html" class="nav-menu-item nav-link"><span class="nav-menu-icon">&#x1F4C5;</span> Calendar</a>

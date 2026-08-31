@@ -67,6 +67,7 @@
     .nav-menu-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:11px; text-decoration:none; color:#eaf8f8; background:transparent; font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; border:none; cursor:pointer; width:100%; }
     .nav-menu-item:active { background:rgba(255,255,255,0.1); }
     .nav-menu-icon { font-size:14px; }
+    img.nav-menu-icon { width:18px; height:18px; object-fit:contain; display:block; }
 
     /* Views */
     .at-view { flex:1; min-height:0; display:flex; flex-direction:column; overflow:hidden; }
@@ -98,6 +99,7 @@
 
     /* Main hero contents (unchanged look, just wrapped) */
     .at-emoji { font-size:52px; line-height:1; filter:drop-shadow(0 8px 24px rgba(75,225,225,0.35)); }
+    img.at-emoji { width:56px; height:56px; object-fit:contain; display:inline-block; }
     .at-hero-main h1 { font-size:22px; font-weight:900; letter-spacing:0.02em; margin:8px 0 2px; color:#fff; }
     .at-hero-sub { font-size:11px; color:var(--muted); font-weight:600; letter-spacing:0.06em; opacity:0.85; }
 
@@ -435,7 +437,7 @@
               <div class="at-thanks-post">for suggesting this feature</div>
             </div>
             <div class="at-hero-main">
-              <div class="at-emoji">⏱️</div>
+              <img class="at-emoji" src="assets/stopwatch.png" alt="">
               <h1>Activity Timer</h1>
               <p class="at-hero-sub">Set duration & activity, tap start</p>
             </div>
@@ -500,7 +502,7 @@
   <nav class="nav-menu" id="navMenu" role="menu">
     <a href="index.html"            class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">🏠</span>Home</a>
     <a href="panther_toolbox.html"  class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">🧰</span>Teacher Toolbox</a>
-    <a href="countdown.html"        class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">⏱️</span>Countdown</a>
+    <a href="countdown.html"        class="nav-menu-item" role="menuitem"><img class="nav-menu-icon" src="assets/stopwatch.png" alt="">Countdown</a>
     <a href="calendar.html"         class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">📅</span>Calendar</a>
     <a href="extension_search.html" class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">🔍</span>Directory</a>
     <a href="panther_prompts.html"  class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">❓</span>Panther Prompts</a>

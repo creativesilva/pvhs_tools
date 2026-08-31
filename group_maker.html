@@ -55,6 +55,7 @@
     .nav-menu-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:11px; text-decoration:none; color:#eaf8f8; background:transparent; font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; border:none; cursor:pointer; width:100%; }
     .nav-menu-item:active { background:rgba(255,255,255,0.1); }
     .nav-menu-icon { font-size:14px; }
+    img.nav-menu-icon { width:18px; height:18px; object-fit:contain; display:block; }
 
     /* Views */
     .gm-view { flex:1; min-height:0; display:flex; flex-direction:column; overflow-y:auto; -webkit-overflow-scrolling:touch; }
@@ -219,11 +220,11 @@
   <nav class="nav-menu" id="navMenu" role="menu">
     <a href="index.html"            class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">🏠</span>Home</a>
     <a href="panther_toolbox.html"  class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">🧰</span>Teacher Toolbox</a>
-    <a href="countdown.html"        class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">⏱️</span>Countdown</a>
+    <a href="countdown.html"        class="nav-menu-item" role="menuitem"><img class="nav-menu-icon" src="assets/stopwatch.png" alt="">Countdown</a>
     <a href="calendar.html"         class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">📅</span>Calendar</a>
     <a href="extension_search.html" class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">🔍</span>Directory</a>
     <a href="panther_prompts.html"  class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">❓</span>Panther Prompts</a>
-    <a href="activity_timer.html"   class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">⏱️</span>Activity Timer</a>
+    <a href="activity_timer.html"   class="nav-menu-item" role="menuitem"><img class="nav-menu-icon" src="assets/stopwatch.png" alt="">Activity Timer</a>
   </nav>
 
   <script>
