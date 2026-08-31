@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PVHS Tools">
+  <meta name="theme-color" content="#007474">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="PV_AppIcon.png">
+  <link rel="icon" type="image/png" href="PV_AppIcon.png">
+  <title>Panther Toolbox</title>
+
+  <style>
+    :root {
+      --teal:#007474; --white:#f7fbfb; --muted:#cfe3e3;
+      --shadow:0 20px 46px rgba(0,0,0,0.30);
+      --card-hover:rgba(255,255,255,0.12); --app-spacing:16px; --radius:34px;
+    }
+    * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; margin:0; padding:0; }
+    html { height:-webkit-fill-available; }
+    html, body { width:100%; height:100%; min-height:100%; background:#021414; overflow:hidden; }
+    body { min-height:100vh; min-height:100dvh; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+           color:var(--white); touch-action:none; user-select:none; -webkit-font-smoothing:antialiased; }
+
+    .frame { width:100%; height:100dvh; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:10px; }
+    .app {
+      width:430px; height:880px; max-width:100%; max-height:100%;
+      border-radius:var(--radius); overflow:hidden; position:relative;
+      box-shadow:var(--shadow); border:1px solid rgba(255,255,255,0.12);
+      background:linear-gradient(168deg, rgba(6,28,28,0.97) 0%, rgba(4,24,24,0.95) 30%, rgba(0,72,72,0.92) 60%, rgba(0,100,100,0.96) 82%, rgba(4,30,30,0.97) 100%);
+      display:flex; flex-direction:column; padding:14px var(--app-spacing) var(--app-spacing);
+    }
+    .app::before {
+      content:""; position:absolute; inset:0; pointer-events:none;
+      background: radial-gradient(ellipse at 50% 20%, rgba(0,116,116,0.18) 0%, transparent 60%),
+                  radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 50%);
+      z-index:0;
+    }
+    .ghost-logo { position:absolute; top:56%; left:50%; width:120%; opacity:0.05; transform:translate(-50%,-50%); filter:grayscale(100%); pointer-events:none; z-index:0; }
+    .content { position:relative; z-index:1; width:100%; flex:1; min-height:0; display:flex; flex-direction:column; overflow:hidden; }
+
+    /* Top row (matches panther_prompts.html) */
+    .top-row { display:flex; align-items:center; justify-content:space-between; width:100%; gap:10px; height:44px; flex-shrink:0; margin-bottom:8px; position:relative; }
+    .logo-clear { width:38px; height:38px; object-fit:contain; filter:drop-shadow(0 8px 18px rgba(0,0,0,0.24)); }
+    .page-title { position:absolute; left:0; right:0; text-align:center; font-size:15px; font-weight:700; color:#dff7f7; text-transform:uppercase; margin:0; letter-spacing:0.14em; pointer-events:none; }
+    .nav-menu-btn { appearance:none; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.13); border-radius:12px; color:rgba(255,255,255,0.92); width:34px; height:34px; font-size:14px; font-weight:900; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+
+    /* Nav dropdown */
+    .nav-menu { position:fixed; z-index:9999; min-width:180px; background:rgba(3,20,20,0.58); border:1px solid rgba(255,255,255,0.16); border-radius:16px; padding:5px; box-shadow:0 14px 44px rgba(0,0,0,0.52); backdrop-filter:blur(26px); -webkit-backdrop-filter:blur(26px); transform-origin:top right; transform:scale(0.88) translateY(-8px); opacity:0; pointer-events:none; transition:opacity 0.17s ease, transform 0.19s cubic-bezier(0.34,1.4,0.64,1); }
+    .nav-menu.is-open { opacity:1; transform:scale(1) translateY(0); pointer-events:auto; }
+    .nav-menu-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:11px; text-decoration:none; color:#eaf8f8; background:transparent; font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; border:none; cursor:pointer; width:100%; }
+    .nav-menu-item:active { background:rgba(255,255,255,0.1); }
+    .nav-menu-icon { font-size:14px; }
+
+    /* Hero */
+    .tb-hero { text-align:center; padding:22px 12px 16px; flex-shrink:0; }
+    .tb-emoji { font-size:66px; line-height:1; filter:drop-shadow(0 8px 24px rgba(75,225,225,0.35)); }
+    .tb-hero h1 { font-size:24px; font-weight:900; letter-spacing:0.02em; margin:12px 0 4px; color:#fff; }
+    .tb-hero-sub { font-size:12px; color:var(--muted); font-weight:600; letter-spacing:0.06em; opacity:0.85; }
+
+    /* Tile grid */
+    .tb-grid { flex:1; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch;
+               display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:8px 4px 4px; align-content:start; }
+    .tb-tile {
+      appearance:none; text-decoration:none; cursor:pointer;
+      background:linear-gradient(160deg, rgba(0,116,116,0.32) 0%, rgba(0,74,74,0.42) 100%);
+      border:1px solid rgba(75,225,225,0.35); border-radius:20px;
+      padding:22px 14px; min-height:140px;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      color:#fff; text-align:center;
+      box-shadow:0 12px 30px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.08);
+      backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+      transition:transform 0.15s ease, background 0.15s ease;
+    }
+    .tb-tile:active { transform:scale(0.97); background:linear-gradient(160deg, rgba(0,140,140,0.4) 0%, rgba(0,90,90,0.5) 100%); }
+    .tb-tile-emoji { font-size:40px; line-height:1; filter:drop-shadow(0 6px 14px rgba(75,225,225,0.35)); }
+    .tb-tile-label { margin-top:12px; font-size:13px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:#fff; }
+    .tb-tile-sub { margin-top:5px; font-size:10px; font-weight:600; color:var(--muted); opacity:0.85; letter-spacing:0.05em; }
+
+    /* Coming-soon tile (dashed, dimmer) — keeps the grid balanced when odd count of live tiles */
+    .tb-tile.is-soon {
+      background:rgba(255,255,255,0.03);
+      border:1px dashed rgba(255,255,255,0.16);
+      opacity:0.6;
+      cursor:default;
+    }
+    .tb-tile.is-soon:active { transform:none; background:rgba(255,255,255,0.03); }
+    .tb-tile.is-soon .tb-tile-emoji { filter:grayscale(1) opacity(0.7); }
+
+    .footer-note { text-align:center; font-size:9.5px; color:#b5d4d4; font-weight:600; padding:8px 0 3px; flex-shrink:0; opacity:0.75; }
+    .footer-version { text-align:center; font-size:8.5px; color:#b5d4d4; opacity:0.55; padding:0 0 6px; font-weight:500; letter-spacing:0.04em; flex-shrink:0; }
+
+    /* Standalone */
+    body.is-standalone { background:#021414; }
+    body.is-standalone::before { content:""; position:fixed; inset:0; background:#021414; pointer-events:none; z-index:0; }
+    body.is-standalone .frame { position:fixed; inset:0; width:100%; height:100%; padding:0 8px max(24px,calc(env(safe-area-inset-bottom) + 8px)) 8px; z-index:1; }
+    body.is-standalone .app { position:relative; width:100%; height:100%; max-width:100%; max-height:100%; border-radius:34px; padding-top:max(10px,env(safe-area-inset-top)); padding-right:max(var(--app-spacing),env(safe-area-inset-right)); padding-bottom:18px; padding-left:max(var(--app-spacing),env(safe-area-inset-left)); }
+    @media (max-width:430px) {
+      body:not(.is-standalone) .frame { padding:env(safe-area-inset-top) 12px env(safe-area-inset-bottom) 12px; }
+      body:not(.is-standalone) .app { width:100%; height:100%; max-height:100%; border-radius:var(--radius); }
+      body { touch-action:pan-y; }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <div class="app">
+      <img class="ghost-logo" src="PV_Logo.png" alt="">
+      <div class="content">
+
+        <!-- Top row -->
+        <div class="top-row">
+          <a href="index.html" class="nav-link" aria-label="Home"><img src="PV_Logo.png" class="logo-clear" alt="PVHS"></a>
+          <h1 class="page-title">Panther Toolbox</h1>
+          <button class="nav-menu-btn" id="navMenuBtn" type="button" aria-label="Menu">···</button>
+        </div>
+
+        <!-- Hero -->
+        <div class="tb-hero">
+          <div class="tb-emoji">🧰</div>
+          <h1>Panther Toolbox</h1>
+          <p class="tb-hero-sub">Mini apps for your classroom</p>
+        </div>
+
+        <!-- Tile grid — add new mini-apps here as they ship -->
+        <div class="tb-grid">
+          <a class="tb-tile" href="panther_prompts.html">
+            <div class="tb-tile-emoji">❓</div>
+            <div class="tb-tile-label">Panther Prompts</div>
+            <div class="tb-tile-sub">75 conversation starters</div>
+          </a>
+          <a class="tb-tile" href="activity_timer.html">
+            <div class="tb-tile-emoji">⏱</div>
+            <div class="tb-tile-label">Activity Timer</div>
+            <div class="tb-tile-sub">1–30 min · chime + haptic</div>
+          </a>
+          <div class="tb-tile is-soon">
+            <div class="tb-tile-emoji">✨</div>
+            <div class="tb-tile-label">More Soon</div>
+            <div class="tb-tile-sub">Coming this year</div>
+          </div>
+        </div>
+
+        <div class="footer-note">By: <a href="https://www.creativesilva.com" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">CreativeSilva</a></div>
+        <div class="footer-version">Panther Toolbox · v1 · Updated Aug 30, 2026</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nav dropdown -->
+  <nav class="nav-menu" id="navMenu" role="menu">
+    <a href="index.html"            class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">🏠</span>Home</a>
+    <a href="countdown.html"        class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">⏱</span>Countdown</a>
+    <a href="calendar.html"         class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">📅</span>Calendar</a>
+    <a href="extension_search.html" class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">🔍</span>Directory</a>
+    <a href="panther_prompts.html"  class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">❓</span>Panther Prompts</a>
+    <a href="activity_timer.html"   class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">⏱</span>Activity Timer</a>
+  </nav>
+
+  <script>
+    // Standalone
+    if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+      document.body.classList.add('is-standalone');
+    }
+
+    // Nav menu
+    const navMenu = document.getElementById('navMenu');
+    const navMenuBtn = document.getElementById('navMenuBtn');
+    navMenuBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      const r = navMenuBtn.getBoundingClientRect();
+      navMenu.style.top   = (r.bottom + 6) + 'px';
+      navMenu.style.right = (window.innerWidth - r.right) + 'px';
+      navMenu.classList.toggle('is-open');
+    });
+    document.addEventListener('click', e => {
+      if (!navMenu.contains(e.target) && e.target !== navMenuBtn) navMenu.classList.remove('is-open');
+    });
+
+    // Home logo — force in-app navigation (PWA)
+    document.querySelector('.top-row a[aria-label="Home"]').addEventListener('click', e => {
+      e.preventDefault(); window.location.href = 'index.html';
+    });
+
+    // Service worker
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  </script>
+</body>
+</html>

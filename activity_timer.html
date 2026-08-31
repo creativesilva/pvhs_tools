@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PVHS Tools">
+  <meta name="theme-color" content="#007474">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="PV_AppIcon.png">
+  <link rel="icon" type="image/png" href="PV_AppIcon.png">
+  <title>Activity Timer</title>
+
+  <style>
+    :root {
+      --teal:#007474; --teal-bright:#4be1e1;
+      --white:#f7fbfb; --muted:#cfe3e3;
+      --shadow:0 20px 46px rgba(0,0,0,0.30);
+      --app-spacing:16px; --radius:34px;
+    }
+    * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; margin:0; padding:0; }
+    html { height:-webkit-fill-available; }
+    html, body { width:100%; height:100%; min-height:100%; background:#021414; overflow:hidden; }
+    body { min-height:100vh; min-height:100dvh; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+           color:var(--white); touch-action:none; user-select:none; -webkit-font-smoothing:antialiased; }
+
+    .frame { width:100%; height:100dvh; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:10px; }
+    .app {
+      width:430px; height:880px; max-width:100%; max-height:100%;
+      border-radius:var(--radius); overflow:hidden; position:relative;
+      box-shadow:var(--shadow); border:1px solid rgba(255,255,255,0.12);
+      background:linear-gradient(168deg, rgba(6,28,28,0.97) 0%, rgba(4,24,24,0.95) 30%, rgba(0,72,72,0.92) 60%, rgba(0,100,100,0.96) 82%, rgba(4,30,30,0.97) 100%);
+      display:flex; flex-direction:column; padding:14px var(--app-spacing) var(--app-spacing);
+      transition:background 0.4s ease;
+    }
+    .app::before {
+      content:""; position:absolute; inset:0; pointer-events:none;
+      background: radial-gradient(ellipse at 50% 20%, rgba(0,116,116,0.18) 0%, transparent 60%),
+                  radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 50%);
+      z-index:0;
+    }
+    .ghost-logo { position:absolute; top:56%; left:50%; width:120%; opacity:0.05; transform:translate(-50%,-50%); filter:grayscale(100%); pointer-events:none; z-index:0; }
+    .content { position:relative; z-index:1; width:100%; flex:1; min-height:0; display:flex; flex-direction:column; overflow:hidden; }
+
+    /* Top row */
+    .top-row { display:flex; align-items:center; justify-content:space-between; width:100%; gap:10px; height:44px; flex-shrink:0; margin-bottom:8px; position:relative; }
+    .logo-clear { width:38px; height:38px; object-fit:contain; filter:drop-shadow(0 8px 18px rgba(0,0,0,0.24)); }
+    .page-title { position:absolute; left:0; right:0; text-align:center; font-size:15px; font-weight:700; color:#dff7f7; text-transform:uppercase; margin:0; letter-spacing:0.14em; pointer-events:none; }
+    .nav-menu-btn { appearance:none; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.13); border-radius:12px; color:rgba(255,255,255,0.92); width:34px; height:34px; font-size:14px; font-weight:900; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+
+    /* Nav dropdown */
+    .nav-menu { position:fixed; z-index:9999; min-width:180px; background:rgba(3,20,20,0.58); border:1px solid rgba(255,255,255,0.16); border-radius:16px; padding:5px; box-shadow:0 14px 44px rgba(0,0,0,0.52); backdrop-filter:blur(26px); -webkit-backdrop-filter:blur(26px); transform-origin:top right; transform:scale(0.88) translateY(-8px); opacity:0; pointer-events:none; transition:opacity 0.17s ease, transform 0.19s cubic-bezier(0.34,1.4,0.64,1); }
+    .nav-menu.is-open { opacity:1; transform:scale(1) translateY(0); pointer-events:auto; }
+    .nav-menu-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:11px; text-decoration:none; color:#eaf8f8; background:transparent; font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; border:none; cursor:pointer; width:100%; }
+    .nav-menu-item:active { background:rgba(255,255,255,0.1); }
+    .nav-menu-icon { font-size:14px; }
+
+    /* Views */
+    .at-view { flex:1; min-height:0; display:flex; flex-direction:column; overflow:hidden; }
+    .at-view[hidden] { display:none; }
+
+    /* ── HOME VIEW ────────────────────────────────────────── */
+    .at-hero { text-align:center; padding:26px 12px 20px; flex-shrink:0; }
+    .at-emoji { font-size:72px; line-height:1; filter:drop-shadow(0 8px 24px rgba(75,225,225,0.35)); }
+    .at-hero h1 { font-size:26px; font-weight:900; letter-spacing:0.02em; margin:12px 0 4px; color:#fff; }
+    .at-hero-sub { font-size:12px; color:var(--muted); font-weight:600; letter-spacing:0.06em; opacity:0.85; }
+
+    .at-field { padding:6px 6px 12px; }
+    .at-field-label { display:block; font-size:10px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:0.14em; margin-bottom:8px; opacity:0.85; padding-left:4px; }
+    .at-select-wrap { position:relative; }
+    .at-select {
+      appearance:none; -webkit-appearance:none; -moz-appearance:none;
+      width:100%; padding:14px 42px 14px 16px;
+      border-radius:14px; border:1px solid rgba(255,255,255,0.14);
+      background:rgba(255,255,255,0.06); color:#f7fbfb;
+      font-size:14px; font-weight:700; font-family:inherit; letter-spacing:0.01em;
+      cursor:pointer; outline:none;
+      transition:background 0.18s, border-color 0.18s;
+    }
+    .at-select:hover, .at-select:focus { background:rgba(255,255,255,0.1); border-color:rgba(75,225,225,0.4); }
+    .at-select option { background:#052828; color:#f7fbfb; font-weight:600; padding:8px; }
+    .at-select-chevron { position:absolute; right:16px; top:50%; transform:translateY(-50%); pointer-events:none; color:var(--teal-bright); font-size:13px; font-weight:900; opacity:0.85; }
+
+    .at-quick-row { display:flex; flex-wrap:wrap; gap:6px; padding:0 6px 8px; }
+    .at-quick { flex:1 1 60px; appearance:none; padding:9px 4px; border-radius:11px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.05); color:#eaf8f8; font-size:11px; font-weight:800; letter-spacing:0.06em; cursor:pointer; }
+    .at-quick.is-active { background:linear-gradient(180deg, rgba(0,180,180,0.4), rgba(0,140,140,0.28)); border-color:rgba(75,225,225,0.5); color:#fff; }
+    .at-quick:active { transform:scale(0.98); }
+
+    .at-start-wrap { padding:14px 8px 10px; margin-top:auto; flex-shrink:0; }
+    .at-start { appearance:none; width:100%; padding:18px; border-radius:16px; border:1px solid rgba(75,225,225,0.4); background:linear-gradient(180deg, rgba(0,180,180,0.35), rgba(0,140,140,0.25)); color:#fff; font-size:15px; font-weight:900; letter-spacing:0.14em; text-transform:uppercase; cursor:pointer; box-shadow:0 8px 24px rgba(0,140,140,0.24); }
+    .at-start:active { transform:scale(0.98); }
+
+    /* ── RUN VIEW (full-screen countdown) ─────────────────── */
+    .at-run { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:16px 6px; }
+    .at-ring-wrap { position:relative; width:min(320px, 80vw); aspect-ratio:1/1; margin:6px 0 22px; display:flex; align-items:center; justify-content:center; }
+    .at-ring { position:absolute; inset:0; transform:rotate(-90deg); }
+    .at-ring-track { fill:none; stroke:rgba(255,255,255,0.08); stroke-width:8; }
+    .at-ring-fill { fill:none; stroke:url(#atGrad); stroke-width:10; stroke-linecap:round; transition:stroke-dashoffset 0.5s linear; filter:drop-shadow(0 0 12px rgba(75,225,225,0.35)); }
+    .at-digits {
+      position:relative;
+      font-variant-numeric:tabular-nums; font-feature-settings:'tnum' 1;
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+      font-size:clamp(56px, 18vw, 96px); font-weight:900; line-height:1;
+      color:#fff; letter-spacing:-0.02em;
+      text-shadow:0 4px 30px rgba(75,225,225,0.35);
+    }
+    .at-label { font-size:11px; font-weight:800; color:var(--muted); letter-spacing:0.2em; text-transform:uppercase; opacity:0.8; margin-bottom:8px; }
+    .at-controls { display:flex; gap:10px; padding:12px 6px 6px; width:100%; }
+    .at-ctrl { flex:1; appearance:none; padding:15px; border-radius:14px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.06); color:#eaf8f8; font-size:12px; font-weight:900; letter-spacing:0.12em; text-transform:uppercase; cursor:pointer; }
+    .at-ctrl:active { transform:scale(0.98); }
+    .at-ctrl.is-primary { background:linear-gradient(180deg, rgba(0,180,180,0.4), rgba(0,140,140,0.28)); border-color:rgba(75,225,225,0.4); color:#fff; }
+
+    /* ── DONE (0:00) STATE ────────────────────────────────── */
+    .app.is-done { background:linear-gradient(168deg, rgba(0,120,120,0.98) 0%, rgba(0,180,180,0.92) 50%, rgba(0,140,140,0.96) 100%); }
+    .app.is-done .at-digits { color:#fff; text-shadow:0 6px 40px rgba(255,255,255,0.6); }
+    .at-done-pill { display:none; padding:10px 20px; border-radius:99px; background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.36); color:#fff; font-size:13px; font-weight:900; letter-spacing:0.2em; text-transform:uppercase; margin-top:14px; }
+    .app.is-done .at-done-pill { display:inline-flex; animation:donePulse 1.2s ease-in-out infinite; }
+    @keyframes donePulse {
+      0%,100% { transform:scale(1);   background:rgba(255,255,255,0.18); }
+      50%     { transform:scale(1.06); background:rgba(255,255,255,0.32); }
+    }
+
+    /* Flash overlay played once at 0 for the visual "buzzer" */
+    .at-flash { position:absolute; inset:0; background:radial-gradient(circle at 50% 50%, rgba(75,225,225,0.55) 0%, transparent 70%); opacity:0; pointer-events:none; z-index:2; }
+    .at-flash.is-firing { animation:atFlash 900ms ease-out; }
+    @keyframes atFlash {
+      0%   { opacity:0; }
+      15%  { opacity:1; }
+      100% { opacity:0; }
+    }
+
+    .footer-note { text-align:center; font-size:9.5px; color:#b5d4d4; font-weight:600; padding:8px 0 3px; margin-top:auto; flex-shrink:0; opacity:0.75; }
+    .footer-version { text-align:center; font-size:8.5px; color:#b5d4d4; opacity:0.55; padding:0 0 6px; font-weight:500; letter-spacing:0.04em; flex-shrink:0; }
+
+    /* Standalone */
+    body.is-standalone { background:#021414; }
+    body.is-standalone::before { content:""; position:fixed; inset:0; background:#021414; pointer-events:none; z-index:0; }
+    body.is-standalone .frame { position:fixed; inset:0; width:100%; height:100%; padding:0 8px max(24px,calc(env(safe-area-inset-bottom) + 8px)) 8px; z-index:1; }
+    body.is-standalone .app { position:relative; width:100%; height:100%; max-width:100%; max-height:100%; border-radius:34px; padding-top:max(10px,env(safe-area-inset-top)); padding-right:max(var(--app-spacing),env(safe-area-inset-right)); padding-bottom:18px; padding-left:max(var(--app-spacing),env(safe-area-inset-left)); }
+    @media (max-width:430px) {
+      body:not(.is-standalone) .frame { padding:env(safe-area-inset-top) 12px env(safe-area-inset-bottom) 12px; }
+      body:not(.is-standalone) .app { width:100%; height:100%; max-height:100%; border-radius:var(--radius); }
+      body { touch-action:pan-y; }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <div class="app" id="atApp">
+      <img class="ghost-logo" src="PV_Logo.png" alt="">
+      <div class="at-flash" id="atFlash"></div>
+      <div class="content">
+
+        <!-- Top row -->
+        <div class="top-row">
+          <a href="panther_toolbox.html" class="nav-link" aria-label="Back to Toolbox"><img src="PV_Logo.png" class="logo-clear" alt="PVHS"></a>
+          <h1 class="page-title">Activity Timer</h1>
+          <button class="nav-menu-btn" id="navMenuBtn" type="button" aria-label="Menu">···</button>
+        </div>
+
+        <!-- HOME VIEW -->
+        <div id="atHome" class="at-view">
+          <div class="at-hero">
+            <div class="at-emoji">⏱</div>
+            <h1>Activity Timer</h1>
+            <p class="at-hero-sub">Set the time, tap start</p>
+          </div>
+
+          <div class="at-field">
+            <label class="at-field-label" for="atDurSelect">Duration</label>
+            <div class="at-select-wrap">
+              <select id="atDurSelect" class="at-select">
+                <option value="1">1 minute</option>
+                <option value="2">2 minutes</option>
+                <option value="3">3 minutes</option>
+                <option value="5" selected>5 minutes</option>
+                <option value="10">10 minutes</option>
+                <option value="15">15 minutes</option>
+                <option value="20">20 minutes</option>
+                <option value="25">25 minutes</option>
+                <option value="30">30 minutes</option>
+              </select>
+              <span class="at-select-chevron" aria-hidden="true">▾</span>
+            </div>
+          </div>
+
+          <div class="at-field" style="padding-bottom:6px">
+            <label class="at-field-label">Quick pick</label>
+            <div class="at-quick-row" id="atQuickRow">
+              <!-- injected by JS so button state stays in sync with the select -->
+            </div>
+          </div>
+
+          <div class="at-start-wrap">
+            <button class="at-start" id="atStart">Start ▶</button>
+          </div>
+        </div>
+
+        <!-- RUN VIEW -->
+        <div id="atRun" class="at-view at-run" hidden>
+          <div class="at-label" id="atStatusLabel">Time Remaining</div>
+          <div class="at-ring-wrap">
+            <svg class="at-ring" viewBox="0 0 200 200" aria-hidden="true">
+              <defs>
+                <linearGradient id="atGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%"  stop-color="#4be1e1"/>
+                  <stop offset="100%" stop-color="#007474"/>
+                </linearGradient>
+              </defs>
+              <circle class="at-ring-track" cx="100" cy="100" r="88"/>
+              <circle class="at-ring-fill"  cx="100" cy="100" r="88" id="atRingFill"/>
+            </svg>
+            <div class="at-digits" id="atDigits">5:00</div>
+          </div>
+          <div class="at-done-pill">⏱ Time</div>
+          <div class="at-controls">
+            <button class="at-ctrl" id="atPause" type="button">Pause</button>
+            <button class="at-ctrl is-primary" id="atReset" type="button">Reset</button>
+          </div>
+        </div>
+
+        <div class="footer-note">By: <a href="https://www.creativesilva.com" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">CreativeSilva</a></div>
+        <div class="footer-version">Activity Timer · v1 · Updated Aug 30, 2026</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nav dropdown -->
+  <nav class="nav-menu" id="navMenu" role="menu">
+    <a href="index.html"            class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">🏠</span>Home</a>
+    <a href="panther_toolbox.html"  class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">🧰</span>Panther Toolbox</a>
+    <a href="countdown.html"        class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">⏱</span>Countdown</a>
+    <a href="calendar.html"         class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">📅</span>Calendar</a>
+    <a href="extension_search.html" class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">🔍</span>Directory</a>
+    <a href="panther_prompts.html"  class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">❓</span>Panther Prompts</a>
+  </nav>
+
+  <script>
+    // ─────────────────────────────────────────────────────────
+    // ACTIVITY TIMER · v1 · Aug 30, 2026
+    // Standalone mini-app under Panther Toolbox. Range 1–30 min.
+    // At 0: gentle two-tone chime (Web Audio, no external file)
+    //       + navigator.vibrate on mobile + visual flash. Stops.
+    // ─────────────────────────────────────────────────────────
+
+    const DUR_KEY = 'at_duration';
+    const QUICK   = [1, 3, 5, 10, 15];    // common quick-picks
+    const RING_C  = 2 * Math.PI * 88;     // circumference of the progress ring
+
+    const $ = id => document.getElementById(id);
+    const app = $('atApp'), home = $('atHome'), run = $('atRun');
+    const durSelect = $('atDurSelect');
+    const quickRow  = $('atQuickRow');
+    const digitsEl  = $('atDigits');
+    const ringFill  = $('atRingFill');
+    const statusEl  = $('atStatusLabel');
+    const pauseBtn  = $('atPause');
+    const resetBtn  = $('atReset');
+    const flashEl   = $('atFlash');
+
+    // State
+    let durationSec = 300;      // seconds; last selection restored below
+    let remainingSec = 0;
+    let running = false;
+    let tickId = null;
+    let audioCtx = null;
+
+    // Standalone
+    if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+      document.body.classList.add('is-standalone');
+    }
+
+    // Restore last duration
+    const saved = parseInt(localStorage.getItem(DUR_KEY), 10);
+    if (Number.isFinite(saved) && saved >= 1 && saved <= 30) {
+      durationSec = saved * 60;
+      durSelect.value = String(saved);
+    }
+
+    // Initial ring geometry
+    ringFill.setAttribute('stroke-dasharray', RING_C);
+    ringFill.setAttribute('stroke-dashoffset', '0');
+
+    // ── Quick-pick chips (kept in sync with the <select>) ──
+    function renderQuickRow() {
+      const currentMin = parseInt(durSelect.value, 10);
+      quickRow.innerHTML = '';
+      QUICK.forEach(min => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'at-quick' + (min === currentMin ? ' is-active' : '');
+        btn.textContent = min + ' min';
+        btn.addEventListener('click', () => {
+          durSelect.value = String(min);
+          durSelect.dispatchEvent(new Event('change'));
+        });
+        quickRow.appendChild(btn);
+      });
+    }
+    renderQuickRow();
+
+    durSelect.addEventListener('change', () => {
+      const min = parseInt(durSelect.value, 10);
+      durationSec = min * 60;
+      localStorage.setItem(DUR_KEY, String(min));
+      renderQuickRow();
+    });
+
+    // ── Formatting ──
+    function fmt(sec) {
+      const s = Math.max(0, Math.round(sec));
+      const m = Math.floor(s / 60);
+      const r = s % 60;
+      return m + ':' + String(r).padStart(2, '0');
+    }
+
+    // ── Chime (gentle two-tone via Web Audio) ──
+    // Ensures audio unlocks on the user's Start tap (required by iOS Safari)
+    function ensureAudio() {
+      if (audioCtx) return audioCtx;
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return null;
+      audioCtx = new Ctx();
+      return audioCtx;
+    }
+    function playChime() {
+      const ctx = ensureAudio();
+      if (!ctx) return;
+      // Two soft sine tones ~500ms total. Warm, not alarming.
+      const now = ctx.currentTime;
+      [ [880, 0.00, 0.28],       // high tone
+        [587, 0.30, 0.32] ].forEach(([freq, offset, dur]) => {
+        const osc  = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + offset);
+        gain.gain.setValueAtTime(0.0001, now + offset);
+        gain.gain.exponentialRampToValueAtTime(0.28, now + offset + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + dur);
+        osc.connect(gain).connect(ctx.destination);
+        osc.start(now + offset);
+        osc.stop(now + offset + dur + 0.05);
+      });
+    }
+
+    // ── Rendering ──
+    function render() {
+      digitsEl.textContent = fmt(remainingSec);
+      const pct = durationSec > 0 ? remainingSec / durationSec : 0;
+      // Fill from full ring at start → empty at 0
+      ringFill.setAttribute('stroke-dashoffset', String(RING_C * (1 - pct)));
+    }
+
+    // ── Timing loop (drift-free via Date.now() end-time) ──
+    let endMs = 0;      // absolute wall-clock ms when timer hits 0
+    let pausedMs = 0;   // remaining ms captured when paused
+
+    function tickLoop() {
+      const nowMs = Date.now();
+      const leftMs = Math.max(0, endMs - nowMs);
+      remainingSec = leftMs / 1000;
+      render();
+      if (leftMs <= 0) {
+        stopTick();
+        finish();
+        return;
+      }
+      // Next frame ~250ms — fine-grained enough for smooth ring, cheap on CPU
+      tickId = setTimeout(tickLoop, 250);
+    }
+    function startTick() {
+      stopTick();
+      running = true;
+      pauseBtn.textContent = 'Pause';
+      tickLoop();
+    }
+    function stopTick() {
+      if (tickId) { clearTimeout(tickId); tickId = null; }
+      running = false;
+    }
+
+    // ── Actions ──
+    function startTimer() {
+      // Unlock audio inside the click (iOS requirement)
+      ensureAudio();
+      remainingSec = durationSec;
+      endMs = Date.now() + durationSec * 1000;
+      home.hidden = true; run.hidden = false;
+      app.classList.remove('is-done');
+      flashEl.classList.remove('is-firing');
+      statusEl.textContent = 'Time Remaining';
+      render();
+      startTick();
+    }
+    function pauseOrResume() {
+      if (app.classList.contains('is-done')) return;   // no-op after finish
+      if (running) {
+        pausedMs = endMs - Date.now();
+        stopTick();
+        pauseBtn.textContent = 'Resume';
+        statusEl.textContent = 'Paused';
+      } else {
+        endMs = Date.now() + Math.max(1000, pausedMs);
+        statusEl.textContent = 'Time Remaining';
+        startTick();
+      }
+    }
+    function reset() {
+      stopTick();
+      app.classList.remove('is-done');
+      flashEl.classList.remove('is-firing');
+      remainingSec = 0;
+      render();
+      run.hidden = true; home.hidden = false;
+      pauseBtn.textContent = 'Pause';
+    }
+    function finish() {
+      // Snap ring/digits to zero
+      remainingSec = 0;
+      render();
+      // Visual: flash overlay + done-state background
+      flashEl.classList.add('is-firing');
+      app.classList.add('is-done');
+      statusEl.textContent = "Time's Up";
+      // Audio: gentle chime
+      try { playChime(); } catch {}
+      // Haptic: mobile buzzer (silently no-op on desktop)
+      try { if ('vibrate' in navigator) navigator.vibrate([120, 60, 120]); } catch {}
+      // Clear the flash class so it can re-trigger on next run
+      setTimeout(() => flashEl.classList.remove('is-firing'), 1000);
+    }
+
+    // ── Handlers ──
+    $('atStart').addEventListener('click', startTimer);
+    pauseBtn.addEventListener('click', pauseOrResume);
+    resetBtn.addEventListener('click', reset);
+
+    // Nav menu
+    const navMenu = $('navMenu'), navMenuBtn = $('navMenuBtn');
+    navMenuBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      const r = navMenuBtn.getBoundingClientRect();
+      navMenu.style.top   = (r.bottom + 6) + 'px';
+      navMenu.style.right = (window.innerWidth - r.right) + 'px';
+      navMenu.classList.toggle('is-open');
+    });
+    document.addEventListener('click', e => {
+      if (!navMenu.contains(e.target) && e.target !== navMenuBtn) navMenu.classList.remove('is-open');
+    });
+
+    // Back-to-Toolbox logo — force in-app nav for PWA
+    document.querySelector('.top-row a[aria-label="Back to Toolbox"]').addEventListener('click', e => {
+      e.preventDefault(); window.location.href = 'panther_toolbox.html';
+    });
+
+    // If the tab is hidden while running, we still hit 0 at the right wall-clock
+    // moment because tickLoop reads Date.now(); on visibility restore the ring
+    // catches up on its own via the next tick.
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && running) render();
+    });
+
+    // Service worker
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+
+    // Init render
+    remainingSec = durationSec;
+    render();
+  </script>
+</body>
+</html>
