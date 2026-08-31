@@ -216,6 +216,36 @@
     .feedback-submit:active { opacity: 0.85; }
     .feedback-note { font-size: 9px; color: var(--muted); text-align: center; opacity: 0.65; margin: 0; }
 
+    /* ── SUBSCRIBE (INSTALL CALENDAR) ── */
+    /* Two-button cluster in the top-row (📥 subscribe + ··· menu) */
+    .top-row-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .cal-subscribe-btn { font-size: 15px; }
+    .cal-subscribe-btn:active { background: rgba(0,116,116,0.24); border-color: rgba(0,116,116,0.36); }
+
+    /* Modal — mirrors feedback-modal so it inherits the standalone/embed layout */
+    .subscribe-modal[hidden] { display: none; }
+    .subscribe-modal { position: absolute; inset: 0; z-index: 25; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .subscribe-backdrop { position: absolute; inset: 0; background: rgba(1,12,12,0.82); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+    .subscribe-dialog { position: relative; width: min(100%, 380px); max-height: calc(100% - 20px); overflow-y: auto; border-radius: 24px; border: 1px solid rgba(255,255,255,0.14); background: rgba(6,26,26,0.9); box-shadow: 0 26px 48px rgba(0,0,0,0.5); padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+    .subscribe-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .subscribe-title { font-size: 13px; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 0.12em; margin: 0; }
+    .subscribe-close { appearance: none; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.6); border-radius: 99px; width: 28px; height: 28px; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .subscribe-sub { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.4; margin: -4px 0 2px; opacity: 0.9; }
+    .subscribe-actions { display: flex; flex-direction: column; gap: 8px; }
+    .subscribe-btn { appearance: none; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px 12px; border-radius: 14px; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; text-decoration: none; }
+    .subscribe-btn.is-primary { background: linear-gradient(135deg,#007474 0%,#00a0a0 100%); border: 1px solid rgba(75,225,225,0.4); color: #fff; }
+    .subscribe-btn.is-primary:active { opacity: 0.86; }
+    .subscribe-btn.is-secondary { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); color: #dff7f7; }
+    .subscribe-btn.is-secondary:active { background: rgba(255,255,255,0.12); }
+    .subscribe-legend { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px; }
+    .subscribe-legend-title { font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted); opacity: 0.85; margin: 0 0 8px; }
+    .subscribe-legend-list { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 12px; }
+    .subscribe-legend-row { display: flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 600; color: #dff7f7; opacity: 0.9; }
+    .subscribe-legend-row .lg { font-size: 11px; line-height: 1; }
+    .subscribe-footer { font-size: 9px; color: var(--muted); text-align: center; opacity: 0.7; line-height: 1.4; margin: 4px 0 0; }
+    .subscribe-status { font-size: 10px; color: #4be1e1; text-align: center; min-height: 12px; opacity: 0; transition: opacity 0.2s; margin: -4px 0 0; }
+    .subscribe-status.is-shown { opacity: 1; }
+
     /* ── STANDALONE ── */
     body.is-standalone { background: #021414; }
     body.is-standalone::before { content: ""; position: fixed; inset: 0; background: #021414; pointer-events: none; z-index: 0; }
@@ -239,7 +269,10 @@
         <div class="top-row">
           <img src="PV_Logo2.png" class="logo-clear" alt="PVHS">
           <span class="page-title">Calendar</span>
-          <button class="nav-menu-btn" id="navMenuBtn" type="button" aria-label="Menu">···</button>
+          <div class="top-row-actions">
+            <button class="nav-menu-btn cal-subscribe-btn" id="calSubscribeBtn" type="button" aria-label="Subscribe to school calendar" title="Subscribe to school calendar">📥</button>
+            <button class="nav-menu-btn" id="navMenuBtn" type="button" aria-label="Menu">···</button>
+          </div>
         </div>
 
         <!-- View Toggle -->
@@ -297,6 +330,7 @@
     <a href="https://www.parentsquare.com/" target="_blank" rel="noopener" class="nav-menu-item nav-link"><span class="nav-menu-icon">&#x1F4F0;</span> News</a>
     <a href="calendar.html" class="nav-menu-item nav-link"><span class="nav-menu-icon">&#x1F4C5;</span> Calendar</a>
     <div class="nav-menu-sep"></div>
+    <button class="nav-menu-item" id="navSubscribe" type="button"><span class="nav-menu-icon">&#x1F4E5;</span> Install Calendar</button>
     <button class="nav-menu-item" id="navPopOut" type="button"><span class="nav-menu-icon">&#x2197;</span> Pop Out</button>
     <button class="nav-menu-item" id="navFeedback" type="button"><span class="nav-menu-icon">&#x1F4AC;</span> Share Feedback</button>
   </nav>
@@ -319,6 +353,37 @@
       </div>
       <button class="feedback-submit" id="feedbackSubmit" type="button">Send Feedback</button>
       <p class="feedback-note">Your feedback is sent directly to CreativeSilva to make this app a better tool for your daily use.</p>
+    </div>
+  </div>
+
+  <!-- Subscribe / Install Calendar Modal -->
+  <div class="subscribe-modal" id="subscribeModal" hidden>
+    <div class="subscribe-backdrop" id="subscribeBackdrop"></div>
+    <div class="subscribe-dialog" role="dialog" aria-modal="true" aria-labelledby="subscribeTitle">
+      <div class="subscribe-header">
+        <h2 id="subscribeTitle" class="subscribe-title">Install School Calendar</h2>
+        <button class="subscribe-close" id="subscribeClose" type="button" aria-label="Close">&#x2715;</button>
+      </div>
+      <p class="subscribe-sub">SMJUHSD 2026-2027 · Subscribe once. Your calendar updates automatically.</p>
+      <div class="subscribe-actions">
+        <a class="subscribe-btn is-primary" id="subApple" href="#" target="_blank" rel="noopener">🍎 Subscribe on Apple Calendar</a>
+        <a class="subscribe-btn is-primary" id="subGoogle" href="#" target="_blank" rel="noopener">📅 Subscribe on Google Calendar</a>
+        <button class="subscribe-btn is-secondary" id="subCopy" type="button">🔗 Copy Calendar URL</button>
+      </div>
+      <p class="subscribe-status" id="subscribeStatus">&nbsp;</p>
+      <div class="subscribe-legend">
+        <p class="subscribe-legend-title">What's Included</p>
+        <div class="subscribe-legend-list">
+          <div class="subscribe-legend-row"><span class="lg">🔴</span>Holidays · No School</div>
+          <div class="subscribe-legend-row"><span class="lg">🟠</span>Long Breaks</div>
+          <div class="subscribe-legend-row"><span class="lg">🟡</span>Finals</div>
+          <div class="subscribe-legend-row"><span class="lg">🔵</span>Staff / Workdays</div>
+          <div class="subscribe-legend-row"><span class="lg">🟢</span>Early Out · Collab</div>
+          <div class="subscribe-legend-row"><span class="lg">⚪</span>Minimum Days</div>
+          <div class="subscribe-legend-row"><span class="lg">⭐</span>Key Dates</div>
+        </div>
+      </div>
+      <p class="subscribe-footer">Calendar updates automatically when subscribed.<br>Last updated: 2026-08-30. Source: SMJUHSD Board Approved Calendar.</p>
     </div>
   </div>
 
@@ -768,6 +833,70 @@
     document.getElementById('navFeedback')?.addEventListener('click',()=>{
       document.getElementById('feedbackModal').hidden = false;
       navMenu.classList.remove('is-open'); navMenuBtn.classList.remove('is-open');
+    });
+
+    // ── SUBSCRIBE / INSTALL CALENDAR ──────────────────────────
+    // The .ics is committed at /calendars/ so it's served both via GitHub Pages
+    // AND raw.githubusercontent.com. We use the raw URL because that's what
+    // Apple Calendar / Google Calendar reliably subscribe to across platforms
+    // and Mr. Silva pushes updates by editing the file in the repo — subscribers
+    // pick up changes automatically within ~24h.
+    const ICS_RAW_URL = 'https://raw.githubusercontent.com/creativesilva/pvhs_tools/main/calendars/SMJUHSD_2026-2027_School_Calendar.ics';
+    // webcal:// swap so iOS/macOS trigger the native subscribe sheet
+    const ICS_WEBCAL  = 'webcal://raw.githubusercontent.com/creativesilva/pvhs_tools/main/calendars/SMJUHSD_2026-2027_School_Calendar.ics';
+    // Google Calendar "Add by URL" pre-fill
+    const ICS_GOOGLE  = 'https://calendar.google.com/calendar/r?cid=' + encodeURIComponent(ICS_RAW_URL);
+
+    const subModal    = document.getElementById('subscribeModal');
+    const subBackdrop = document.getElementById('subscribeBackdrop');
+    const subClose    = document.getElementById('subscribeClose');
+    const subApple    = document.getElementById('subApple');
+    const subGoogle   = document.getElementById('subGoogle');
+    const subCopy     = document.getElementById('subCopy');
+    const subStatus   = document.getElementById('subscribeStatus');
+
+    // Fill hrefs at wire-up time so a middle-click / share picks them up too
+    if (subApple)  subApple.href  = ICS_WEBCAL;
+    if (subGoogle) subGoogle.href = ICS_GOOGLE;
+
+    function openSubscribe() {
+      if (!subModal) return;
+      subModal.hidden = false;
+      // Reset any transient status
+      subStatus.textContent = ' ';
+      subStatus.classList.remove('is-shown');
+    }
+    function closeSubscribe() { if (subModal) subModal.hidden = true; }
+
+    document.getElementById('calSubscribeBtn')?.addEventListener('click', openSubscribe);
+    document.getElementById('navSubscribe')?.addEventListener('click', () => {
+      openSubscribe();
+      navMenu.classList.remove('is-open'); navMenuBtn.classList.remove('is-open');
+    });
+    subClose?.addEventListener('click', closeSubscribe);
+    subBackdrop?.addEventListener('click', closeSubscribe);
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && subModal && !subModal.hidden) closeSubscribe();
+    });
+
+    // Copy Raw URL — 2-second reset per handoff spec
+    subCopy?.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(ICS_RAW_URL);
+        subCopy.textContent = '✓ Copied!';
+        subStatus.textContent = 'Paste into any calendar app that supports "Add by URL".';
+        subStatus.classList.add('is-shown');
+      } catch {
+        // Fallback: select the URL into a hidden field so the user can Cmd/Ctrl+C
+        const ta = document.createElement('textarea');
+        ta.value = ICS_RAW_URL; ta.style.position='fixed'; ta.style.opacity='0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); subCopy.textContent = '✓ Copied!'; } catch { subCopy.textContent = 'Press ⌘/Ctrl+C'; }
+        document.body.removeChild(ta);
+        subStatus.textContent = 'URL copied to clipboard.';
+        subStatus.classList.add('is-shown');
+      }
+      setTimeout(() => { subCopy.textContent = '🔗 Copy Calendar URL'; }, 2000);
     });
 
     // ── FEEDBACK ──────────────────────────────────────────────
