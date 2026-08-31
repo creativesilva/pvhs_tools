@@ -278,6 +278,22 @@
       0%,100% { opacity:0.35; }
       50%     { opacity:0.85; }
     }
+    /* Buttons on the red done screen: re-tint from teal → white so they
+       live in the red palette. Also flip the emphasis — AGAIN becomes
+       the brighter action (natural next step), RESET recedes. */
+    .app.is-done .at-ctrl {
+      background:rgba(255,255,255,0.10);
+      border-color:rgba(255,255,255,0.28);
+      color:#fff;
+    }
+    .app.is-done #atPause {                /* the "Again ↻" button */
+      background:rgba(255,255,255,0.26);
+      border-color:rgba(255,255,255,0.6);
+    }
+    .app.is-done .at-ctrl.is-primary {     /* Reset — de-emphasized on done */
+      background:rgba(255,255,255,0.08);
+      border-color:rgba(255,255,255,0.22);
+    }
 
     /* Flash overlay played once at 0 — red so it stays consistent with the done wash */
     .at-flash { position:absolute; inset:0; background:radial-gradient(circle at 50% 50%, rgba(255,60,60,0.65) 0%, transparent 70%); opacity:0; pointer-events:none; z-index:2; }
