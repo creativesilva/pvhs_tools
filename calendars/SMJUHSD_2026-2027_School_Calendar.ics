@@ -9,7 +9,7 @@ X-WR-CALDESC:PVHS / SMJUHSD Official School Year Calendar 2026-2027 - Holidays, 
 
 BEGIN:VEVENT
 UID:smjuhsd-20260703@pvhs
-SUMMARY:Independence Day Holiday - No School
+SUMMARY:No School - Independence Day
 DTSTART;VALUE=DATE:20260703
 DTEND;VALUE=DATE:20260704
 DESCRIPTION:July 3 - Independence Day Holiday. School closed.
@@ -129,7 +129,7 @@ END:VEVENT
 
 BEGIN:VEVENT
 UID:smjuhsd-20260907@pvhs
-SUMMARY:Labor Day Holiday - No School
+SUMMARY:No School - Labor Day
 DTSTART;VALUE=DATE:20260907
 DTEND;VALUE=DATE:20260908
 DESCRIPTION:September 7 - Labor Day Holiday. School closed.
@@ -249,7 +249,7 @@ END:VEVENT
 
 BEGIN:VEVENT
 UID:smjuhsd-20261111@pvhs
-SUMMARY:Veterans Day Holiday - No School
+SUMMARY:No School - Veterans Day
 DTSTART;VALUE=DATE:20261111
 DTEND;VALUE=DATE:20261112
 DESCRIPTION:November 11 - Veterans Day as prescribed by law. School closed.
@@ -269,7 +269,7 @@ END:VEVENT
 
 BEGIN:VEVENT
 UID:smjuhsd-20261123-20261127@pvhs
-SUMMARY:Thanksgiving Break - No School
+SUMMARY:No School - Thanksgiving Break
 DTSTART;VALUE=DATE:20261123
 DTEND;VALUE=DATE:20261128
 DESCRIPTION:November 23-27 - Thanksgiving Break. School closed.
@@ -319,7 +319,7 @@ END:VEVENT
 
 BEGIN:VEVENT
 UID:smjuhsd-20261221-20270108@pvhs
-SUMMARY:Winter Break - No School
+SUMMARY:No School - Winter Break
 DTSTART;VALUE=DATE:20261221
 DTEND;VALUE=DATE:20270109
 DESCRIPTION:December 21 - January 8 - Winter Break. School closed.
@@ -379,7 +379,7 @@ END:VEVENT
 
 BEGIN:VEVENT
 UID:smjuhsd-20270118@pvhs
-SUMMARY:Martin Luther King Jr. Day - No School
+SUMMARY:No School - Martin Luther King Jr. Day
 DTSTART;VALUE=DATE:20270118
 DTEND;VALUE=DATE:20270119
 DESCRIPTION:January 18 - Martin Luther King Jr. Day Observed. School closed.
@@ -409,7 +409,7 @@ END:VEVENT
 
 BEGIN:VEVENT
 UID:smjuhsd-20270208@pvhs
-SUMMARY:Lincoln's Day Holiday - No School
+SUMMARY:No School - Lincoln's Day
 DTSTART;VALUE=DATE:20270208
 DTEND;VALUE=DATE:20270209
 DESCRIPTION:February 8 - Lincoln's Day. School closed.
@@ -419,7 +419,7 @@ END:VEVENT
 
 BEGIN:VEVENT
 UID:smjuhsd-20270215@pvhs
-SUMMARY:Presidents Day Holiday - No School
+SUMMARY:No School - Presidents Day
 DTSTART;VALUE=DATE:20270215
 DTEND;VALUE=DATE:20270216
 DESCRIPTION:February 15 - Presidents Day. School closed.
@@ -499,7 +499,7 @@ END:VEVENT
 
 BEGIN:VEVENT
 UID:smjuhsd-20270326@pvhs
-SUMMARY:Spring Vacation Day Holiday - No School
+SUMMARY:No School - Spring Vacation Day
 DTSTART;VALUE=DATE:20270326
 DTEND;VALUE=DATE:20270327
 DESCRIPTION:March 26 - Spring Vacation Day Holiday. School closed.
@@ -509,7 +509,7 @@ END:VEVENT
 
 BEGIN:VEVENT
 UID:smjuhsd-20270329-20270402@pvhs
-SUMMARY:Spring Break - No School
+SUMMARY:No School - Spring Break
 DTSTART;VALUE=DATE:20270329
 DTEND;VALUE=DATE:20270403
 DESCRIPTION:March 29 - April 2 - Spring Break. School closed.
@@ -609,7 +609,7 @@ END:VEVENT
 
 BEGIN:VEVENT
 UID:smjuhsd-20270531@pvhs
-SUMMARY:Memorial Day Holiday - No School
+SUMMARY:No School - Memorial Day
 DTSTART;VALUE=DATE:20270531
 DTEND;VALUE=DATE:20270601
 DESCRIPTION:May 31 - Memorial Day Holiday. School closed.
@@ -659,7 +659,7 @@ END:VEVENT
 
 BEGIN:VEVENT
 UID:smjuhsd-20270618@pvhs
-SUMMARY:Juneteenth Holiday - No School
+SUMMARY:No School - Juneteenth
 DTSTART;VALUE=DATE:20270618
 DTEND;VALUE=DATE:20270619
 DESCRIPTION:June 18 - Juneteenth Holiday. School closed.
@@ -669,7 +669,7 @@ END:VEVENT
 
 BEGIN:VEVENT
 UID:smjuhsd-20270705@pvhs
-SUMMARY:Independence Day Holiday - No School
+SUMMARY:No School - Independence Day
 DTSTART;VALUE=DATE:20270705
 DTEND;VALUE=DATE:20270706
 DESCRIPTION:July 5, 2027 - Independence Day Holiday. School closed.
