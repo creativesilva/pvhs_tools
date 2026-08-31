@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PVHS Tools">
+  <meta name="theme-color" content="#007474">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="PV_AppIcon.png">
+  <link rel="icon" type="image/png" href="PV_AppIcon.png">
+  <title>Group Maker</title>
+
+  <style>
+    :root {
+      --teal:#007474; --white:#f7fbfb; --muted:#cfe3e3;
+      --shadow:0 20px 46px rgba(0,0,0,0.30);
+      --card-hover:rgba(255,255,255,0.12); --app-spacing:16px; --radius:34px;
+    }
+    * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; margin:0; padding:0; }
+    html { height:-webkit-fill-available; }
+    html, body { width:100%; height:100%; min-height:100%; background:#021414; overflow:hidden; }
+    body { min-height:100vh; min-height:100dvh; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+           color:var(--white); touch-action:none; user-select:none; -webkit-font-smoothing:antialiased; }
+
+    .frame { width:100%; height:100dvh; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:10px; }
+    .app {
+      width:430px; height:880px; max-width:100%; max-height:100%;
+      border-radius:var(--radius); overflow:hidden; position:relative;
+      box-shadow:var(--shadow); border:1px solid rgba(255,255,255,0.12);
+      background:linear-gradient(168deg, rgba(6,28,28,0.97) 0%, rgba(4,24,24,0.95) 30%, rgba(0,72,72,0.92) 60%, rgba(0,100,100,0.96) 82%, rgba(4,30,30,0.97) 100%);
+      display:flex; flex-direction:column; padding:14px var(--app-spacing) var(--app-spacing);
+    }
+    .app::before {
+      content:""; position:absolute; inset:0; pointer-events:none;
+      background: radial-gradient(ellipse at 50% 20%, rgba(0,116,116,0.18) 0%, transparent 60%),
+                  radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 50%);
+      z-index:0;
+    }
+    .ghost-logo { position:absolute; top:56%; left:50%; width:120%; opacity:0.05; transform:translate(-50%,-50%); filter:grayscale(100%); pointer-events:none; z-index:0; }
+    .content { position:relative; z-index:1; width:100%; flex:1; min-height:0; display:flex; flex-direction:column; overflow:hidden; }
+
+    /* Top row */
+    .top-row { display:flex; align-items:center; justify-content:space-between; width:100%; gap:10px; height:44px; flex-shrink:0; margin-bottom:8px; position:relative; }
+    .logo-clear { width:38px; height:38px; object-fit:contain; filter:drop-shadow(0 8px 18px rgba(0,0,0,0.24)); }
+    .page-title { position:absolute; left:0; right:0; text-align:center; font-size:15px; font-weight:700; color:#dff7f7; text-transform:uppercase; margin:0; letter-spacing:0.14em; pointer-events:none; }
+    .nav-menu-btn { appearance:none; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.13); border-radius:12px; color:rgba(255,255,255,0.92); width:34px; height:34px; font-size:14px; font-weight:900; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+
+    /* Nav dropdown */
+    .nav-menu { position:fixed; z-index:9999; min-width:180px; background:rgba(3,20,20,0.58); border:1px solid rgba(255,255,255,0.16); border-radius:16px; padding:5px; box-shadow:0 14px 44px rgba(0,0,0,0.52); backdrop-filter:blur(26px); -webkit-backdrop-filter:blur(26px); transform-origin:top right; transform:scale(0.88) translateY(-8px); opacity:0; pointer-events:none; transition:opacity 0.17s ease, transform 0.19s cubic-bezier(0.34,1.4,0.64,1); }
+    .nav-menu.is-open { opacity:1; transform:scale(1) translateY(0); pointer-events:auto; }
+    .nav-menu-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:11px; text-decoration:none; color:#eaf8f8; background:transparent; font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; border:none; cursor:pointer; width:100%; }
+    .nav-menu-item:active { background:rgba(255,255,255,0.1); }
+    .nav-menu-icon { font-size:14px; }
+
+    /* Views */
+    .gm-view { flex:1; min-height:0; display:flex; flex-direction:column; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+    .gm-view[hidden] { display:none; }
+
+    /* Home hero */
+    .gm-hero { text-align:center; padding:24px 12px 16px; }
+    .gm-emoji { font-size:66px; line-height:1; filter:drop-shadow(0 8px 24px rgba(75,225,225,0.35)); }
+    .gm-hero h1 { font-size:24px; font-weight:900; letter-spacing:0.02em; margin:12px 0 4px; color:#fff; }
+    .gm-hero-sub { font-size:12px; color:var(--muted); font-weight:600; letter-spacing:0.06em; opacity:0.85; }
+
+    /* Filter selector */
+    .gm-field { padding:6px 6px 16px; }
+    .gm-field-label { display:block; font-size:10px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:0.14em; margin-bottom:8px; opacity:0.85; padding-left:4px; }
+    .gm-select-wrap { position:relative; }
+    .gm-select {
+      appearance:none; -webkit-appearance:none; -moz-appearance:none;
+      width:100%; padding:14px 42px 14px 16px;
+      border-radius:14px; border:1px solid rgba(255,255,255,0.14);
+      background:rgba(255,255,255,0.06); color:#f7fbfb;
+      font-size:14px; font-weight:700; font-family:inherit; letter-spacing:0.01em;
+      cursor:pointer; outline:none;
+      transition:background 0.18s, border-color 0.18s;
+    }
+    .gm-select:hover, .gm-select:focus { background:rgba(255,255,255,0.1); border-color:rgba(75,225,225,0.4); }
+    .gm-select option { background:#052828; color:#f7fbfb; font-weight:600; padding:8px; }
+    .gm-select-chevron { position:absolute; right:16px; top:50%; transform:translateY(-50%); pointer-events:none; color:#4be1e1; font-size:13px; font-weight:900; opacity:0.85; }
+
+    .gm-start-wrap { padding:14px 8px 10px; margin-top:auto; }
+    .gm-start { appearance:none; width:100%; padding:18px; border-radius:16px; border:1px solid rgba(75,225,225,0.4); background:linear-gradient(180deg, rgba(0,180,180,0.35), rgba(0,140,140,0.25)); color:#fff; font-size:15px; font-weight:900; letter-spacing:0.14em; text-transform:uppercase; cursor:pointer; box-shadow:0 8px 24px rgba(0,140,140,0.24); }
+    .gm-start:active { transform:scale(0.98); }
+    .gm-start:disabled { opacity:0.4; cursor:not-allowed; }
+
+    /* Game bar (progress + controls) */
+    .gm-bar { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:6px 0 12px; flex-shrink:0; }
+    .gm-bar-btn { appearance:none; width:36px; height:36px; border-radius:12px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.06); color:#eaf8f8; font-size:16px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+    .gm-bar-btn:active { background:rgba(255,255,255,0.14); }
+    .gm-progress { flex:1; text-align:center; }
+    .gm-progress-count { font-size:11px; font-weight:800; color:var(--muted); letter-spacing:0.14em; text-transform:uppercase; }
+    .gm-progress-bar { margin-top:5px; height:4px; border-radius:99px; background:rgba(255,255,255,0.1); overflow:hidden; }
+    .gm-progress-fill { height:100%; background:linear-gradient(90deg, #4be1e1, #007474); border-radius:99px; transition:width 0.28s cubic-bezier(0.34,1.2,0.64,1); }
+
+    /* Strategy card */
+    .gm-card-wrap { flex:1; min-height:0; display:flex; align-items:center; justify-content:center; padding:6px 0 12px; }
+    .gm-card {
+      width:100%; max-width:390px; min-height:320px;
+      background:linear-gradient(160deg, rgba(0,116,116,0.32) 0%, rgba(0,74,74,0.42) 100%);
+      border:1px solid rgba(75,225,225,0.35); border-radius:24px;
+      padding:24px 22px; display:flex; flex-direction:column;
+      box-shadow:0 16px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08);
+      backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+      transition:opacity 0.22s ease, transform 0.28s cubic-bezier(0.34,1.2,0.64,1);
+      cursor:pointer;
+    }
+    .gm-card.is-swapping { opacity:0; transform:translateY(10px); }
+    .gm-card-emoji { font-size:38px; line-height:1; margin-bottom:14px; filter:drop-shadow(0 6px 18px rgba(75,225,225,0.4)); }
+    .gm-card-title { font-size:22px; line-height:1.2; font-weight:900; color:#fff; margin:0 0 14px; letter-spacing:-0.005em; }
+    .gm-card-how { font-size:15px; line-height:1.45; font-weight:500; color:#eaf8f8; margin:0 0 auto; }
+    .gm-card-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:18px; }
+    .gm-card-tag {
+      padding:5px 11px; border-radius:99px;
+      background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.14);
+      font-size:10px; font-weight:800; letter-spacing:0.12em; text-transform:uppercase;
+      color:#4be1e1;
+    }
+    .gm-card-tag.is-vibe { color:#f7fbfb; opacity:0.75; }
+
+    /* Controls */
+    .gm-controls { display:flex; gap:8px; flex-shrink:0; padding-top:8px; }
+    .gm-ctrl { flex:1; appearance:none; padding:14px; border-radius:14px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.06); color:#eaf8f8; font-size:12px; font-weight:800; letter-spacing:0.12em; text-transform:uppercase; cursor:pointer; }
+    .gm-ctrl:active { transform:scale(0.98); }
+    .gm-ctrl.is-primary { background:linear-gradient(180deg, rgba(0,180,180,0.4), rgba(0,140,140,0.28)); border-color:rgba(75,225,225,0.4); color:#fff; }
+    .gm-ctrl:disabled { opacity:0.35; cursor:not-allowed; }
+
+    .footer-note { text-align:center; font-size:9.5px; color:#b5d4d4; font-weight:600; padding:8px 0 3px; margin-top:auto; flex-shrink:0; opacity:0.75; }
+    .footer-version { text-align:center; font-size:8.5px; color:#b5d4d4; opacity:0.55; padding:0 0 6px; font-weight:500; letter-spacing:0.04em; flex-shrink:0; }
+
+    /* Standalone */
+    body.is-standalone { background:#021414; }
+    body.is-standalone::before { content:""; position:fixed; inset:0; background:#021414; pointer-events:none; z-index:0; }
+    body.is-standalone .frame { position:fixed; inset:0; width:100%; height:100%; padding:0 8px max(24px,calc(env(safe-area-inset-bottom) + 8px)) 8px; z-index:1; }
+    body.is-standalone .app { position:relative; width:100%; height:100%; max-width:100%; max-height:100%; border-radius:34px; padding-top:max(10px,env(safe-area-inset-top)); padding-right:max(var(--app-spacing),env(safe-area-inset-right)); padding-bottom:18px; padding-left:max(var(--app-spacing),env(safe-area-inset-left)); }
+    @media (max-width:430px) {
+      body:not(.is-standalone) .frame { padding:env(safe-area-inset-top) 12px env(safe-area-inset-bottom) 12px; }
+      body:not(.is-standalone) .app { width:100%; height:100%; max-height:100%; border-radius:var(--radius); }
+      body { touch-action:pan-y; }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <div class="app">
+      <img class="ghost-logo" src="PV_Logo.png" alt="">
+      <div class="content">
+
+        <!-- Top row -->
+        <div class="top-row">
+          <a href="panther_toolbox.html" class="nav-link" aria-label="Back to Toolbox"><img src="PV_Logo.png" class="logo-clear" alt="PVHS"></a>
+          <h1 class="page-title">Group Maker</h1>
+          <button class="nav-menu-btn" id="navMenuBtn" type="button" aria-label="Menu">···</button>
+        </div>
+
+        <!-- HOME VIEW -->
+        <div id="gmHome" class="gm-view">
+          <div class="gm-hero">
+            <div class="gm-emoji">👥</div>
+            <h1>Group Maker</h1>
+            <p class="gm-hero-sub">Grouping strategies for your class</p>
+          </div>
+
+          <div class="gm-field">
+            <label class="gm-field-label" for="gmSizeSelect">Group size</label>
+            <div class="gm-select-wrap">
+              <select id="gmSizeSelect" class="gm-select">
+                <option value="all">🎯  Any size</option>
+                <option value="pairs">👫  Pairs</option>
+                <option value="trios">👨‍👩‍👧  Trios</option>
+                <option value="quads">👪  Quads</option>
+                <option value="large">👨‍👩‍👧‍👦  Larger groups (5+)</option>
+              </select>
+              <span class="gm-select-chevron" aria-hidden="true">▾</span>
+            </div>
+          </div>
+
+          <div class="gm-start-wrap">
+            <button class="gm-start" id="gmStart">Draw Strategy ▶</button>
+          </div>
+        </div>
+
+        <!-- GAME VIEW -->
+        <div id="gmGame" class="gm-view" hidden>
+          <div class="gm-bar">
+            <button class="gm-bar-btn" id="gmHomeBtn" aria-label="Home">←</button>
+            <div class="gm-progress">
+              <div class="gm-progress-count" id="gmCount">1 / 15</div>
+              <div class="gm-progress-bar"><div class="gm-progress-fill" id="gmFill" style="width:7%"></div></div>
+            </div>
+            <button class="gm-bar-btn" id="gmShuffle" aria-label="Shuffle">🔀</button>
+          </div>
+
+          <div class="gm-card-wrap">
+            <div class="gm-card" id="gmCard">
+              <div class="gm-card-emoji" id="gmCardEmoji">👥</div>
+              <h2 class="gm-card-title" id="gmCardTitle">—</h2>
+              <p class="gm-card-how" id="gmCardHow">—</p>
+              <div class="gm-card-tags" id="gmCardTags"></div>
+            </div>
+          </div>
+
+          <div class="gm-controls">
+            <button class="gm-ctrl" id="gmBack">← Back</button>
+            <button class="gm-ctrl is-primary" id="gmNext">Next →</button>
+          </div>
+        </div>
+
+        <div class="footer-note">By: <a href="https://www.creativesilva.com" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">CreativeSilva</a></div>
+        <div class="footer-version">Group Maker · v1 · Updated Aug 30, 2026</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nav dropdown -->
+  <nav class="nav-menu" id="navMenu" role="menu">
+    <a href="index.html"            class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">🏠</span>Home</a>
+    <a href="panther_toolbox.html"  class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">🧰</span>Panther Toolbox</a>
+    <a href="countdown.html"        class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">⏱</span>Countdown</a>
+    <a href="calendar.html"         class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">📅</span>Calendar</a>
+    <a href="extension_search.html" class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">🔍</span>Directory</a>
+    <a href="panther_prompts.html"  class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">❓</span>Panther Prompts</a>
+    <a href="activity_timer.html"   class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">⏱</span>Activity Timer</a>
+  </nav>
+
+  <script>
+    // ─────────────────────────────────────────────────────────
+    // GROUP MAKER · v1 · Aug 30, 2026
+    // Card-swipe deck of classroom grouping STRATEGIES (not a
+    // roster picker). Curated from teacher-forum practice.
+    // Filter chip: All / Pairs / Trios / Quads / Large (5+).
+    // Same shuffle/deck pattern as Panther Prompts.
+    // To add a strategy: append to STRATEGIES with sizes:[...].
+    // ─────────────────────────────────────────────────────────
+
+    // Size categories a strategy can service. Strategy stays in the
+    // deck if the picked filter is 'all' or matches ANY entry in .sizes.
+    const STRATEGIES = [
+      {
+        emoji: '🎂',
+        title: 'Silent Birthday Line-up',
+        howTo: "Have students line up by birth month and day — no talking, use gestures only. Then count off 1-2-3-4 (or fold the line in half) to form groups.",
+        sizes: ['pairs','trios','quads','large'],
+        vibe:  'Silent'
+      },
+      {
+        emoji: '🔤',
+        title: 'Alphabet Chain',
+        howTo: "Line up alphabetically by first name (no talking!), then pair with the person next to you — or split the line in half.",
+        sizes: ['pairs'],
+        vibe:  'Silent'
+      },
+      {
+        emoji: '🕐',
+        title: 'Clock Buddies',
+        howTo: "Give each student a clock face with 12, 3, 6, and 9 slots. They fill each slot with a different partner. Later, just call \"meet with your 3 o'clock partner.\"",
+        sizes: ['pairs'],
+        vibe:  'Prep once, reuse'
+      },
+      {
+        emoji: '🔢',
+        title: 'Numbered Heads',
+        howTo: "Go around the room counting off 1-2-3 (or 1-2-3-4). All the 1s form a group, all the 2s, and so on.",
+        sizes: ['trios','quads','large'],
+        vibe:  'Fast'
+      },
+      {
+        emoji: '👟',
+        title: 'Shoe Color Sort',
+        howTo: "Group by shoe color: black shoes here, white shoes there, colored/patterned shoes over there. Merge tiny groups if needed.",
+        sizes: ['trios','quads','large'],
+        vibe:  'Visual'
+      },
+      {
+        emoji: '🎴',
+        title: 'Card Deal',
+        howTo: "Deal a playing card to each student. Group by suit for 4 groups, by number for pairs, or by red/black for two teams.",
+        sizes: ['pairs','quads','large'],
+        vibe:  'Chance'
+      },
+      {
+        emoji: '✊',
+        title: 'Rock-Paper-Scissors',
+        howTo: "Everyone finds a partner and plays one round of RPS. Winners join Team A, losers join Team B. Fast, fair, and burns off some energy.",
+        sizes: ['pairs','large'],
+        vibe:  'Energetic'
+      },
+      {
+        emoji: '🧩',
+        title: 'Puzzle Piece Match',
+        howTo: "Cut 4–5 photos or magazine pages into pieces (one piece per student). Students find their group by reassembling the picture.",
+        sizes: ['trios','quads','large'],
+        vibe:  'Movement · Prep'
+      },
+      {
+        emoji: '🌟',
+        title: 'Find Something in Common',
+        howTo: "Students walk around silently until they find 2–3 others who share one thing they didn't know (favorite food, hobby, hometown). That's your group.",
+        sizes: ['trios','quads'],
+        vibe:  'Icebreaker'
+      },
+      {
+        emoji: '📏',
+        title: 'Height Line Fold',
+        howTo: "Line up shortest to tallest (silently!). Fold the line in half so the shortest partners with the tallest — natural mixed pairs.",
+        sizes: ['pairs'],
+        vibe:  'Silent'
+      },
+      {
+        emoji: '🌀',
+        title: 'Walk-and-Freeze Clusters',
+        howTo: "Students walk around the room in random directions. Call \"Groups of 4!\" — they scramble to form groups of that size wherever they stand.",
+        sizes: ['pairs','trios','quads','large'],
+        vibe:  'Energetic'
+      },
+      {
+        emoji: '💬',
+        title: 'Speed-Meet Lines',
+        howTo: "Form two facing lines. Give 30 seconds to discuss a prompt with the person across from you. One line shifts one seat and repeat — great before pairing off.",
+        sizes: ['pairs'],
+        vibe:  'Timed'
+      },
+      {
+        emoji: '🌈',
+        title: 'Colored Dot Sort',
+        howTo: "Before class, stick a colored dot under each desk. Ask students to check under their seat — groups form by matching color. No lecture time lost.",
+        sizes: ['trios','quads','large'],
+        vibe:  'Passive · Prep'
+      },
+      {
+        emoji: '🐶',
+        title: 'Either-Or Split',
+        howTo: "Pose a fun this-or-that question (\"Dogs or cats?\", \"Mountains or beach?\") and group by answer. Split lopsided groups by asking a second question.",
+        sizes: ['trios','quads','large'],
+        vibe:  'Discussion'
+      },
+      {
+        emoji: '🔡',
+        title: 'Last Name Bands',
+        howTo: "Group by first letter of last name: A–G, H–M, N–S, T–Z. Adjust the letter bands based on your class size for even groups.",
+        sizes: ['trios','quads','large'],
+        vibe:  'Instant'
+      },
+      {
+        emoji: '🎬',
+        title: '10-Second Movement Meet',
+        howTo: "Say \"You have 10 seconds to find 2 people you haven't worked with today.\" Count down loudly — the pressure gets them moving.",
+        sizes: ['trios'],
+        vibe:  'Energetic'
+      },
+      {
+        emoji: '🍬',
+        title: 'Candy Color Grab',
+        howTo: "Pass around a bag of colored candy. Everyone takes one without looking. Group by color. They eat it after settling in.",
+        sizes: ['trios','quads','large'],
+        vibe:  'Chance · Prep'
+      }
+    ];
+
+    // ── STATE ──
+    const SIZE_KEY = 'gm_size';
+    let sizeFilter = localStorage.getItem(SIZE_KEY) || 'all';
+    let deck = [];   // shuffled indices into filtered STRATEGIES
+    let idx  = 0;
+
+    // ── DOM ──
+    const $ = id => document.getElementById(id);
+    const home = $('gmHome'), game = $('gmGame');
+    const sizeSelect = $('gmSizeSelect');
+
+    // Standalone
+    if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+      document.body.classList.add('is-standalone');
+    }
+
+    // Sync select with saved filter
+    sizeSelect.value = sizeFilter;
+
+    // ── DECK ──
+    function buildDeck() {
+      const pool = STRATEGIES
+        .map((_, i) => i)
+        .filter(i => sizeFilter === 'all' || STRATEGIES[i].sizes.includes(sizeFilter));
+      // Fisher-Yates
+      for (let i = pool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
+      }
+      deck = pool;
+      idx = 0;
+    }
+
+    // ── RENDER CARD ──
+    function renderCard() {
+      const s = STRATEGIES[deck[idx]];
+      const card = $('gmCard');
+      card.classList.add('is-swapping');
+      setTimeout(() => {
+        $('gmCardEmoji').textContent = s.emoji;
+        $('gmCardTitle').textContent = s.title;
+        $('gmCardHow').textContent   = s.howTo;
+        // Tags: group-size chip(s) + vibe chip
+        const tags = $('gmCardTags');
+        tags.innerHTML = '';
+        // Which size chip(s) to show — condense to one label when only one size is served
+        const sizeLabels = { pairs:'Pairs', trios:'Trios', quads:'Quads', large:'5+' };
+        // Prefer showing the picked filter's size chip; otherwise show all served sizes
+        const sizeChips = sizeFilter !== 'all' && s.sizes.includes(sizeFilter)
+          ? [sizeLabels[sizeFilter]]
+          : s.sizes.map(k => sizeLabels[k]);
+        // De-dup
+        [...new Set(sizeChips)].forEach(txt => {
+          const t = document.createElement('span');
+          t.className = 'gm-card-tag';
+          t.textContent = txt;
+          tags.appendChild(t);
+        });
+        if (s.vibe) {
+          const v = document.createElement('span');
+          v.className = 'gm-card-tag is-vibe';
+          v.textContent = s.vibe;
+          tags.appendChild(v);
+        }
+        card.classList.remove('is-swapping');
+      }, 160);
+
+      const total = deck.length;
+      $('gmCount').textContent = `${idx + 1} / ${total}`;
+      $('gmFill').style.width = `${((idx + 1) / total) * 100}%`;
+      $('gmBack').disabled = idx === 0;
+      $('gmNext').textContent = idx === total - 1 ? 'Done ✓' : 'Next →';
+    }
+
+    // ── VIEW SWITCHING ──
+    function showHome() { home.hidden = false; game.hidden = true; }
+    function showGame() { home.hidden = true;  game.hidden = false; renderCard(); }
+
+    function startDeck() {
+      buildDeck();
+      if (deck.length === 0) return;   // shouldn't happen — every strategy tags at least one size
+      showGame();
+    }
+
+    // ── HANDLERS ──
+    sizeSelect.addEventListener('change', () => {
+      sizeFilter = sizeSelect.value;
+      localStorage.setItem(SIZE_KEY, sizeFilter);
+    });
+    $('gmStart').addEventListener('click', startDeck);
+    $('gmHomeBtn').addEventListener('click', showHome);
+    $('gmShuffle').addEventListener('click', () => { buildDeck(); renderCard(); });
+    $('gmBack').addEventListener('click', () => { if (idx > 0) { idx--; renderCard(); } });
+    $('gmNext').addEventListener('click', () => {
+      if (idx < deck.length - 1) { idx++; renderCard(); }
+      else { showHome(); }
+    });
+    // Tap card = next (mirrors Panther Prompts)
+    $('gmCard').addEventListener('click', () => {
+      if (idx < deck.length - 1) { idx++; renderCard(); }
+    });
+
+    // Nav menu
+    const navMenu = $('navMenu'), navMenuBtn = $('navMenuBtn');
+    navMenuBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      const r = navMenuBtn.getBoundingClientRect();
+      navMenu.style.top   = (r.bottom + 6) + 'px';
+      navMenu.style.right = (window.innerWidth - r.right) + 'px';
+      navMenu.classList.toggle('is-open');
+    });
+    document.addEventListener('click', e => {
+      if (!navMenu.contains(e.target) && e.target !== navMenuBtn) navMenu.classList.remove('is-open');
+    });
+
+    // Back-to-Toolbox logo — force in-app nav for PWA
+    document.querySelector('.top-row a[aria-label="Back to Toolbox"]').addEventListener('click', e => {
+      e.preventDefault(); window.location.href = 'panther_toolbox.html';
+    });
+
+    // Service worker
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  </script>
+</body>
+</html>

@@ -15,6 +15,16 @@
   <title>Activity Timer</title>
 
   <style>
+    /* DSEG7 Classic — self-hosted, SIL OFL 1.1 (see fonts/DSEG-LICENSE.txt).
+       Real 7-segment display face, used for the countdown digits. */
+    @font-face {
+      font-family: 'DSEG7Classic';
+      src: url('fonts/DSEG7Classic-Bold.woff2') format('woff2');
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
     :root {
       --teal:#007474; --teal-bright:#4be1e1;
       --white:#f7fbfb; --muted:#cfe3e3;
@@ -63,51 +73,146 @@
     .at-view[hidden] { display:none; }
 
     /* ── HOME VIEW ────────────────────────────────────────── */
-    .at-hero { text-align:center; padding:26px 12px 20px; flex-shrink:0; }
-    .at-emoji { font-size:72px; line-height:1; filter:drop-shadow(0 8px 24px rgba(75,225,225,0.35)); }
-    .at-hero h1 { font-size:26px; font-weight:900; letter-spacing:0.02em; margin:12px 0 4px; color:#fff; }
-    .at-hero-sub { font-size:12px; color:var(--muted); font-weight:600; letter-spacing:0.06em; opacity:0.85; }
+    .at-hero { text-align:center; padding:14px 12px 8px; flex-shrink:0; }
+    .at-emoji { font-size:52px; line-height:1; filter:drop-shadow(0 8px 24px rgba(75,225,225,0.35)); }
+    .at-hero h1 { font-size:22px; font-weight:900; letter-spacing:0.02em; margin:8px 0 2px; color:#fff; }
+    .at-hero-sub { font-size:11px; color:var(--muted); font-weight:600; letter-spacing:0.06em; opacity:0.85; }
 
-    .at-field { padding:6px 6px 12px; }
-    .at-field-label { display:block; font-size:10px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:0.14em; margin-bottom:8px; opacity:0.85; padding-left:4px; }
-    .at-select-wrap { position:relative; }
-    .at-select {
-      appearance:none; -webkit-appearance:none; -moz-appearance:none;
-      width:100%; padding:14px 42px 14px 16px;
+    /* ── WHEEL PICKER (iOS-style scroll-snap) ────────────── */
+    .at-picker { flex-shrink:0; display:flex; flex-direction:column; align-items:center; padding:4px 6px 6px; }
+    .at-picker-label { font-size:10px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:0.18em; opacity:0.75; margin-bottom:8px; }
+    .tp-wheel-frame {
+      position:relative;
+      width:min(260px, 78vw);
+      height:180px;
+      border-radius:20px;
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.14);
+      overflow:hidden;
+      box-shadow:inset 0 2px 12px rgba(0,0,0,0.35);
+    }
+    .tp-wheel-highlight {
+      position:absolute; left:12px; right:12px;
+      top:50%; height:44px; transform:translateY(-50%);
+      border-top:1px solid rgba(75,225,225,0.28);
+      border-bottom:1px solid rgba(75,225,225,0.28);
+      background:linear-gradient(180deg, rgba(75,225,225,0.06), rgba(75,225,225,0.02));
+      pointer-events:none; z-index:2;
+      border-radius:8px;
+    }
+    .tp-wheel-mask {
+      position:absolute; left:0; right:0; height:60px;
+      pointer-events:none; z-index:3;
+    }
+    .tp-wheel-mask-top { top:0;    background:linear-gradient(to bottom, rgba(4,24,24,0.9), transparent); }
+    .tp-wheel-mask-bot { bottom:0; background:linear-gradient(to top,    rgba(4,24,24,0.9), transparent); }
+
+    .tp-wheel {
+      width:100%; height:100%;
+      overflow-y:scroll;
+      scroll-snap-type:y mandatory;
+      -webkit-overflow-scrolling:touch;
+      /* (frame_h - item_h) / 2 = (180-44)/2 = 68 → padding so first/last items can center */
+      padding:68px 0;
+      scrollbar-width:none;
+      overscroll-behavior:contain;
+    }
+    .tp-wheel::-webkit-scrollbar { display:none; }
+    .tp-item {
+      height:44px;
+      display:flex; align-items:center; justify-content:center;
+      scroll-snap-align:center; scroll-snap-stop:always;
+      font-size:22px; font-weight:800;
+      color:rgba(255,255,255,0.35);
+      transition:color 0.18s, font-size 0.18s, transform 0.18s;
+      letter-spacing:-0.005em;
+    }
+    .tp-item.is-selected {
+      color:#fff;
+      font-size:30px;
+      font-weight:900;
+      transform:scale(1.02);
+    }
+    .tp-wheel-unit {
+      margin-top:8px;
+      font-size:11px; font-weight:800;
+      color:var(--muted); letter-spacing:0.18em; text-transform:uppercase;
+    }
+
+    /* Activity name text field */
+    .at-field { padding:10px 6px 0; flex-shrink:0; }
+    .at-field-label { display:block; font-size:10px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:0.14em; margin-bottom:6px; opacity:0.85; padding-left:4px; }
+    .at-input {
+      width:100%; padding:13px 16px;
       border-radius:14px; border:1px solid rgba(255,255,255,0.14);
       background:rgba(255,255,255,0.06); color:#f7fbfb;
-      font-size:14px; font-weight:700; font-family:inherit; letter-spacing:0.01em;
-      cursor:pointer; outline:none;
+      font-size:14px; font-weight:700; font-family:inherit;
+      outline:none;
       transition:background 0.18s, border-color 0.18s;
     }
-    .at-select:hover, .at-select:focus { background:rgba(255,255,255,0.1); border-color:rgba(75,225,225,0.4); }
-    .at-select option { background:#052828; color:#f7fbfb; font-weight:600; padding:8px; }
-    .at-select-chevron { position:absolute; right:16px; top:50%; transform:translateY(-50%); pointer-events:none; color:var(--teal-bright); font-size:13px; font-weight:900; opacity:0.85; }
+    .at-input:focus { background:rgba(255,255,255,0.1); border-color:rgba(75,225,225,0.4); }
+    .at-input::placeholder { color:rgba(255,255,255,0.32); font-weight:500; font-style:italic; }
 
-    .at-quick-row { display:flex; flex-wrap:wrap; gap:6px; padding:0 6px 8px; }
-    .at-quick { flex:1 1 60px; appearance:none; padding:9px 4px; border-radius:11px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.05); color:#eaf8f8; font-size:11px; font-weight:800; letter-spacing:0.06em; cursor:pointer; }
-    .at-quick.is-active { background:linear-gradient(180deg, rgba(0,180,180,0.4), rgba(0,140,140,0.28)); border-color:rgba(75,225,225,0.5); color:#fff; }
-    .at-quick:active { transform:scale(0.98); }
-
-    .at-start-wrap { padding:14px 8px 10px; margin-top:auto; flex-shrink:0; }
-    .at-start { appearance:none; width:100%; padding:18px; border-radius:16px; border:1px solid rgba(75,225,225,0.4); background:linear-gradient(180deg, rgba(0,180,180,0.35), rgba(0,140,140,0.25)); color:#fff; font-size:15px; font-weight:900; letter-spacing:0.14em; text-transform:uppercase; cursor:pointer; box-shadow:0 8px 24px rgba(0,140,140,0.24); }
+    .at-start-wrap { padding:14px 8px 6px; margin-top:auto; flex-shrink:0; }
+    .at-start { appearance:none; width:100%; padding:16px; border-radius:16px; border:1px solid rgba(75,225,225,0.4); background:linear-gradient(180deg, rgba(0,180,180,0.35), rgba(0,140,140,0.25)); color:#fff; font-size:15px; font-weight:900; letter-spacing:0.14em; text-transform:uppercase; cursor:pointer; box-shadow:0 8px 24px rgba(0,140,140,0.24); }
     .at-start:active { transform:scale(0.98); }
 
-    /* ── RUN VIEW (full-screen countdown) ─────────────────── */
+    /* ── RUN VIEW (full-screen countdown w/ DSEG7 digits) ── */
     .at-run { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:16px 6px; }
-    .at-ring-wrap { position:relative; width:min(320px, 80vw); aspect-ratio:1/1; margin:6px 0 22px; display:flex; align-items:center; justify-content:center; }
+    .at-ring-wrap { position:relative; width:min(320px, 82vw); aspect-ratio:1/1; margin:6px 0 22px; display:flex; align-items:center; justify-content:center; }
     .at-ring { position:absolute; inset:0; transform:rotate(-90deg); }
     .at-ring-track { fill:none; stroke:rgba(255,255,255,0.08); stroke-width:8; }
-    .at-ring-fill { fill:none; stroke:url(#atGrad); stroke-width:10; stroke-linecap:round; transition:stroke-dashoffset 0.5s linear; filter:drop-shadow(0 0 12px rgba(75,225,225,0.35)); }
-    .at-digits {
-      position:relative;
-      font-variant-numeric:tabular-nums; font-feature-settings:'tnum' 1;
-      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
-      font-size:clamp(56px, 18vw, 96px); font-weight:900; line-height:1;
-      color:#fff; letter-spacing:-0.02em;
-      text-shadow:0 4px 30px rgba(75,225,225,0.35);
+    .at-ring-fill {
+      fill:none;
+      /* stroke + filter are set by JS via inline style — CSS class rules would
+         out-specify the SVG `stroke=""` attribute, so we skip the class value
+         and let applyRingColor() write inline styles instead. */
+      stroke-width:10; stroke-linecap:round;
+      transition:stroke-dashoffset 0.5s linear, stroke 0.5s ease, filter 0.5s ease;
     }
-    .at-label { font-size:11px; font-weight:800; color:var(--muted); letter-spacing:0.2em; text-transform:uppercase; opacity:0.8; margin-bottom:8px; }
+
+    /* Digital-clock digits + task-name label, both inside the ring */
+    .at-ring-center {
+      position:absolute; inset:0;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      pointer-events:none;
+    }
+    .at-clock {
+      position:relative;
+      font-family:'DSEG7Classic', 'Courier New', ui-monospace, monospace;
+      font-weight:700;
+      font-size:clamp(46px, 15vw, 78px);
+      line-height:1;
+      letter-spacing:0.02em;
+      color:#4be1e1;
+      text-shadow:0 0 22px rgba(75,225,225,0.55), 0 0 4px rgba(75,225,225,0.35);
+    }
+    .at-clock-ghost {
+      position:absolute; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      color:rgba(75,225,225,0.09);
+      text-shadow:none;
+      pointer-events:none;
+    }
+    .at-clock-live {
+      position:relative; z-index:1;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .at-clock-label {
+      margin-top:10px;
+      font-size:11px; font-weight:800;
+      color:var(--muted); letter-spacing:0.2em; text-transform:uppercase;
+      opacity:0.85;
+      max-width:82%; text-align:center;
+      overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    }
+    /* When the task name is set, bump size a hair and warm the color slightly */
+    .at-clock-label.is-named {
+      font-size:12px;
+      color:#e4faff;
+      opacity:1;
+    }
+
     .at-controls { display:flex; gap:10px; padding:12px 6px 6px; width:100%; }
     .at-ctrl { flex:1; appearance:none; padding:15px; border-radius:14px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.06); color:#eaf8f8; font-size:12px; font-weight:900; letter-spacing:0.12em; text-transform:uppercase; cursor:pointer; }
     .at-ctrl:active { transform:scale(0.98); }
@@ -115,7 +220,9 @@
 
     /* ── DONE (0:00) STATE ────────────────────────────────── */
     .app.is-done { background:linear-gradient(168deg, rgba(0,120,120,0.98) 0%, rgba(0,180,180,0.92) 50%, rgba(0,140,140,0.96) 100%); }
-    .app.is-done .at-digits { color:#fff; text-shadow:0 6px 40px rgba(255,255,255,0.6); }
+    .app.is-done .at-clock { color:#ffffff; text-shadow:0 0 30px rgba(255,255,255,0.9), 0 0 6px rgba(255,255,255,0.6); }
+    .app.is-done .at-clock-ghost { color:rgba(255,255,255,0.14); }
+    .app.is-done .at-clock-label { color:#fff; opacity:1; }
     .at-done-pill { display:none; padding:10px 20px; border-radius:99px; background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.36); color:#fff; font-size:13px; font-weight:900; letter-spacing:0.2em; text-transform:uppercase; margin-top:14px; }
     .app.is-done .at-done-pill { display:inline-flex; animation:donePulse 1.2s ease-in-out infinite; }
     @keyframes donePulse {
@@ -123,7 +230,7 @@
       50%     { transform:scale(1.06); background:rgba(255,255,255,0.32); }
     }
 
-    /* Flash overlay played once at 0 for the visual "buzzer" */
+    /* Flash overlay played once at 0 */
     .at-flash { position:absolute; inset:0; background:radial-gradient(circle at 50% 50%, rgba(75,225,225,0.55) 0%, transparent 70%); opacity:0; pointer-events:none; z-index:2; }
     .at-flash.is-firing { animation:atFlash 900ms ease-out; }
     @keyframes atFlash {
@@ -132,8 +239,8 @@
       100% { opacity:0; }
     }
 
-    .footer-note { text-align:center; font-size:9.5px; color:#b5d4d4; font-weight:600; padding:8px 0 3px; margin-top:auto; flex-shrink:0; opacity:0.75; }
-    .footer-version { text-align:center; font-size:8.5px; color:#b5d4d4; opacity:0.55; padding:0 0 6px; font-weight:500; letter-spacing:0.04em; flex-shrink:0; }
+    .footer-note { text-align:center; font-size:9.5px; color:#b5d4d4; font-weight:600; padding:6px 0 2px; margin-top:auto; flex-shrink:0; opacity:0.75; }
+    .footer-version { text-align:center; font-size:8.5px; color:#b5d4d4; opacity:0.55; padding:0 0 4px; font-weight:500; letter-spacing:0.04em; flex-shrink:0; }
 
     /* Standalone */
     body.is-standalone { background:#021414; }
@@ -166,32 +273,25 @@
           <div class="at-hero">
             <div class="at-emoji">⏱</div>
             <h1>Activity Timer</h1>
-            <p class="at-hero-sub">Set the time, tap start</p>
+            <p class="at-hero-sub">Set duration & activity, tap start</p>
+          </div>
+
+          <div class="at-picker">
+            <div class="at-picker-label">Duration</div>
+            <div class="tp-wheel-frame">
+              <div class="tp-wheel-mask tp-wheel-mask-top"></div>
+              <div class="tp-wheel-mask tp-wheel-mask-bot"></div>
+              <div class="tp-wheel-highlight"></div>
+              <div class="tp-wheel" id="tpWheel"><!-- items injected by JS --></div>
+            </div>
+            <div class="tp-wheel-unit">minutes</div>
           </div>
 
           <div class="at-field">
-            <label class="at-field-label" for="atDurSelect">Duration</label>
-            <div class="at-select-wrap">
-              <select id="atDurSelect" class="at-select">
-                <option value="1">1 minute</option>
-                <option value="2">2 minutes</option>
-                <option value="3">3 minutes</option>
-                <option value="5" selected>5 minutes</option>
-                <option value="10">10 minutes</option>
-                <option value="15">15 minutes</option>
-                <option value="20">20 minutes</option>
-                <option value="25">25 minutes</option>
-                <option value="30">30 minutes</option>
-              </select>
-              <span class="at-select-chevron" aria-hidden="true">▾</span>
-            </div>
-          </div>
-
-          <div class="at-field" style="padding-bottom:6px">
-            <label class="at-field-label">Quick pick</label>
-            <div class="at-quick-row" id="atQuickRow">
-              <!-- injected by JS so button state stays in sync with the select -->
-            </div>
+            <label class="at-field-label" for="atTaskInput">Activity name (optional)</label>
+            <input class="at-input" id="atTaskInput" type="text"
+                   placeholder="Clean up · Quiz · Log in to computers…"
+                   maxlength="40" autocomplete="off" autocapitalize="sentences">
           </div>
 
           <div class="at-start-wrap">
@@ -201,19 +301,18 @@
 
         <!-- RUN VIEW -->
         <div id="atRun" class="at-view at-run" hidden>
-          <div class="at-label" id="atStatusLabel">Time Remaining</div>
           <div class="at-ring-wrap">
             <svg class="at-ring" viewBox="0 0 200 200" aria-hidden="true">
-              <defs>
-                <linearGradient id="atGrad" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%"  stop-color="#4be1e1"/>
-                  <stop offset="100%" stop-color="#007474"/>
-                </linearGradient>
-              </defs>
               <circle class="at-ring-track" cx="100" cy="100" r="88"/>
               <circle class="at-ring-fill"  cx="100" cy="100" r="88" id="atRingFill"/>
             </svg>
-            <div class="at-digits" id="atDigits">5:00</div>
+            <div class="at-ring-center">
+              <div class="at-clock">
+                <span class="at-clock-ghost" id="atGhost">88:88</span>
+                <span class="at-clock-live"  id="atDigits">5:00</span>
+              </div>
+              <div class="at-clock-label" id="atClockLabel">Time Remaining</div>
+            </div>
           </div>
           <div class="at-done-pill">⏱ Time</div>
           <div class="at-controls">
@@ -223,7 +322,7 @@
         </div>
 
         <div class="footer-note">By: <a href="https://www.creativesilva.com" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">CreativeSilva</a></div>
-        <div class="footer-version">Activity Timer · v1 · Updated Aug 30, 2026</div>
+        <div class="footer-version">Activity Timer · v3 · Updated Aug 30, 2026</div>
       </div>
     </div>
   </div>
@@ -236,89 +335,175 @@
     <a href="calendar.html"         class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">📅</span>Calendar</a>
     <a href="extension_search.html" class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">🔍</span>Directory</a>
     <a href="panther_prompts.html"  class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">❓</span>Panther Prompts</a>
+    <a href="group_maker.html"      class="nav-menu-item" role="menuitem"><span class="nav-menu-icon">👥</span>Group Maker</a>
   </nav>
 
   <script>
     // ─────────────────────────────────────────────────────────
-    // ACTIVITY TIMER · v1 · Aug 30, 2026
-    // Standalone mini-app under Panther Toolbox. Range 1–30 min.
+    // ACTIVITY TIMER · v3 · Aug 30, 2026
+    //   v3 adds: activity-name text field, task name inside the
+    //   ring, color-shifting ring (teal→lime→yellow→orange→red),
+    //   simplified minute values (1/5/10/15/20/25/30).
+    //   v2: iOS-style wheel picker + DSEG7 digits.
     // At 0: gentle two-tone chime (Web Audio, no external file)
     //       + navigator.vibrate on mobile + visual flash. Stops.
     // ─────────────────────────────────────────────────────────
 
-    const DUR_KEY = 'at_duration';
-    const QUICK   = [1, 3, 5, 10, 15];    // common quick-picks
-    const RING_C  = 2 * Math.PI * 88;     // circumference of the progress ring
+    // Duration values shown in the wheel — Chris wants "clean" round intervals
+    const MINUTES = [1, 5, 10, 15, 20, 25, 30];
+    const DUR_KEY  = 'at_duration';
+    const TASK_KEY = 'at_taskname';
+    const RING_C   = 2 * Math.PI * 88;   // circumference of the progress ring
+
+    // Ring color steps. Picked so the shift is noticeable across a room
+    // without hitting red until the last ~15% (Sharon's "not too obnoxious").
+    // Each entry: { min: pct-remaining threshold, color, shadow }
+    const RING_STOPS = [
+      { min: 0.60, color: '#4be1e1', shadow: 'rgba(75,225,225,0.5)'  },  // 60–100% : bright teal
+      { min: 0.40, color: '#9de24b', shadow: 'rgba(157,226,75,0.45)' },  // 40–60%  : lime
+      { min: 0.25, color: '#ffce4b', shadow: 'rgba(255,206,75,0.5)'  },  // 25–40%  : yellow
+      { min: 0.12, color: '#ff8a3c', shadow: 'rgba(255,138,60,0.55)' },  // 12–25%  : orange
+      { min: 0.00, color: '#ff4b4b', shadow: 'rgba(255,75,75,0.65)'  }   //  0–12%  : red
+    ];
 
     const $ = id => document.getElementById(id);
     const app = $('atApp'), home = $('atHome'), run = $('atRun');
-    const durSelect = $('atDurSelect');
-    const quickRow  = $('atQuickRow');
-    const digitsEl  = $('atDigits');
-    const ringFill  = $('atRingFill');
-    const statusEl  = $('atStatusLabel');
-    const pauseBtn  = $('atPause');
-    const resetBtn  = $('atReset');
-    const flashEl   = $('atFlash');
+    const digitsEl = $('atDigits'), ghostEl = $('atGhost');
+    const ringFill = $('atRingFill');
+    const labelEl  = $('atClockLabel');
+    const pauseBtn = $('atPause'), resetBtn = $('atReset');
+    const flashEl  = $('atFlash');
+    const wheel    = $('tpWheel');
+    const taskInput= $('atTaskInput');
 
     // State
-    let durationSec = 300;      // seconds; last selection restored below
+    let durationMin = 5;
+    let durationSec = 300;
     let remainingSec = 0;
     let running = false;
     let tickId = null;
     let audioCtx = null;
+    let currentStopIdx = -1;   // remember active RING_STOPS entry to avoid redundant writes
 
     // Standalone
     if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
       document.body.classList.add('is-standalone');
     }
 
-    // Restore last duration
-    const saved = parseInt(localStorage.getItem(DUR_KEY), 10);
-    if (Number.isFinite(saved) && saved >= 1 && saved <= 30) {
-      durationSec = saved * 60;
-      durSelect.value = String(saved);
+    // Restore last duration (falls back to 5 if saved value not in MINUTES)
+    {
+      const saved = parseInt(localStorage.getItem(DUR_KEY), 10);
+      if (Number.isFinite(saved) && MINUTES.includes(saved)) {
+        durationMin = saved;
+        durationSec = saved * 60;
+      }
     }
+    // Restore last activity name (blank if none)
+    taskInput.value = localStorage.getItem(TASK_KEY) || '';
+    taskInput.addEventListener('input', () => {
+      localStorage.setItem(TASK_KEY, taskInput.value.trim());
+    });
 
     // Initial ring geometry
     ringFill.setAttribute('stroke-dasharray', RING_C);
     ringFill.setAttribute('stroke-dashoffset', '0');
 
-    // ── Quick-pick chips (kept in sync with the <select>) ──
-    function renderQuickRow() {
-      const currentMin = parseInt(durSelect.value, 10);
-      quickRow.innerHTML = '';
-      QUICK.forEach(min => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'at-quick' + (min === currentMin ? ' is-active' : '');
-        btn.textContent = min + ' min';
-        btn.addEventListener('click', () => {
-          durSelect.value = String(min);
-          durSelect.dispatchEvent(new Event('change'));
-        });
-        quickRow.appendChild(btn);
+    // ── WHEEL PICKER ──
+    function buildWheel() {
+      const frag = document.createDocumentFragment();
+      MINUTES.forEach(m => {
+        const el = document.createElement('div');
+        el.className = 'tp-item';
+        el.dataset.val = String(m);
+        el.textContent = String(m);
+        frag.appendChild(el);
       });
+      wheel.appendChild(frag);
     }
-    renderQuickRow();
+    buildWheel();
 
-    durSelect.addEventListener('change', () => {
-      const min = parseInt(durSelect.value, 10);
-      durationSec = min * 60;
-      localStorage.setItem(DUR_KEY, String(min));
-      renderQuickRow();
+    function scrollToValue(min, behavior = 'auto') {
+      const item = wheel.querySelector(`.tp-item[data-val="${min}"]`);
+      if (!item) return;
+      const target = item.offsetTop + item.offsetHeight / 2 - wheel.clientHeight / 2;
+      wheel.scrollTo({ top: target, behavior });
+    }
+    function updateSelectedFromScroll() {
+      const items = wheel.querySelectorAll('.tp-item');
+      const wr = wheel.getBoundingClientRect();
+      const centerY = wr.top + wr.height / 2;
+      let closest = null, closestDist = Infinity;
+      items.forEach(item => {
+        const r = item.getBoundingClientRect();
+        const d = Math.abs(r.top + r.height / 2 - centerY);
+        if (d < closestDist) { closestDist = d; closest = item; }
+      });
+      items.forEach(i => i.classList.toggle('is-selected', i === closest));
+      if (closest) {
+        const val = parseInt(closest.dataset.val, 10);
+        if (val !== durationMin) {
+          durationMin = val;
+          durationSec = val * 60;
+          localStorage.setItem(DUR_KEY, String(val));
+          if (!running && run.hidden) remainingSec = durationSec;
+        }
+      }
+    }
+    let scrollRaf = null;
+    wheel.addEventListener('scroll', () => {
+      if (scrollRaf) return;
+      scrollRaf = requestAnimationFrame(() => {
+        scrollRaf = null;
+        updateSelectedFromScroll();
+      });
+    });
+    wheel.tabIndex = 0;
+    wheel.addEventListener('keydown', e => {
+      const currIdx = MINUTES.indexOf(durationMin);
+      if (e.key === 'ArrowUp'   && currIdx > 0)                 { e.preventDefault(); scrollToValue(MINUTES[currIdx - 1], 'smooth'); }
+      if (e.key === 'ArrowDown' && currIdx < MINUTES.length - 1) { e.preventDefault(); scrollToValue(MINUTES[currIdx + 1], 'smooth'); }
+    });
+    requestAnimationFrame(() => {
+      scrollToValue(durationMin, 'auto');
+      updateSelectedFromScroll();
     });
 
-    // ── Formatting ──
+    // ── FORMAT / CLOCK ──
     function fmt(sec) {
       const s = Math.max(0, Math.round(sec));
       const m = Math.floor(s / 60);
       const r = s % 60;
       return m + ':' + String(r).padStart(2, '0');
     }
+    // Ghost mirrors width of live digit slots — DSEG7's "8" is fully-lit.
+    // "5:00" → "8:88";  "12:34" → "88:88".
+    function ghostFor(str) {
+      return str.split('').map(ch => (ch === ':' ? ':' : '8')).join('');
+    }
+    function renderClock() {
+      const str = fmt(remainingSec);
+      digitsEl.textContent = str;
+      ghostEl.textContent  = ghostFor(str);
+    }
 
-    // ── Chime (gentle two-tone via Web Audio) ──
-    // Ensures audio unlocks on the user's Start tap (required by iOS Safari)
+    // ── RING COLOR ──
+    // Reads pct-remaining, applies the matching stop's color + drop-shadow.
+    // Skips writes when the stop hasn't changed → keeps the browser cheap.
+    function applyRingColor(pct) {
+      let idx = RING_STOPS.length - 1;
+      for (let i = 0; i < RING_STOPS.length; i++) {
+        if (pct >= RING_STOPS[i].min) { idx = i; break; }
+      }
+      if (idx === currentStopIdx) return;
+      currentStopIdx = idx;
+      const stop = RING_STOPS[idx];
+      // Inline style so SVG presentation attribute (or missing CSS default)
+      // doesn't fight us; also survives class-rule additions later.
+      ringFill.style.stroke = stop.color;
+      ringFill.style.filter = `drop-shadow(0 0 12px ${stop.shadow})`;
+    }
+
+    // ── CHIME ──
     function ensureAudio() {
       if (audioCtx) return audioCtx;
       const Ctx = window.AudioContext || window.webkitAudioContext;
@@ -329,9 +514,8 @@
     function playChime() {
       const ctx = ensureAudio();
       if (!ctx) return;
-      // Two soft sine tones ~500ms total. Warm, not alarming.
       const now = ctx.currentTime;
-      [ [880, 0.00, 0.28],       // high tone
+      [ [880, 0.00, 0.28],
         [587, 0.30, 0.32] ].forEach(([freq, offset, dur]) => {
         const osc  = ctx.createOscillator();
         const gain = ctx.createGain();
@@ -346,65 +530,53 @@
       });
     }
 
-    // ── Rendering ──
+    // ── RENDER ──
     function render() {
-      digitsEl.textContent = fmt(remainingSec);
+      renderClock();
       const pct = durationSec > 0 ? remainingSec / durationSec : 0;
-      // Fill from full ring at start → empty at 0
       ringFill.setAttribute('stroke-dashoffset', String(RING_C * (1 - pct)));
+      applyRingColor(pct);
     }
 
-    // ── Timing loop (drift-free via Date.now() end-time) ──
-    let endMs = 0;      // absolute wall-clock ms when timer hits 0
-    let pausedMs = 0;   // remaining ms captured when paused
-
+    // ── TIMING LOOP ──
+    let endMs = 0, pausedMs = 0;
     function tickLoop() {
-      const nowMs = Date.now();
-      const leftMs = Math.max(0, endMs - nowMs);
+      const leftMs = Math.max(0, endMs - Date.now());
       remainingSec = leftMs / 1000;
       render();
-      if (leftMs <= 0) {
-        stopTick();
-        finish();
-        return;
-      }
-      // Next frame ~250ms — fine-grained enough for smooth ring, cheap on CPU
+      if (leftMs <= 0) { stopTick(); finish(); return; }
       tickId = setTimeout(tickLoop, 250);
     }
-    function startTick() {
-      stopTick();
-      running = true;
-      pauseBtn.textContent = 'Pause';
-      tickLoop();
-    }
-    function stopTick() {
-      if (tickId) { clearTimeout(tickId); tickId = null; }
-      running = false;
-    }
+    function startTick() { stopTick(); running = true; pauseBtn.textContent = 'Pause'; tickLoop(); }
+    function stopTick()  { if (tickId) { clearTimeout(tickId); tickId = null; } running = false; }
 
-    // ── Actions ──
+    // ── ACTIONS ──
+    function setLabel(text, isNamed) {
+      labelEl.textContent = text;
+      labelEl.classList.toggle('is-named', !!isNamed);
+    }
     function startTimer() {
-      // Unlock audio inside the click (iOS requirement)
       ensureAudio();
+      const name = taskInput.value.trim();
+      setLabel(name || 'Time Remaining', !!name);
+
       remainingSec = durationSec;
       endMs = Date.now() + durationSec * 1000;
       home.hidden = true; run.hidden = false;
       app.classList.remove('is-done');
       flashEl.classList.remove('is-firing');
-      statusEl.textContent = 'Time Remaining';
+      currentStopIdx = -1;             // force ring color to re-apply
       render();
       startTick();
     }
     function pauseOrResume() {
-      if (app.classList.contains('is-done')) return;   // no-op after finish
+      if (app.classList.contains('is-done')) return;
       if (running) {
         pausedMs = endMs - Date.now();
         stopTick();
         pauseBtn.textContent = 'Resume';
-        statusEl.textContent = 'Paused';
       } else {
         endMs = Date.now() + Math.max(1000, pausedMs);
-        statusEl.textContent = 'Time Remaining';
         startTick();
       }
     }
@@ -413,30 +585,28 @@
       app.classList.remove('is-done');
       flashEl.classList.remove('is-firing');
       remainingSec = 0;
+      currentStopIdx = -1;
       render();
       run.hidden = true; home.hidden = false;
       pauseBtn.textContent = 'Pause';
     }
     function finish() {
-      // Snap ring/digits to zero
       remainingSec = 0;
       render();
-      // Visual: flash overlay + done-state background
       flashEl.classList.add('is-firing');
       app.classList.add('is-done');
-      statusEl.textContent = "Time's Up";
-      // Audio: gentle chime
+      setLabel("Time's Up", false);
       try { playChime(); } catch {}
-      // Haptic: mobile buzzer (silently no-op on desktop)
       try { if ('vibrate' in navigator) navigator.vibrate([120, 60, 120]); } catch {}
-      // Clear the flash class so it can re-trigger on next run
       setTimeout(() => flashEl.classList.remove('is-firing'), 1000);
     }
 
-    // ── Handlers ──
+    // ── HANDLERS ──
     $('atStart').addEventListener('click', startTimer);
     pauseBtn.addEventListener('click', pauseOrResume);
     resetBtn.addEventListener('click', reset);
+    // Enter in the text field starts the timer (mouse-and-keyboard convenience)
+    taskInput.addEventListener('keydown', e => { if (e.key === 'Enter') startTimer(); });
 
     // Nav menu
     const navMenu = $('navMenu'), navMenuBtn = $('navMenuBtn');
@@ -456,9 +626,7 @@
       e.preventDefault(); window.location.href = 'panther_toolbox.html';
     });
 
-    // If the tab is hidden while running, we still hit 0 at the right wall-clock
-    // moment because tickLoop reads Date.now(); on visibility restore the ring
-    // catches up on its own via the next tick.
+    // Re-render on tab restore so digits catch up to wall-clock instantly
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden && running) render();
     });
@@ -466,7 +634,7 @@
     // Service worker
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
-    // Init render
+    // Init render (idle state shows the picked duration)
     remainingSec = durationSec;
     render();
   </script>
