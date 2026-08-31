@@ -73,27 +73,51 @@
     .at-view[hidden] { display:none; }
 
     /* ── HOME VIEW ────────────────────────────────────────── */
-    .at-hero { text-align:center; padding:14px 12px 8px; flex-shrink:0; }
+    /* Hero uses a 1-cell grid so the "thanks to Sharon" overlay and the
+       normal hero stack on top of each other and cross-fade without
+       collapsing the layout. Both children share grid-area "stack". */
+    .at-hero {
+      display:grid; grid-template-areas:"stack";
+      text-align:center; padding:14px 12px 8px; flex-shrink:0;
+    }
+    .at-hero-thanks, .at-hero-main {
+      grid-area:stack;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      transition:opacity 0.6s ease;
+    }
+    .at-hero-thanks { opacity:1; }
+    .at-hero-main   { opacity:0; pointer-events:none; }
+    .at-hero.is-flipped .at-hero-thanks { opacity:0; pointer-events:none; }
+    .at-hero.is-flipped .at-hero-main   { opacity:1; pointer-events:auto; }
+
+    /* Thanks contents */
+    .at-thanks-icon { font-size:42px; line-height:1; margin-bottom:8px; filter:drop-shadow(0 6px 18px rgba(75,225,225,0.4)); }
+    .at-thanks-pre  { font-size:11px; color:var(--muted); font-weight:600; letter-spacing:0.08em; opacity:0.85; text-transform:uppercase; }
+    .at-thanks-name { font-size:20px; font-weight:900; color:#fff; margin:5px 0 3px; letter-spacing:0.01em; }
+    .at-thanks-post { font-size:11px; color:var(--muted); font-weight:600; letter-spacing:0.06em; opacity:0.85; }
+
+    /* Main hero contents (unchanged look, just wrapped) */
     .at-emoji { font-size:52px; line-height:1; filter:drop-shadow(0 8px 24px rgba(75,225,225,0.35)); }
-    .at-hero h1 { font-size:22px; font-weight:900; letter-spacing:0.02em; margin:8px 0 2px; color:#fff; }
+    .at-hero-main h1 { font-size:22px; font-weight:900; letter-spacing:0.02em; margin:8px 0 2px; color:#fff; }
     .at-hero-sub { font-size:11px; color:var(--muted); font-weight:600; letter-spacing:0.06em; opacity:0.85; }
 
     /* ── WHEEL PICKER (iOS-style scroll-snap) ────────────── */
-    .at-picker { flex-shrink:0; display:flex; flex-direction:column; align-items:center; padding:4px 6px 6px; }
-    .at-picker-label { font-size:10px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:0.18em; opacity:0.75; margin-bottom:8px; }
+    /* Compact: 130px tall shows ~3 items, plenty for a granular 1–30 range. */
+    .at-picker { flex-shrink:0; display:flex; flex-direction:column; align-items:center; padding:2px 6px 4px; }
+    .at-picker-label { font-size:10px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:0.18em; opacity:0.75; margin-bottom:6px; }
     .tp-wheel-frame {
       position:relative;
-      width:min(260px, 78vw);
-      height:180px;
-      border-radius:20px;
+      width:min(200px, 62vw);
+      height:130px;
+      border-radius:18px;
       background:rgba(255,255,255,0.06);
       border:1px solid rgba(255,255,255,0.14);
       overflow:hidden;
       box-shadow:inset 0 2px 12px rgba(0,0,0,0.35);
     }
     .tp-wheel-highlight {
-      position:absolute; left:12px; right:12px;
-      top:50%; height:44px; transform:translateY(-50%);
+      position:absolute; left:10px; right:10px;
+      top:50%; height:36px; transform:translateY(-50%);
       border-top:1px solid rgba(75,225,225,0.28);
       border-bottom:1px solid rgba(75,225,225,0.28);
       background:linear-gradient(180deg, rgba(75,225,225,0.06), rgba(75,225,225,0.02));
@@ -101,7 +125,7 @@
       border-radius:8px;
     }
     .tp-wheel-mask {
-      position:absolute; left:0; right:0; height:60px;
+      position:absolute; left:0; right:0; height:44px;
       pointer-events:none; z-index:3;
     }
     .tp-wheel-mask-top { top:0;    background:linear-gradient(to bottom, rgba(4,24,24,0.9), transparent); }
@@ -112,36 +136,36 @@
       overflow-y:scroll;
       scroll-snap-type:y mandatory;
       -webkit-overflow-scrolling:touch;
-      /* (frame_h - item_h) / 2 = (180-44)/2 = 68 → padding so first/last items can center */
-      padding:68px 0;
+      /* (frame_h - item_h) / 2 = (130-36)/2 = 47 → padding so first/last items can center */
+      padding:47px 0;
       scrollbar-width:none;
       overscroll-behavior:contain;
     }
     .tp-wheel::-webkit-scrollbar { display:none; }
     .tp-item {
-      height:44px;
+      height:36px;
       display:flex; align-items:center; justify-content:center;
       scroll-snap-align:center; scroll-snap-stop:always;
-      font-size:22px; font-weight:800;
+      font-size:18px; font-weight:800;
       color:rgba(255,255,255,0.35);
       transition:color 0.18s, font-size 0.18s, transform 0.18s;
       letter-spacing:-0.005em;
     }
     .tp-item.is-selected {
       color:#fff;
-      font-size:30px;
+      font-size:24px;
       font-weight:900;
       transform:scale(1.02);
     }
     .tp-wheel-unit {
-      margin-top:8px;
-      font-size:11px; font-weight:800;
+      margin-top:6px;
+      font-size:10.5px; font-weight:800;
       color:var(--muted); letter-spacing:0.18em; text-transform:uppercase;
     }
 
-    /* Activity name text field */
-    .at-field { padding:10px 6px 0; flex-shrink:0; }
-    .at-field-label { display:block; font-size:10px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:0.14em; margin-bottom:6px; opacity:0.85; padding-left:4px; }
+    /* Activity name text field — label centered above the input per Chris */
+    .at-field { padding:12px 6px 0; flex-shrink:0; }
+    .at-field-label { display:block; font-size:10px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:0.14em; margin-bottom:6px; opacity:0.85; text-align:center; }
     .at-input {
       width:100%; padding:13px 16px;
       border-radius:14px; border:1px solid rgba(255,255,255,0.14);
@@ -257,23 +281,33 @@
 <body>
   <div class="frame">
     <div class="app" id="atApp">
-      <img class="ghost-logo" src="PV_Logo.png" alt="">
+      <img class="ghost-logo" src="PV_Logo2.png" alt="">
       <div class="at-flash" id="atFlash"></div>
       <div class="content">
 
         <!-- Top row -->
         <div class="top-row">
-          <a href="panther_toolbox.html" class="nav-link" aria-label="Back to Toolbox"><img src="PV_Logo.png" class="logo-clear" alt="PVHS"></a>
+          <a href="panther_toolbox.html" class="nav-link" aria-label="Back to Toolbox"><img src="PV_Logo2.png" class="logo-clear" alt="PVHS"></a>
           <h1 class="page-title">Activity Timer</h1>
           <button class="nav-menu-btn" id="navMenuBtn" type="button" aria-label="Menu">···</button>
         </div>
 
         <!-- HOME VIEW -->
         <div id="atHome" class="at-view">
-          <div class="at-hero">
-            <div class="at-emoji">⏱</div>
-            <h1>Activity Timer</h1>
-            <p class="at-hero-sub">Set duration & activity, tap start</p>
+          <!-- Hero cross-fades: 'thanks to Sharon' appears first for ~3s,
+               then fades into the normal ⏱ hero. No dismiss needed. -->
+          <div class="at-hero" id="atHero">
+            <div class="at-hero-thanks">
+              <div class="at-thanks-icon">💡</div>
+              <div class="at-thanks-pre">Thanks to</div>
+              <div class="at-thanks-name">Sharon Domingues</div>
+              <div class="at-thanks-post">for suggesting this feature</div>
+            </div>
+            <div class="at-hero-main">
+              <div class="at-emoji">⏱</div>
+              <h1>Activity Timer</h1>
+              <p class="at-hero-sub">Set duration & activity, tap start</p>
+            </div>
           </div>
 
           <div class="at-picker">
@@ -322,7 +356,6 @@
         </div>
 
         <div class="footer-note">By: <a href="https://www.creativesilva.com" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">CreativeSilva</a></div>
-        <div class="footer-version">Activity Timer · v3 · Updated Aug 30, 2026</div>
       </div>
     </div>
   </div>
@@ -349,8 +382,8 @@
     //       + navigator.vibrate on mobile + visual flash. Stops.
     // ─────────────────────────────────────────────────────────
 
-    // Duration values shown in the wheel — Chris wants "clean" round intervals
-    const MINUTES = [1, 5, 10, 15, 20, 25, 30];
+    // Duration values shown in the wheel — full 1..30 min range in 1-min steps
+    const MINUTES = Array.from({length: 30}, (_, i) => i + 1);
     const DUR_KEY  = 'at_duration';
     const TASK_KEY = 'at_taskname';
     const RING_C   = 2 * Math.PI * 88;   // circumference of the progress ring
@@ -637,6 +670,15 @@
     // Init render (idle state shows the picked duration)
     remainingSec = durationSec;
     render();
+
+    // ── SHARON THANKS INTRO ──
+    // Show the "Thanks to Sharon Domingues" panel on every page-open, then
+    // cross-fade into the normal hero after ~3s. Self-dismissing; no state
+    // to remember. Runs once per page load.
+    setTimeout(() => {
+      const hero = document.getElementById('atHero');
+      if (hero) hero.classList.add('is-flipped');
+    }, 3000);
   </script>
 </body>
 </html>
