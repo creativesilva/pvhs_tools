@@ -208,8 +208,9 @@
       font-size:clamp(46px, 15vw, 78px);
       line-height:1;
       letter-spacing:0.02em;
-      color:#4be1e1;
-      text-shadow:0 0 22px rgba(75,225,225,0.55), 0 0 4px rgba(75,225,225,0.35);
+      /* Live digits use CSS vars so JS's applyRingColor() can shift them
+         in lockstep with the progress ring. Ghost stays a subtle constant. */
+      transition:color 0.5s ease, text-shadow 0.5s ease;
     }
     .at-clock-ghost {
       position:absolute; inset:0;
@@ -221,6 +222,9 @@
     .at-clock-live {
       position:relative; z-index:1;
       display:flex; align-items:center; justify-content:center;
+      color:#4be1e1;
+      text-shadow:0 0 22px rgba(75,225,225,0.55), 0 0 4px rgba(75,225,225,0.35);
+      transition:color 0.5s ease, text-shadow 0.5s ease;
     }
     .at-clock-label {
       /* Always says 'Time Remaining' (or 'Time's Up' on finish) —
@@ -256,19 +260,27 @@
     .at-ctrl.is-primary { background:linear-gradient(180deg, rgba(0,180,180,0.4), rgba(0,140,140,0.28)); border-color:rgba(75,225,225,0.4); color:#fff; }
 
     /* ── DONE (0:00) STATE ────────────────────────────────── */
-    .app.is-done { background:linear-gradient(168deg, rgba(0,120,120,0.98) 0%, rgba(0,180,180,0.92) 50%, rgba(0,140,140,0.96) 100%); }
-    .app.is-done .at-clock { color:#ffffff; text-shadow:0 0 30px rgba(255,255,255,0.9), 0 0 6px rgba(255,255,255,0.6); }
+    /* Bright red wash across the entire app frame — impossible to miss.
+       Digits and label bump to white for maximum contrast. */
+    .app.is-done {
+      background:linear-gradient(168deg,
+        rgba(150,10,10,0.98) 0%,
+        rgba(220,30,30,0.94) 45%,
+        rgba(180,10,10,0.98) 100%);
+    }
+    .app.is-done .at-clock-live { color:#ffffff; text-shadow:0 0 30px rgba(255,255,255,0.9), 0 0 6px rgba(255,255,255,0.6); }
     .app.is-done .at-clock-ghost { color:rgba(255,255,255,0.14); }
     .app.is-done .at-clock-label { color:#fff; opacity:1; }
-    .at-done-pill { display:none; padding:10px 20px; border-radius:99px; background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.36); color:#fff; font-size:13px; font-weight:900; letter-spacing:0.2em; text-transform:uppercase; margin-top:14px; }
-    .app.is-done .at-done-pill { display:inline-flex; animation:donePulse 1.2s ease-in-out infinite; }
-    @keyframes donePulse {
-      0%,100% { transform:scale(1);   background:rgba(255,255,255,0.18); }
-      50%     { transform:scale(1.06); background:rgba(255,255,255,0.32); }
+    .app.is-done .at-task-title  { color:#fff; }
+    /* Pulse the ring outline itself so there's still motion without a 3rd button */
+    .app.is-done .at-ring-fill   { animation:doneRingPulse 1.4s ease-in-out infinite; }
+    @keyframes doneRingPulse {
+      0%,100% { opacity:0.35; }
+      50%     { opacity:0.85; }
     }
 
-    /* Flash overlay played once at 0 */
-    .at-flash { position:absolute; inset:0; background:radial-gradient(circle at 50% 50%, rgba(75,225,225,0.55) 0%, transparent 70%); opacity:0; pointer-events:none; z-index:2; }
+    /* Flash overlay played once at 0 — red so it stays consistent with the done wash */
+    .at-flash { position:absolute; inset:0; background:radial-gradient(circle at 50% 50%, rgba(255,60,60,0.65) 0%, transparent 70%); opacity:0; pointer-events:none; z-index:2; }
     .at-flash.is-firing { animation:atFlash 900ms ease-out; }
     @keyframes atFlash {
       0%   { opacity:0; }
@@ -365,7 +377,8 @@
               <div class="at-clock-label" id="atClockLabel">Time Remaining</div>
             </div>
           </div>
-          <div class="at-done-pill">⏱ Time</div>
+          <!-- No 3rd button. The Pause button relabels to "Again ↻" on finish
+               and re-uses the same duration + task title. Reset returns home. -->
           <div class="at-controls">
             <button class="at-ctrl" id="atPause" type="button">Pause</button>
             <button class="at-ctrl is-primary" id="atReset" type="button">Reset</button>
@@ -552,6 +565,11 @@
       // doesn't fight us; also survives class-rule additions later.
       ringFill.style.stroke = stop.color;
       ringFill.style.filter = `drop-shadow(0 0 12px ${stop.shadow})`;
+      // Digits shift color in lockstep with the ring so the whole clock
+      // reads the same urgency at a glance from across the room.
+      // .app.is-done overrides these back to white on finish.
+      digitsEl.style.color = stop.color;
+      digitsEl.style.textShadow = `0 0 22px ${stop.shadow}, 0 0 4px ${stop.shadow}`;
     }
 
     // ── CHIME ──
@@ -623,14 +641,20 @@
       startTick();
     }
     function pauseOrResume() {
-      if (app.classList.contains('is-done')) return;
+      // Contextual: when the timer has FINISHED, this button acts as
+      // "Again" — restart the same duration + task title. Otherwise
+      // it toggles Pause/Resume like normal.
+      if (app.classList.contains('is-done')) {
+        startTimer();
+        return;
+      }
       if (running) {
         pausedMs = endMs - Date.now();
         stopTick();
         pauseBtn.textContent = 'Resume';
       } else {
         endMs = Date.now() + Math.max(1000, pausedMs);
-        startTick();
+        startTick();     // startTick() also flips label back to 'Pause'
       }
     }
     function reset() {
@@ -652,7 +676,13 @@
       render();
       flashEl.classList.add('is-firing');
       app.classList.add('is-done');
-      setStatusLabel("Time's Up");   // keeps task title visible above, updates the inside label
+      setStatusLabel("Time's Up");    // keeps task title visible above, updates the inside label
+      // Clear inline digit color/shadow so the .is-done CSS rule (white on red)
+      // wins — otherwise the last color from applyRingColor() would stick.
+      digitsEl.style.color = '';
+      digitsEl.style.textShadow = '';
+      // Left button becomes "Again ↻" — reuses same duration + task title
+      pauseBtn.textContent = 'Again ↻';
       try { playChime(); } catch {}
       try { if ('vibrate' in navigator) navigator.vibrate([120, 60, 120]); } catch {}
       setTimeout(() => flashEl.classList.remove('is-firing'), 1000);
