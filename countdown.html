@@ -38,32 +38,21 @@
     html, body { width: 100%; height: 100%; min-height: 100%; background: #021414; overflow: hidden; }
     body { min-height: 100vh; min-height: 100dvh; min-height: -webkit-fill-available; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; color: var(--white); touch-action: none; user-select: none; -webkit-user-select: none; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
 
-    /* The Frame ensures the app stays centered with margins when resized on desktop.
-       overflow:hidden here contains the transform:scale on .app so the scaled-down
-       app never spills outside the frame's visible area. */
+    /* The Frame ensures the app stays centered with margins when resized on desktop */
     .frame {
       width: 100%; height: 100dvh; min-height: 100vh; min-height: -webkit-fill-available; display: flex; align-items: center; justify-content: center;
       padding: 10px;
-      overflow: hidden;
     }
 
-    /* THE PERMANENT IPHONE BUBBLE
-       Fixed 430×880 design footprint, then scaled to fit whatever window the user
-       has. min(1, …) caps scale at 1 so a big screen never upscales the artwork —
-       only smaller windows shrink it. Fixes the Windows PWA case where teachers
-       couldn't drag the window smaller than the app's natural width (Sharon's
-       teacher's report). Same rule now works everywhere: phone, tablet, popped-out
-       browser window, or a corner-parked PWA on a laptop. */
+    /* THE PERMANENT IPHONE BUBBLE */
     .app {
-      width: 430px; height: 880px;
+      width: 430px; height: 880px; max-width: 100%; max-height: 100%;
       border-radius: var(--radius);
       overflow: hidden; position: relative; box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,0.12); border-top-color: rgba(255,255,255,0.04);
       background: linear-gradient(168deg, rgba(6,28,28,0.97) 0%, rgba(4,24,24,0.95) 30%, rgba(0,72,72,0.92) 60%, rgba(0,100,100,0.96) 82%, rgba(4,30,30,0.97) 100%);
       display: flex; flex-direction: column; padding: 14px var(--app-spacing) var(--app-spacing) var(--app-spacing);
       isolation: isolate;
       container-type: inline-size;
-      transform-origin: center center;
-      transform: scale(min(1, calc((100dvw - 20px) / 430px), calc((100dvh - 20px) / 880px)));
     }
 
     .app::before {
@@ -531,11 +520,11 @@
     }
 
     body.is-standalone .app {
-      /* Keep the 430×880 design footprint from the base .app rule so the same
-         transform:scale(min(1, …)) shrinks the app to fit any window the user
-         picks (small Windows PWA window, iPad in split view, whatever). Don't
-         reset width/height/max-* here — that would defeat the scaling. */
       position: relative;
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
       border-radius: 34px;
       border: 1px solid rgba(255,255,255,0.12);
       box-shadow: 0 24px 46px rgba(0,0,0,0.22);
@@ -545,10 +534,7 @@
       padding-left: max(var(--app-spacing), env(safe-area-inset-left));
     }
 
-    /* NATIVE APP OVERRIDE (Option B) — non-standalone, non-popout phone case only.
-       Opt out of the base .app transform:scale here so a mobile Safari/Chrome tab
-       fills the screen the way it used to; only standalone / small windows want
-       the proportional-scale behavior. */
+    /* NATIVE APP OVERRIDE (Option B) */
     @media (max-width: 430px) {
       body:not(.is-popout):not(.is-standalone) .frame {
         padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom) 12px;
@@ -559,7 +545,6 @@
         max-height: 100%;
         border-radius: var(--radius);
         border: 1px solid rgba(255,255,255,0.12);
-        transform: none;
       }
       .nav-menu-btn-hide { display: none; }
       body { touch-action: pan-y; }
