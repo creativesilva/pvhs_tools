@@ -614,9 +614,15 @@
         resultCount.textContent = "Recommended Contacts";
       } else {
         results = extensionSearch.filter(e => {
-          // Build a searchable string that includes prep tokens like "p1"/"period 1"
-          // so typing P3 (or "period 3") filters to teachers on prep during that period.
-          const prepTokens = (e.prep || []).map(p => `p${p} period${p} period ${p}`).join(" ");
+          // Build a searchable string that expands each prep period into the
+          // phrasings a teacher would actually type: "p3", "period 3",
+          // "period3", "3rd period", "3rd". Skipped "per 3" / "per3" earlier
+          // because "per 3" substring-matches "Upper 300s" and similar noise.
+          const ORD = { 1:'1st', 2:'2nd', 3:'3rd', 4:'4th', 5:'5th', 6:'6th', 7:'7th' };
+          const prepTokens = (e.prep || []).flatMap(p => [
+            `p${p}`, `period${p}`, `period ${p}`,
+            `${ORD[p]} period`, ORD[p]
+          ]).join(" ");
           const searchSpace = [e.name, (e.role || ""), (e.extension || ""), (e.room || ""), prepTokens].join(" ").toLowerCase();
           return searchSpace.includes(q);
         });
@@ -637,9 +643,12 @@
         const label = isPhoneNumber ? "Phone" : "Ext";
         const div = document.createElement("div");
         div.className = "result-item";
-        // Prep line — only rendered for teachers with prep data (from Fall 2026 chart)
+        // Prep line — only rendered for teachers with prep data (from Fall 2026
+        // chart). Plain-English format: 'Prep Period 3' for one period,
+        // 'Prep Periods 3, 4' for multiple. Part-time / prep-less teachers
+        // (e.g. Laura Garcia Solorio) simply get no prep line.
         const prepStr = (entry.prep && entry.prep.length)
-          ? `<p class="result-line result-prep">Prep: ${entry.prep.map(p => 'P' + p).join(', ')}</p>`
+          ? `<p class="result-line result-prep">Prep Period${entry.prep.length > 1 ? 's' : ''} ${entry.prep.join(', ')}</p>`
           : '';
         div.innerHTML = `<p class="result-name">${entry.name}</p><p class="result-line">${entry.role}</p>${entry.room ? `<p class="result-line">Room: ${entry.room}</p>` : ''}${prepStr}<p class="result-ext">${label}: ${entry.extension}</p>`;
         resultsList.appendChild(div);
