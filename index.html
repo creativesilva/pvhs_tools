@@ -2601,54 +2601,11 @@
         {q:"Life is short. Smile while you still have teeth.", a:"Unknown"}
       ];
 
-      // ── CALENDAR ANNOUNCEMENT ──────────────────────────────
-      (function() {
-        if (localStorage.getItem('pvhs_calAnnounced')) return;
-        const backdrop = document.getElementById('calAnnounceBackdrop');
-        const sheet    = document.getElementById('calAnnounceSheet');
-        function dismiss() {
-          sheet.classList.remove('is-visible');
-          setTimeout(() => { sheet.hidden = true; backdrop.hidden = true; }, 460);
-          localStorage.setItem('pvhs_calAnnounced', '1');
-        }
-        setTimeout(() => {
-          backdrop.hidden = false;
-          sheet.hidden = false;
-          requestAnimationFrame(() => requestAnimationFrame(() => sheet.classList.add('is-visible')));
-        }, 900);
-        backdrop.addEventListener('click', dismiss);
-        document.getElementById('calAnnounceClose').addEventListener('click', dismiss);
-        document.getElementById('calAnnounceLater').addEventListener('click', dismiss);
-        document.querySelector('.cal-announce-cta').addEventListener('click', dismiss);
-      })();
-
-      // ── VERSION UPDATE ANNOUNCEMENT ────────────────────────
-      (function() {
-        var VER_KEY = 'pvhs_v17_announced';
-        if (localStorage.getItem(VER_KEY)) return;
-        // Don't stack on top of calendar announcement — wait until it's been dismissed
-        var calAlreadyDone = !!localStorage.getItem('pvhs_calAnnounced');
-        var delay = calAlreadyDone ? 900 : 2400;
-        var backdrop = document.getElementById('verAnnounceBackdrop');
-        var sheet    = document.getElementById('verAnnounceSheet');
-        if (!backdrop || !sheet) return;
-        function dismiss() {
-          sheet.classList.remove('is-visible');
-          setTimeout(function() { sheet.hidden = true; backdrop.hidden = true; }, 460);
-          localStorage.setItem(VER_KEY, '1');
-        }
-        setTimeout(function() {
-          // Only show if calendar popup is not currently visible
-          var calSheet = document.getElementById('calAnnounceSheet');
-          if (calSheet && !calSheet.hidden) return;
-          backdrop.hidden = false;
-          sheet.hidden = false;
-          requestAnimationFrame(function() { requestAnimationFrame(function() { sheet.classList.add('is-visible'); }); });
-        }, delay);
-        backdrop.addEventListener('click', dismiss);
-        document.getElementById('verAnnounceClose').addEventListener('click', dismiss);
-        document.getElementById('verAnnounceDismiss').addEventListener('click', dismiss);
-      })();
+      // Rollout popups (calendar announcement, version update) removed per Chris:
+      // the features they announced are no longer new, and unsolicited modals
+      // on app open just interrupt teachers. Nav dropdown + release-note emails
+      // now cover the "here's what's new" job. HTML for the sheets stays in
+      // place as dead markup (hidden by default) so a future re-enable is easy.
 
       const idx = schoolDays.indexOf(today);
       let quote;

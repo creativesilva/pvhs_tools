@@ -74,33 +74,11 @@
     .at-view[hidden] { display:none; }
 
     /* ── HOME VIEW ────────────────────────────────────────── */
-    /* Hero uses a 1-cell grid so the "thanks to Sharon" overlay and the
-       normal hero stack on top of each other and cross-fade without
-       collapsing the layout. Both children share grid-area "stack". */
-    .at-hero {
-      display:grid; grid-template-areas:"stack";
-      text-align:center; padding:14px 12px 8px; flex-shrink:0;
-    }
-    .at-hero-thanks, .at-hero-main {
-      grid-area:stack;
-      display:flex; flex-direction:column; align-items:center; justify-content:center;
-      transition:opacity 0.6s ease;
-    }
-    .at-hero-thanks { opacity:1; }
-    .at-hero-main   { opacity:0; pointer-events:none; }
-    .at-hero.is-flipped .at-hero-thanks { opacity:0; pointer-events:none; }
-    .at-hero.is-flipped .at-hero-main   { opacity:1; pointer-events:auto; }
-
-    /* Thanks contents */
-    .at-thanks-icon { font-size:42px; line-height:1; margin-bottom:8px; filter:drop-shadow(0 6px 18px rgba(75,225,225,0.4)); }
-    .at-thanks-pre  { font-size:11px; color:var(--muted); font-weight:600; letter-spacing:0.08em; opacity:0.85; text-transform:uppercase; }
-    .at-thanks-name { font-size:20px; font-weight:900; color:#fff; margin:5px 0 3px; letter-spacing:0.01em; }
-    .at-thanks-post { font-size:11px; color:var(--muted); font-weight:600; letter-spacing:0.06em; opacity:0.85; }
-
-    /* Main hero contents (unchanged look, just wrapped) */
+    .at-hero { text-align:center; padding:14px 12px 8px; flex-shrink:0;
+               display:flex; flex-direction:column; align-items:center; justify-content:center; }
     .at-emoji { font-size:52px; line-height:1; filter:drop-shadow(0 8px 24px rgba(75,225,225,0.35)); }
     img.at-emoji { width:56px; height:56px; object-fit:contain; display:inline-block; }
-    .at-hero-main h1 { font-size:22px; font-weight:900; letter-spacing:0.02em; margin:8px 0 2px; color:#fff; }
+    .at-hero h1 { font-size:22px; font-weight:900; letter-spacing:0.02em; margin:8px 0 2px; color:#fff; }
     .at-hero-sub { font-size:11px; color:var(--muted); font-weight:600; letter-spacing:0.06em; opacity:0.85; }
 
     /* ── WHEEL PICKER (iOS-style scroll-snap) ────────────── */
@@ -109,7 +87,10 @@
     .at-picker-label { font-size:10px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:0.18em; opacity:0.75; margin-bottom:6px; }
     .tp-wheel-frame {
       position:relative;
-      width:min(200px, 62vw);
+      /* Compact — the numbers max out at 2 digits (30), so the column doesn't
+         need to be wide. Was 200px, now trimmed to 128px so it reads as a
+         proper picker column instead of a wide box. */
+      width:min(128px, 42vw);
       height:130px;
       border-radius:18px;
       background:rgba(255,255,255,0.06);
@@ -142,6 +123,9 @@
       padding:47px 0;
       scrollbar-width:none;
       overscroll-behavior:contain;
+      /* Lock touch drift to the vertical axis so numbers don't slide sideways
+         with the finger — feels much more like a native iOS wheel picker. */
+      touch-action:pan-y;
     }
     .tp-wheel::-webkit-scrollbar { display:none; }
     .tp-item {
@@ -427,20 +411,10 @@
 
         <!-- HOME VIEW -->
         <div id="atHome" class="at-view">
-          <!-- Hero cross-fades: 'thanks to Sharon' appears first for ~3s,
-               then fades into the normal ⏱ hero. No dismiss needed. -->
-          <div class="at-hero" id="atHero">
-            <div class="at-hero-thanks">
-              <div class="at-thanks-icon">💡</div>
-              <div class="at-thanks-pre">Thanks to</div>
-              <div class="at-thanks-name">Sharon Domingues</div>
-              <div class="at-thanks-post">for suggesting this feature</div>
-            </div>
-            <div class="at-hero-main">
-              <img class="at-emoji" src="assets/stopwatch.png" alt="">
-              <h1>Activity Timer</h1>
-              <p class="at-hero-sub">Set duration & activity, tap start</p>
-            </div>
+          <div class="at-hero">
+            <img class="at-emoji" src="assets/stopwatch.png" alt="">
+            <h1>Activity Timer</h1>
+            <p class="at-hero-sub">Set duration & activity, tap start</p>
           </div>
 
           <div class="at-picker">
@@ -633,6 +607,24 @@
       const target = item.offsetTop + item.offsetHeight / 2 - wheel.clientHeight / 2;
       wheel.scrollTo({ top: target, behavior });
     }
+    // Tiny high-pitched "tick" on Web Audio — feels like the iOS wheel picker
+    // sound when the center value changes. Only plays if the audio context has
+    // been unlocked by a prior user gesture (e.g. Start on a previous run);
+    // Safari won't spam warnings if it's still locked, it just no-ops.
+    function playTick() {
+      const ctx = audioCtx;
+      if (!ctx || ctx.state !== 'running') return;
+      const now = ctx.currentTime;
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(2100, now);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.045, now + 0.005);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.03);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now); osc.stop(now + 0.04);
+    }
     function updateSelectedFromScroll() {
       const items = wheel.querySelectorAll('.tp-item');
       const wr = wheel.getBoundingClientRect();
@@ -651,6 +643,11 @@
           durationSec = val * 60;
           localStorage.setItem(DUR_KEY, String(val));
           if (!running && run.hidden) remainingSec = durationSec;
+          // Apple-style haptic + click on every value change during scroll.
+          // Haptic is silent no-op on desktop / iOS Safari; vibrate() only
+          // fires on Android + Chrome-based mobile browsers.
+          playTick();
+          try { navigator.vibrate?.(8); } catch {}
         }
       }
     }
@@ -662,6 +659,14 @@
         updateSelectedFromScroll();
       });
     });
+    // Unlock the Web Audio context on the FIRST touch/click on the wheel, so
+    // playTick() can fire during that same drag rather than staying silent
+    // until the user's first Start. iOS Safari specifically needs .resume()
+    // called synchronously inside a user gesture; other browsers no-op.
+    wheel.addEventListener('pointerdown', () => {
+      const ctx = ensureAudio();
+      if (ctx && ctx.state === 'suspended') { try { ctx.resume(); } catch {} }
+    }, { once: true });
     wheel.tabIndex = 0;
     wheel.addEventListener('keydown', e => {
       const currIdx = MINUTES.indexOf(durationMin);
@@ -947,15 +952,6 @@
     // Init render (idle state shows the picked duration)
     remainingSec = durationSec;
     render();
-
-    // ── SHARON THANKS INTRO ──
-    // Show the "Thanks to Sharon Domingues" panel on every page-open, then
-    // cross-fade into the normal hero after ~3s. Self-dismissing; no state
-    // to remember. Runs once per page load.
-    setTimeout(() => {
-      const hero = document.getElementById('atHero');
-      if (hero) hero.classList.add('is-flipped');
-    }, 3000);
   </script>
 </body>
 </html>

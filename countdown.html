@@ -1755,18 +1755,8 @@
     checkReschedule();
     updateNotifBtn();
 
-    // ── ONE-SHOT ANNOUNCEMENT ───────────────────────────────────────────────
-    // Fire once per device when the user next opens the app after this deploy.
-    const ANNOUNCE_KEY = 'pvhs_announce_schedule_cards_v1';
-    if (_notifGranted() && !localStorage.getItem(ANNOUNCE_KEY)) {
-      localStorage.setItem(ANNOUNCE_KEY, '1');
-      setTimeout(() => fireNotif(
-        '📅 New: Quick Schedule View',
-        'Tap Finals, Weekly, or Today on the countdown screen to see the day\'s schedule at a glance — requested by security. Your feedback shapes what\'s next! 💬',
-        'pvhs-announce-schedule-cards'
-      ), 2500);
-    }
-    // ───────────────────────────────────────────────────────────────────────
+    // Rollout push-notification announcement removed per Chris — feature is no
+    // longer new. Release-note emails cover "here's what's new" instead.
 
     function updateProgressBars() {
       const now = getNow();
@@ -2321,18 +2311,9 @@
       });
     })();
 
-    // ── LOGO UPDATE ANNOUNCEMENT ───────────────────────────────────────────
-    (function() {
-      // auto-show paused
-      function close() {
-        const m = document.getElementById('logoUpdateModal');
-        if (m) m.hidden = true;
-        localStorage.setItem('pvhs_logo_v2b_seen', '1');
-      }
-      document.getElementById('logoUpdateClose')?.addEventListener('click', close);
-      document.getElementById('logoUpdateCloseBtn')?.addEventListener('click', close);
-      document.getElementById('logoUpdateBackdrop')?.addEventListener('click', close);
-    })();
+    // Logo-update rollout modal removed per Chris — the refreshed panther logo
+    // is no longer new. Modal HTML stays in the DOM as dead markup (hidden by
+    // default, no listeners) so re-enabling later is a one-block change.
 
     // ── SCHEDULE SHEET ─────────────────────────────────────────────────────
     (function() {
