@@ -150,6 +150,9 @@
     .info-sub { font-size: 8px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.82; margin: 0; text-align: center; }
 
     .block-label { font-size: clamp(16px, 4.5vw, 22px); line-height: 1.02; font-weight: 700; text-transform: uppercase; margin: 0 0 2px 0; color: #40dede; text-align: center; letter-spacing: 0.08em; }
+    /* Time range in parens next to the period label — non-bold, slightly muted,
+       not uppercase so the digits and colons read normally. */
+    .block-time { font-weight: 400; text-transform: none; letter-spacing: 0.02em; opacity: 0.72; font-size: 0.7em; margin-left: 5px; }
 
     .timer {
       width: 100%;
@@ -1408,7 +1411,8 @@
 
             const isCollab = /COLLAB/i.test(blocks[i].l);
             const waitBellEl = document.getElementById("waitBell");
-            document.getElementById("blockLabel").textContent = blocks[i].l;
+            // Show the period name + its time range in parens, e.g. "6TH PERIOD (2:05-2:55)"
+            document.getElementById("blockLabel").innerHTML = blocks[i].l + blockTimeSpan(blocks[i]);
 
             // For class periods (1st-7th), freeze at 05:00 and blink
             if (isLastFive) {
@@ -1435,7 +1439,8 @@
         const nextBlock = blocks.find(b => parseToSec(b.s) > now.totalSec);
         if (nextBlock) {
           const rem = parseToSec(nextBlock.s) - now.totalSec;
-          document.getElementById("blockLabel").textContent = `UP NEXT: ${nextBlock.l}`;
+          // 'UP NEXT: 5TH PERIOD (1:05-1:55)' — same range treatment on the next-block preview
+          document.getElementById("blockLabel").innerHTML = `UP NEXT: ${nextBlock.l}` + blockTimeSpan(nextBlock);
           document.getElementById("timerText").textContent = formatTime(rem);
           document.getElementById("timerText").className = "timer passing";
           document.getElementById("subText").textContent = "Starting soon";

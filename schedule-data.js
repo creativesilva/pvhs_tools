@@ -157,6 +157,21 @@ function formatTime(sec, forceHH = false) {
   return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
 }
 
+// Convert a schedule "HH:MM" 24-hour string into a friendly 12-hour display
+// (e.g. "14:05" → "2:05"). Drops the leading zero on the hour and skips AM/PM
+// since the context — the countdown label — makes daylight obvious.
+function fmt12(t) {
+  const [h, m] = t.split(":").map(Number);
+  const h12 = h % 12 || 12;
+  return `${h12}:${String(m).padStart(2, "0")}`;
+}
+// HTML fragment that appends "(2:05-2:55)" in the muted .block-time style
+// next to a block label. Kept as a helper so the two label update sites
+// (active block + up-next) stay in sync.
+function blockTimeSpan(b) {
+  return ` <span class="block-time">(${fmt12(b.s)}-${fmt12(b.e)})</span>`;
+}
+
 function getNow() {
   const now = new Date();
   const dateStr  = new Intl.DateTimeFormat("en-CA",  { timeZone, year:"numeric", month:"2-digit", day:"2-digit" }).format(now);
