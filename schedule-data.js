@@ -165,11 +165,12 @@ function fmt12(t) {
   const h12 = h % 12 || 12;
   return `${h12}:${String(m).padStart(2, "0")}`;
 }
-// HTML fragment that appends "(2:05-2:55)" in the muted .block-time style
-// next to a block label. Kept as a helper so the two label update sites
-// (active block + up-next) stay in sync.
+// Text fragment that appends " ENDS 2:55" so the full label reads as one
+// unified bold line, e.g. "LUNCH ENDS 1:05" or "6TH PERIOD ENDS 2:55".
+// Only the end time is shown — start time is redundant since it's just
+// whatever the previous block ended at.
 function blockTimeSpan(b) {
-  return ` <span class="block-time">(${fmt12(b.s)}-${fmt12(b.e)})</span>`;
+  return ` ENDS ${fmt12(b.e)}`;
 }
 
 function getNow() {

@@ -150,9 +150,9 @@
     .info-sub { font-size: 8px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.82; margin: 0; text-align: center; }
 
     .block-label { font-size: clamp(16px, 4.5vw, 22px); line-height: 1.02; font-weight: 700; text-transform: uppercase; margin: 0 0 2px 0; color: #40dede; text-align: center; letter-spacing: 0.08em; }
-    /* Time range in parens next to the period label — non-bold, slightly muted,
-       not uppercase so the digits and colons read normally. */
-    .block-time { font-weight: 400; text-transform: none; letter-spacing: 0.02em; opacity: 0.72; font-size: 0.7em; margin-left: 5px; }
+    /* End-time is appended to .block-label as plain text ("LUNCH ENDS 1:05"),
+       so it inherits the same bold uppercase teal treatment — no separate
+       .block-time style needed. */
 
     .timer {
       width: 100%;
