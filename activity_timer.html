@@ -97,6 +97,10 @@
       border:1px solid rgba(255,255,255,0.14);
       overflow:hidden;
       box-shadow:inset 0 2px 12px rgba(0,0,0,0.35);
+      /* Belt-and-suspenders: also lock the frame itself to vertical pan so a
+         touch that starts on the highlight overlay (pointer-events:none) or
+         a mask still can't yank horizontally. */
+      touch-action:pan-y;
     }
     .tp-wheel-highlight {
       position:absolute; left:10px; right:10px;
@@ -117,12 +121,16 @@
     .tp-wheel {
       width:100%; height:100%;
       overflow-y:scroll;
+      overflow-x:hidden;
       scroll-snap-type:y mandatory;
       -webkit-overflow-scrolling:touch;
       /* (frame_h - item_h) / 2 = (130-36)/2 = 47 → padding so first/last items can center */
       padding:47px 0;
       scrollbar-width:none;
-      overscroll-behavior:contain;
+      /* 'none' (stricter than 'contain') prevents the iOS rubber-band bounce
+         when a finger drags past the top/bottom snap point — that bounce was
+         registering as horizontal drift when the drag arced sideways. */
+      overscroll-behavior:none;
       /* Lock touch drift to the vertical axis so numbers don't slide sideways
          with the finger — feels much more like a native iOS wheel picker. */
       touch-action:pan-y;
@@ -135,6 +143,12 @@
       font-size:18px; font-weight:800;
       color:rgba(255,255,255,0.35);
       transition:color 0.18s, font-size 0.18s, transform 0.18s;
+      /* Extra iOS lockdown — no text-selection drag, no long-press callout,
+         no drag ghost. Belts + suspenders + duct tape for that sideways drift. */
+      -webkit-user-select:none; user-select:none;
+      -webkit-user-drag:none;
+      -webkit-touch-callout:none;
+      pointer-events:auto;
       letter-spacing:-0.005em;
     }
     .tp-item.is-selected {
