@@ -152,10 +152,92 @@
       text-transform: uppercase; letter-spacing: 0.12em;
       text-align: center; line-height: 1.25;
       animation: drillBannerPulse 2s ease-in-out infinite;
+      cursor: pointer; user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
+    .drill-banner:active { transform: scale(0.98); }
     @keyframes drillBannerPulse {
       0%,100% { opacity: 1; }
       50%     { opacity: 0.72; }
+    }
+
+    /* ── SRP MODAL ─────────────────────────────────────────
+       Quick reference for Standard Response Protocol actions.
+       Content sourced from "I Love U Guys" Foundation SRP K-12 poster.
+       Adult actions only (teachers) + SHELTER hazard sub-table. */
+    .srp-modal[hidden] { display: none; }
+    .srp-modal {
+      position: absolute; inset: 0; z-index: 22;
+      display: flex; align-items: center; justify-content: center; padding: 16px;
+    }
+    .srp-modal-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(1,12,12,0.82);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    }
+    .srp-dialog {
+      position: relative; width: min(100%, 380px);
+      border-radius: 24px; border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(6,26,26,0.92);
+      box-shadow: 0 26px 48px rgba(0,0,0,0.5);
+      padding: 16px; display: flex; flex-direction: column; gap: 10px;
+      max-height: calc(100% - 20px); overflow-y: auto;
+    }
+    .srp-header {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      position: sticky; top: -16px; margin: -16px -16px 0 -16px; padding: 14px 16px 6px 16px;
+      background: rgba(6,26,26,0.96);
+      backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      border-radius: 24px 24px 0 0;
+      z-index: 1;
+    }
+    .srp-title { font-size: 13px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 0.12em; margin: 0; }
+    .srp-close {
+      appearance: none; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.7); border-radius: 99px; width: 28px; height: 28px;
+      font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .srp-lede {
+      font-size: 10px; color: var(--muted); opacity: 0.75; margin: 0 0 2px 0;
+      text-transform: uppercase; letter-spacing: 0.1em;
+    }
+    .srp-item {
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;
+      border-left-width: 4px;
+      transition: background 0.2s, border-color 0.2s;
+      /* Keep the target below the sticky header when scrolled into view. */
+      scroll-margin-top: 48px;
+    }
+    .srp-item.is-active {
+      background: rgba(255,184,75,0.12);
+      border-color: rgba(255,184,75,0.5);
+    }
+    .srp-item.srp-hold     { border-left-color: #a78bfa; }
+    .srp-item.srp-secure   { border-left-color: #60a5fa; }
+    .srp-item.srp-lockdown { border-left-color: #ef4444; }
+    .srp-item.srp-evacuate { border-left-color: #34d399; }
+    .srp-item.srp-shelter  { border-left-color: #fb923c; }
+    .srp-item-head {
+      display: flex; align-items: baseline; gap: 8px;
+      font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+    }
+    .srp-item-name  { color: #fff; }
+    .srp-item-tag   { font-size: 9px; color: var(--muted); font-weight: 700; letter-spacing: 0.12em; }
+    .srp-item-steps { font-size: 11.5px; color: #dcefef; line-height: 1.5; margin: 0; }
+    .srp-shelter-table {
+      display: grid; grid-template-columns: auto 1fr; gap: 3px 10px;
+      margin: 4px 0 0 0; padding: 6px 8px;
+      background: rgba(0,0,0,0.22); border-radius: 8px;
+      font-size: 11px; color: #f0dcc8;
+    }
+    .srp-shelter-table dt { font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; font-size: 10px; }
+    .srp-shelter-table dd { margin: 0; }
+    .srp-source {
+      font-size: 9px; color: var(--muted); opacity: 0.55; text-align: center;
+      margin: 4px 0 0 0; letter-spacing: 0.05em;
     }
     /* End-time is appended to .block-label as plain text ("LUNCH ENDS 1:05"),
        so it inherits the same bold uppercase teal treatment — no separate
@@ -955,6 +1037,50 @@
         </div>
       </div>
 
+      <!-- SRP ACTIONS REFERENCE MODAL
+           Quick reference for Standard Response Protocol. Content adapted from
+           the "I Love U Guys" Foundation SRP K-12 poster — adult (staff)
+           actions only + SHELTER hazard sub-table. Opens from ··· menu OR
+           by tapping the amber drill banner during a live drill window.
+           If opened via the banner, matching card is highlighted + scrolled to. -->
+      <div id="srpModal" class="srp-modal" hidden>
+        <div class="srp-modal-backdrop" id="srpBackdrop"></div>
+        <div class="srp-dialog" id="srpDialog">
+          <div class="srp-header">
+            <p class="srp-title">🚨 SRP Emergency Actions</p>
+            <button id="srpClose" class="srp-close" type="button" aria-label="Close">✕</button>
+          </div>
+          <p class="srp-lede">Staff actions · Standard Response Protocol</p>
+          <div class="srp-item srp-hold" data-srp="HOLD">
+            <div class="srp-item-head"><span class="srp-item-name">🟪 HOLD</span><span class="srp-item-tag">In your room · Clear the halls</span></div>
+            <p class="srp-item-steps">Close and lock the door · Keep students in room · Account for students and adults · Business as usual · Do not release until <em>All Clear</em>.</p>
+          </div>
+          <div class="srp-item srp-secure" data-srp="SECURE">
+            <div class="srp-item-head"><span class="srp-item-name">🟦 SECURE</span><span class="srp-item-tag">Get inside · Lock outside doors</span></div>
+            <p class="srp-item-steps">Bring everyone indoors · Lock exterior doors · Increase situational awareness · Account for students and adults · Business as usual inside.</p>
+          </div>
+          <div class="srp-item srp-lockdown" data-srp="LOCKDOWN">
+            <div class="srp-item-head"><span class="srp-item-name">🟥 LOCKDOWN</span><span class="srp-item-tag">Locks · Lights · Out of sight</span></div>
+            <p class="srp-item-steps">Recover students from hallway if possible · Lock classroom door · Turn out lights · Move away from sight · Maintain silence · Do <strong>not</strong> open the door · Prepare to evade or defend.</p>
+          </div>
+          <div class="srp-item srp-evacuate" data-srp="EVACUATE">
+            <div class="srp-item-head"><span class="srp-item-name">🟩 EVACUATE</span><span class="srp-item-tag">To a location (may be specified)</span></div>
+            <p class="srp-item-steps">Bring roster + Red/Green/Med cards · Lead students to the evacuation location · Account for students and adults · Notify if anyone is missing, extra, or injured.</p>
+          </div>
+          <div class="srp-item srp-shelter" data-srp="SHELTER">
+            <div class="srp-item-head"><span class="srp-item-name">🟧 SHELTER</span><span class="srp-item-tag">Hazard + safety strategy</span></div>
+            <p class="srp-item-steps">Lead the safety strategy for the hazard · Account for students · Notify if missing or injured.</p>
+            <dl class="srp-shelter-table">
+              <dt>🌪 Tornado</dt><dd>Evacuate to shelter area</dd>
+              <dt>☣ Hazmat</dt><dd>Seal the room</dd>
+              <dt>🌎 Earthquake</dt><dd>Drop, Cover, Hold</dd>
+              <dt>🌊 Tsunami</dt><dd>Get to high ground</dd>
+            </dl>
+          </div>
+          <p class="srp-source">Adapted from "I Love U Guys" Foundation · SRP K-12</p>
+        </div>
+      </div>
+
       <div id="feedbackModal" class="feedback-modal" hidden>
         <div class="feedback-modal-backdrop" id="feedbackBackdrop"></div>
         <div class="feedback-dialog">
@@ -1008,6 +1134,7 @@
       <!-- NAV DROPDOWN (position:fixed, outside content scroll) -->
       <div id="navMenu" class="nav-menu" role="menu">
         <button id="notifBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon">🔔</span><span id="notifLabel">Alerts</span></button>
+        <button id="srpBtn" class="nav-menu-item" type="button" role="menuitem"><span class="nav-menu-icon">🚨</span>Emergency Actions</button>
         <div class="nav-menu-sep"></div>
         <a href="calendar.html" class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">📅</span>Calendar</a>
         <a href="extension_search.html" class="nav-menu-item nav-link" role="menuitem"><span class="nav-menu-icon">🔍</span>Directory</a>
@@ -1113,13 +1240,15 @@
     // before start, startMsg fires at start time.
     const PLANNED_DRILLS = [
       { date: '2026-09-10', startTime: '11:00', endTime: '11:10',
-        bannerLabel: '🔒 SECURE DRILL · STAY INSIDE',
-        headsMsg:    '⏰ Secure Drill in 5 min — get all students inside, lock exterior doors.',
-        startMsg:    '🔒 Secure Drill starting now — stay inside for ~10 min. Business as usual.' },
+        srpAction:   'SECURE',
+        bannerLabel: '🔒 SECURE DRILL · STAY INSIDE · Tap for actions',
+        headsMsg:    '⏰ Secure Drill in 5 min. SECURE: Bring everyone indoors · Lock outside doors · Account for students · Business as usual.',
+        startMsg:    '🔒 SECURE now (~10 min): Everyone indoors · Doors locked · Increase situational awareness · Account for students · Business as usual.' },
       { date: '2026-10-15', startTime: '10:15', endTime: '10:25',
-        bannerLabel: '🌎 EARTHQUAKE DRILL · DROP · COVER · EVACUATE',
-        headsMsg:    '⏰ Great California Shakeout in 5 min — Drop, Cover, then Evacuate.',
-        startMsg:    '🌎 Great California Shakeout — Drop, Cover, Evacuate. Use Red/Green/Med cards.' }
+        srpAction:   'SHELTER',
+        bannerLabel: '🌎 EARTHQUAKE DRILL · DROP · COVER · HOLD · Tap for actions',
+        headsMsg:    '⏰ Shakeout in 5 min. SHELTER (earthquake): Prepare to Drop, Cover, Hold · then EVACUATE to your zone · Bring roster + Red/Green/Med cards.',
+        startMsg:    '🌎 SHAKEOUT now: Drop · Cover · Hold · then EVACUATE to zone · Account for all students · Notify if missing/extra/injured.' }
     ];
     function findActiveDrill(dateStr, totalSec) {
       return PLANNED_DRILLS.find(d => {
@@ -2395,6 +2524,57 @@
     // is no longer new. Modal HTML stays in the DOM as dead markup (hidden by
     // default, no listeners) so re-enabling later is a one-block change.
 
+    // ── SRP MODAL ───────────────────────────────────────────────
+    // Open sources: (1) ··· menu → "Emergency Actions", (2) tap the amber
+    // drill banner. When opened via the banner, we highlight + scroll to the
+    // matching action card (SECURE, SHELTER, etc.) so teachers get straight
+    // to what applies to them right now.
+    (function() {
+      const modal   = document.getElementById('srpModal');
+      const dialog  = document.getElementById('srpDialog');
+      if (!modal) return;
+      function open(highlightAction) {
+        // Clear any previous highlight, then optionally set a new one.
+        modal.querySelectorAll('.srp-item.is-active').forEach(el => el.classList.remove('is-active'));
+        modal.hidden = false;
+        if (highlightAction) {
+          const target = modal.querySelector(`.srp-item[data-srp="${highlightAction}"]`);
+          if (target) {
+            target.classList.add('is-active');
+            // Defer to next frame so layout has settled before we scroll.
+            requestAnimationFrame(() => {
+              target.scrollIntoView({ block: 'start', behavior: 'auto' });
+              // Nudge the dialog scroll back a touch so the header still shows.
+              if (dialog) dialog.scrollTop = Math.max(0, dialog.scrollTop - 8);
+            });
+          }
+        } else if (dialog) {
+          dialog.scrollTop = 0;
+        }
+      }
+      function close() { modal.hidden = true; }
+
+      document.getElementById('srpBtn')?.addEventListener('click', () => {
+        navMenu?.classList.remove('is-open');
+        navMenuBtn?.classList.remove('is-open');
+        open();
+      });
+      document.getElementById('srpClose')?.addEventListener('click', close);
+      document.getElementById('srpBackdrop')?.addEventListener('click', close);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !modal.hidden) close();
+      });
+
+      // Tap the amber drill banner → open modal pre-scrolled to the active
+      // drill's SRP action. findActiveDrill is defined near PLANNED_DRILLS.
+      const banner = document.getElementById('drillBanner');
+      banner?.addEventListener('click', () => {
+        const now = (typeof getNow === 'function') ? getNow() : null;
+        const active = now ? findActiveDrill(now.dateStr, now.totalSec) : null;
+        open(active?.srpAction || null);
+      });
+    })();
+
     // ── SCHEDULE SHEET ─────────────────────────────────────────────────────
     (function() {
       const sheet = document.getElementById('schedSheet');
@@ -2675,7 +2855,7 @@
       }
       function overlayOpen() {
         const ids = ['maintModal','installModal','installBanner','verAnnounceSheet',
-          'newsModal','newsChooser','embedModal','feedbackModal',
+          'newsModal','newsChooser','embedModal','feedbackModal','srpModal',
           'schedSheet','calAnnounceSheet','a2hsPrompt','directoryChooser'];
         if (ids.some(id => { const el = document.getElementById(id); return el && !el.hidden; })) return true;
         const lb = document.getElementById('newsLightbox');
