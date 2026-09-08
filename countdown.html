@@ -139,6 +139,24 @@
     .info-sub { font-size: 8px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.82; margin: 0; text-align: center; }
 
     .block-label { font-size: clamp(16px, 4.5vw, 22px); line-height: 1.02; font-weight: 700; text-transform: uppercase; margin: 0 0 2px 0; color: #40dede; text-align: center; letter-spacing: 0.08em; }
+    /* Safety-drill banner — amber, pulsing slowly, sits above the period label
+       during a scheduled drill window. Hidden the rest of the time. */
+    .drill-banner {
+      margin: 0 0 8px 0;
+      padding: 6px 12px;
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(255,184,75,0.32), rgba(255,138,60,0.22));
+      border: 1px solid rgba(255,184,75,0.55);
+      color: #ffd28c;
+      font-size: 11px; font-weight: 900;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      text-align: center; line-height: 1.25;
+      animation: drillBannerPulse 2s ease-in-out infinite;
+    }
+    @keyframes drillBannerPulse {
+      0%,100% { opacity: 1; }
+      50%     { opacity: 0.72; }
+    }
     /* End-time is appended to .block-label as plain text ("LUNCH ENDS 1:05"),
        so it inherits the same bold uppercase teal treatment — no separate
        .block-time style needed. */
@@ -819,6 +837,8 @@
     .sched-table td { padding: 5px 4px; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.88); vertical-align: middle; }
     .sched-table td:first-child { color: rgba(255,255,255,0.92); font-size: 11.5px; letter-spacing: 0.05em; text-transform: uppercase; }
     .sched-table td:last-child { text-align: right; color: #d4f4f4; font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    /* Drill sub-row tucked under the period that contains a planned drill */
+    .sched-table .sched-drill-row td { color: #ffd28c; font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 4px 6px; text-align: left; }
     .sched-finals-day { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 10px 12px; }
     .sched-finals-day-title { font-size: 9.5px; font-weight: 800; color: #40dede; text-transform: uppercase; letter-spacing: 0.15em; margin: 0 0 6px; }
     .sched-no-school { color: var(--muted); font-size: 11px; text-align: center; padding: 24px 0; opacity: 0.7; }
@@ -840,6 +860,9 @@
         </div>
 
         <div class="card period-card">
+          <!-- Safety-drill banner. Hidden by default. JS shows it when the
+               current wall-clock lands inside a PLANNED_DRILLS window. -->
+          <div class="drill-banner" id="drillBanner" hidden></div>
           <div class="block-label" id="blockLabel">Loading</div>
           <div class="timer normal" id="timerText">--:--</div>
           <p class="subtext" id="subText">Syncing Calendar...</p>
@@ -1081,6 +1104,30 @@
     const isEmbed = mode === 'embed';
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+
+    // ── PLANNED SAFETY DRILLS (SRP 2026-2027) ──
+    // Only drills with a confirmed specific date + time land here. Week-of
+    // drills without a specific day live on the calendar page + .ics feed
+    // only, and get added here (banner + notifications) once admin confirms
+    // the day. bannerLabel is the pulsing amber strip; headsMsg fires 5 min
+    // before start, startMsg fires at start time.
+    const PLANNED_DRILLS = [
+      { date: '2026-09-10', startTime: '11:00', endTime: '11:10',
+        bannerLabel: '🔒 SECURE DRILL · STAY INSIDE',
+        headsMsg:    '⏰ Secure Drill in 5 min — get all students inside, lock exterior doors.',
+        startMsg:    '🔒 Secure Drill starting now — stay inside for ~10 min. Business as usual.' },
+      { date: '2026-10-15', startTime: '10:15', endTime: '10:25',
+        bannerLabel: '🌎 EARTHQUAKE DRILL · DROP · COVER · EVACUATE',
+        headsMsg:    '⏰ Great California Shakeout in 5 min — Drop, Cover, then Evacuate.',
+        startMsg:    '🌎 Great California Shakeout — Drop, Cover, Evacuate. Use Red/Green/Med cards.' }
+    ];
+    function findActiveDrill(dateStr, totalSec) {
+      return PLANNED_DRILLS.find(d => {
+        if (d.date !== dateStr) return false;
+        const s = parseToSec(d.startTime), e = parseToSec(d.endTime);
+        return totalSec >= s && totalSec < e;
+      });
+    }
 
     const navLinks = document.querySelectorAll(".nav-link");
 
@@ -1375,6 +1422,21 @@
     function updateApp() {
       const now = getNow();
       document.getElementById("todayText").textContent = new Intl.DateTimeFormat("en-US", {timeZone, weekday:"short", month:"short", day:"numeric"}).format(new Date());
+
+      // Toggle the safety-drill banner on/off every tick. Cheap DOM write only
+      // fires when the wall-clock crosses into or out of a PLANNED_DRILLS window.
+      {
+        const activeDrill = findActiveDrill(now.dateStr, now.totalSec);
+        const banner = document.getElementById('drillBanner');
+        if (banner) {
+          if (activeDrill) {
+            if (banner.textContent !== activeDrill.bannerLabel) banner.textContent = activeDrill.bannerLabel;
+            banner.hidden = false;
+          } else if (!banner.hidden) {
+            banner.hidden = true;
+          }
+        }
+      }
 
       // (getScheduleType / getScheduleBlocks are hoisted to outer scope)
 
@@ -1699,6 +1761,24 @@
       _notifTimers.push(setTimeout(() => {
         fireNotif('🎉 School Day Complete!', nextPraise(), 'pvhs-eod');
       }, msEOD));
+
+      // Safety drill notifications — schedule any drill happening today that
+      // hasn't started yet. 5-min heads-up + start alert per drill.
+      PLANNED_DRILLS.forEach((drill, i) => {
+        if (drill.date !== dateStr) return;
+        const startSec  = parseToSec(drill.startTime);
+        const headsSec  = startSec - 300;  // 5 min before
+        if (headsSec > totalSec) {
+          _notifTimers.push(setTimeout(
+            () => fireNotif('⏰ Drill Alert', drill.headsMsg, `drill-heads-${i}`),
+            (headsSec - totalSec) * 1000));
+        }
+        if (startSec > totalSec) {
+          _notifTimers.push(setTimeout(
+            () => fireNotif('🚨 Drill Now', drill.startMsg, `drill-start-${i}`),
+            (startSec - totalSec) * 1000));
+        }
+      });
     }
 
     // Safe notification check (Notification API doesn't exist on iOS Safari non-PWA)
@@ -2327,13 +2407,28 @@
         return `${h % 12 || 12}:${String(m).padStart(2,'0')} ${h >= 12 ? 'PM' : 'AM'}`;
       }
 
-      function renderTable(blocks) {
+      function renderTable(blocks, dateStr) {
+        // If dateStr is provided AND a planned drill starts inside a given
+        // block, tuck a small amber sub-row under it so the teacher opening
+        // the schedule sees "P3 10:35–11:25  ·  🔒 SECURE DRILL 11:00" together.
+        const todaysDrills = dateStr ? PLANNED_DRILLS.filter(d => d.date === dateStr) : [];
         const rows = blocks
           .filter(b => !/PASSING/i.test(b.l))
-          .map(b => `<tr>
-            <td>${b.l}</td>
-            <td>${fmt12(b.s)}&nbsp;–&nbsp;${fmt12(b.e)}</td>
-          </tr>`).join('');
+          .map(b => {
+            let out = `<tr>
+              <td>${b.l}</td>
+              <td>${fmt12(b.s)}&nbsp;–&nbsp;${fmt12(b.e)}</td>
+            </tr>`;
+            if (todaysDrills.length) {
+              const sBlock = parseToSec(b.s), eBlock = parseToSec(b.e);
+              todaysDrills
+                .filter(d => { const s = parseToSec(d.startTime); return s >= sBlock && s < eBlock; })
+                .forEach(d => {
+                  out += `<tr class="sched-drill-row"><td colspan="2">${d.bannerLabel} · ${fmt12(d.startTime)}</td></tr>`;
+                });
+            }
+            return out;
+          }).join('');
         return `<table class="sched-table">${rows}</table>`;
       }
 
@@ -2374,7 +2469,7 @@
         body.innerHTML = `${prefix}
           <div class="sched-section">
             <p class="sched-section-title">${dayStr} &middot; ${type}</p>
-            ${renderTable(blocks)}
+            ${renderTable(blocks, srcDate)}
           </div>`;
       }
 

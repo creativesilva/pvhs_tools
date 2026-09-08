@@ -687,4 +687,74 @@ CATEGORIES:KEY DATE
 STATUS:CONFIRMED
 END:VEVENT
 
+BEGIN:VEVENT
+UID:smjuhsd-drill-20260910-secure@pvhs
+SUMMARY:Secure Drill (Period 3)
+DTSTART;TZID=America/Los_Angeles:20260910T110000
+DTEND;TZID=America/Los_Angeles:20260910T111000
+DESCRIPTION:SRP: Secure. All students and staff inside locked buildings; no entry from outside campus. Remain in Secure for 10 minutes. Instruction continues as usual.
+CATEGORIES:DRILL
+STATUS:CONFIRMED
+END:VEVENT
+
+BEGIN:VEVENT
+UID:smjuhsd-drill-20261015-shakeout@pvhs
+SUMMARY:Great California Shakeout (Earthquake Drill)
+DTSTART;TZID=America/Los_Angeles:20261015T101500
+DTEND;TZID=America/Los_Angeles:20261015T102500
+DESCRIPTION:SRP: Shelter + Evacuate. Drop\, Cover\, then Evacuate to the appropriate zone. Utilize Red/Green/Med Cards. Submit attendance.
+CATEGORIES:DRILL
+STATUS:CONFIRMED
+END:VEVENT
+
+BEGIN:VEVENT
+UID:smjuhsd-drill-20261109-lockdown@pvhs
+SUMMARY:Lockdown Drill (Week of Nov 9 · P5 · day TBD)
+DTSTART;VALUE=DATE:20261109
+DTEND;VALUE=DATE:20261110
+DESCRIPTION:SRP: Lockdown. Coordinate with law enforcement to have them on campus. Remain in Lockdown for 5 minutes. Specific day this week will be announced by admin.
+CATEGORIES:DRILL
+STATUS:TENTATIVE
+END:VEVENT
+
+BEGIN:VEVENT
+UID:smjuhsd-drill-20261207-hold-evacuate@pvhs
+SUMMARY:Hold + Evacuate Drill (Week of Dec 7 · P6 · day TBD)
+DTSTART;VALUE=DATE:20261207
+DTEND;VALUE=DATE:20261208
+DESCRIPTION:SRP: Hold + Evacuate. All students and staff inside locked buildings; no entry from outside campus. Remain Secure for 5 minutes. Specific day this week will be announced by admin.
+CATEGORIES:DRILL
+STATUS:TENTATIVE
+END:VEVENT
+
+BEGIN:VEVENT
+UID:smjuhsd-drill-20270216-hold-evacuate@pvhs
+SUMMARY:Hold + Evacuate Drill (Week of Feb 15 · Nutrition · day TBD)
+DTSTART;VALUE=DATE:20270216
+DTEND;VALUE=DATE:20270217
+DESCRIPTION:SRP: Hold + Evacuate. Activate fire alarm and initiate Hold. Initiate Evacuate to appropriate zone. Utilize Red/Green/Med cards. Specific day this week will be announced by admin.
+CATEGORIES:DRILL
+STATUS:TENTATIVE
+END:VEVENT
+
+BEGIN:VEVENT
+UID:smjuhsd-drill-20270308-hold@pvhs
+SUMMARY:Hold Drill · Medical Response (Week of Mar 8 · P7 · day TBD)
+DTSTART;VALUE=DATE:20270308
+DTEND;VALUE=DATE:20270309
+DESCRIPTION:SRP: Hold. Hold students in locations due to a medical response on campus. Remain in Hold for 10 minutes. Specific day this week will be announced by admin.
+CATEGORIES:DRILL
+STATUS:TENTATIVE
+END:VEVENT
+
+BEGIN:VEVENT
+UID:smjuhsd-drill-20270405-lockdown@pvhs
+SUMMARY:Lockdown Drill (Week of Apr 5 · P3 · day TBD)
+DTSTART;VALUE=DATE:20270405
+DTEND;VALUE=DATE:20270406
+DESCRIPTION:SRP: Lockdown. All students and staff are to be in locked buildings. Remain in Lockdown for 5 minutes. Specific day this week will be announced by admin.
+CATEGORIES:DRILL
+STATUS:TENTATIVE
+END:VEVENT
+
 END:VCALENDAR

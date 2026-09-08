@@ -108,6 +108,8 @@
     .cal-dot-finals    { background: #ffaa33; }
     .cal-dot-grading   { background: #c07bff; }
     .cal-dot-event     { background: #6fdf6f; }
+    /* Safety drills — amber, distinct from Finals orange so teachers spot them at a glance */
+    .cal-dot-drill     { background: #ffb84b; }
     .cal-dot-notable   { background: rgba(255,255,255,0.38); }
 
     /* ── DAY DETAIL PANEL (month view) ── */
@@ -131,6 +133,7 @@
     .cal-event-row.type-finals    { border-left-color: #ffaa33; }
     .cal-event-row.type-grading   { border-left-color: #c07bff; }
     .cal-event-row.type-event     { border-left-color: #6fdf6f; }
+    .cal-event-row.type-drill     { border-left-color: #ffb84b; }
     .cal-event-row.type-notable   { border-left-color: rgba(255,255,255,0.25); }
     .cal-event-row.has-link       { cursor: pointer; }
     .cal-event-row.has-link:active { background: rgba(255,255,255,0.07); }
@@ -303,6 +306,7 @@
             <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#ffaa33"></div><span class="cal-legend-label">Finals</span></div>
             <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#c07bff"></div><span class="cal-legend-label">Grading</span></div>
             <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#6fdf6f"></div><span class="cal-legend-label">Events</span></div>
+            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#ffb84b"></div><span class="cal-legend-label">Drill</span></div>
           </div>
           <div class="cal-panel" id="calPanel"><div class="cal-panel-inner"><p class="cal-panel-empty">Tap a date to see events</p></div></div>
         </div>
@@ -458,6 +462,20 @@
       {start:'2026-07-10',end:'2026-07-10',label:'Summer School Ends (2025-26 Session)',type:'notable',emoji:'\u{2600}\u{FE0F}'},
       {start:'2027-06-14',end:'2027-06-14',label:'Summer School Begins',type:'notable',emoji:'\u{2600}\u{FE0F}'},
       {start:'2027-07-09',end:'2027-07-09',label:'Summer School Ends',type:'notable',emoji:'\u{2600}\u{FE0F}'},
+
+      // ── Safety Drills — SRP calendar 2026-2027 (from Monica Pallan) ──
+      // Sept 10 + Oct 15 have confirmed specific dates/times.
+      // The other 5 are "Week of…" placeholders — I've dropped them on the
+      // Monday of that week (Tue when Mon is a holiday). Admin sends a
+      // specific-day email a few days before each; update the date + label
+      // here when that arrives, then re-push (bumps SW cache too).
+      {start:'2026-09-10',end:'2026-09-10',label:'Secure Drill · P3 · 11:00 AM',type:'drill',emoji:'\u{1F512}'},
+      {start:'2026-10-15',end:'2026-10-15',label:'Great California Shakeout · 10:15 AM · Drop/Cover/Evacuate',type:'drill',emoji:'\u{1F30E}'},
+      {start:'2026-11-09',end:'2026-11-09',label:'Lockdown Drill · Week of Nov 9 · P5 (day TBD)',type:'drill',emoji:'\u{1F512}'},
+      {start:'2026-12-07',end:'2026-12-07',label:'Hold + Evacuate Drill · Week of Dec 7 · P6 (day TBD)',type:'drill',emoji:'\u{1F6A8}'},
+      {start:'2027-02-16',end:'2027-02-16',label:'Hold + Evacuate Drill · Week of Feb 15 · Nutrition (day TBD)',type:'drill',emoji:'\u{1F6A8}'},
+      {start:'2027-03-08',end:'2027-03-08',label:'Hold Drill · Medical Response · Week of Mar 8 · P7 (day TBD)',type:'drill',emoji:'\u{1FA7A}'},
+      {start:'2027-04-05',end:'2027-04-05',label:'Lockdown Drill · Week of Apr 5 · P3 (day TBD)',type:'drill',emoji:'\u{1F512}'},
     ];
 
     // ── DYNAMIC EVENTS (loaded from events.json on init) ──────
