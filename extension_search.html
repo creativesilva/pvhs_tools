@@ -51,6 +51,7 @@
       background: linear-gradient(168deg, rgba(6,28,28,0.97) 0%, rgba(4,24,24,0.95) 30%, rgba(0,72,72,0.92) 60%, rgba(0,100,100,0.96) 82%, rgba(4,30,30,0.97) 100%);
       display: flex; flex-direction: column; padding: 14px var(--app-spacing) var(--app-spacing) var(--app-spacing);
       isolation: isolate;
+      container-type: inline-size;
     }
 
     .app::before {
@@ -135,7 +136,7 @@
     .result-prep { color: #4be1e1; font-weight: 700; letter-spacing: 0.05em; opacity: 0.9; }
     .result-ext { margin-top: 6px; font-size: 14px; font-weight: 700; color: #fff; text-align: center; }
 
-    .footer-note { margin-top: auto; padding: 10px 0 3px 0; font-size: 9.5px; color: #b5d4d4; font-weight: 600; text-align: center; flex-shrink: 0; }
+    .footer-note { margin-top: auto; padding: 6px 0 3px; font-size: 9.5px; color: #b5d4d4; font-weight: 600; text-align: center; flex-shrink: 0; opacity: 0.8; }
 
     body.is-standalone { background: #021414; }
 
