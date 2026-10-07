@@ -64,7 +64,10 @@ const schedules = {
   finals_1:[ {l:"1ST PERIOD",s:"08:30",e:"10:20"},{l:"BREAK",s:"10:20",e:"10:30"},{l:"2ND PERIOD",s:"10:40",e:"12:30"},{l:"LUNCH",s:"12:30",e:"13:00"},{l:"7TH PERIOD",s:"13:10",e:"15:00"} ],
   finals_2:[ {l:"3RD PERIOD",s:"08:30",e:"10:25"},{l:"LUNCH",s:"10:25",e:"10:55"},{l:"4TH PERIOD",s:"11:05",e:"13:00"} ],
   finals_3:[ {l:"5TH PERIOD",s:"08:30",e:"10:25"},{l:"LUNCH",s:"10:25",e:"10:55"},{l:"6TH PERIOD",s:"11:05",e:"13:00"} ],
-  rally:   [ {l:"1ST PERIOD",s:"08:30",e:"09:10"},{l:"PASSING",s:"09:10",e:"09:20"},{l:"2ND PERIOD",s:"09:20",e:"10:00"},{l:"NUTRITION",s:"10:00",e:"10:05"},{l:"PASSING",s:"10:05",e:"10:15"},{l:"3RD PERIOD",s:"10:15",e:"10:55"},{l:"PASSING",s:"10:55",e:"11:05"},{l:"4TH PERIOD",s:"11:05",e:"11:45"},{l:"LUNCH",s:"11:45",e:"12:15"},{l:"PASSING",s:"12:15",e:"12:25"},{l:"5TH PERIOD / RALLY 1",s:"12:25",e:"13:15"},{l:"PASSING",s:"13:15",e:"13:25"},{l:"5TH PERIOD / RALLY 2",s:"13:25",e:"14:15"},{l:"PASSING",s:"14:15",e:"14:25"},{l:"6TH PERIOD",s:"14:25",e:"15:05"},{l:"PASSING",s:"15:05",e:"15:15"},{l:"7TH PERIOD",s:"15:15",e:"15:55"} ],
+  // Room-group assignments on the two Rally blocks are for the 2026-10-09
+  // Homecoming Rally. If a future rally uses different groups, swap the
+  // suffixes here (or fork into rally_winter / rally_spring keys).
+  rally:   [ {l:"1ST PERIOD",s:"08:30",e:"09:10"},{l:"PASSING",s:"09:10",e:"09:20"},{l:"2ND PERIOD",s:"09:20",e:"10:00"},{l:"NUTRITION",s:"10:00",e:"10:05"},{l:"PASSING",s:"10:05",e:"10:15"},{l:"3RD PERIOD",s:"10:15",e:"10:55"},{l:"PASSING",s:"10:55",e:"11:05"},{l:"4TH PERIOD",s:"11:05",e:"11:45"},{l:"LUNCH",s:"11:45",e:"12:15"},{l:"PASSING",s:"12:15",e:"12:25"},{l:"5TH PERIOD / RALLY 1 · 400/600/LIBRARY",s:"12:25",e:"13:15"},{l:"PASSING",s:"13:15",e:"13:25"},{l:"5TH PERIOD / RALLY 2 · 200/300/500/PE",s:"13:25",e:"14:15"},{l:"PASSING",s:"14:15",e:"14:25"},{l:"6TH PERIOD",s:"14:25",e:"15:05"},{l:"PASSING",s:"15:05",e:"15:15"},{l:"7TH PERIOD",s:"15:15",e:"15:55"} ],
   graduation: [
     {l:"☕ BREAKFAST & COFFEE",    s:"07:30", e:"08:30"},
     {l:"STUDENT DROP-OFF OPENS",   s:"09:15", e:"10:30"},
@@ -114,7 +117,8 @@ const finalsMap = {
 const specialDayMap = {
   "2026-08-10": { key:"basecamp", label:"BASE CAMP @ SMHS" },
   "2026-08-11": { key:"pvhs_pd",  label:"PVHS PD DAY" },
-  "2026-08-12": { key:"workday",  label:"ALL STAFF WORKDAY" }
+  "2026-08-12": { key:"workday",  label:"ALL STAFF WORKDAY" },
+  "2026-10-09": { key:"rally",    label:"HOMECOMING RALLY 🏈" }
   // "2027-06-10": { key:"graduation", label:"GRADUATION DAY 🎓" }
 };
 
