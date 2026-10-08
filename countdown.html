@@ -306,6 +306,9 @@
     .prog-bar--grad { background: linear-gradient(90deg, #ffd44a 0%, #e07000 100%); }
     .prog-bar--vac  { background: linear-gradient(90deg, #ff9a5c 0%, #d94f00 100%); }
     .prog-bar--pr   { background: linear-gradient(90deg, #ff7070 0%, #b80000 100%); }
+    /* Amber — matches the drill-banner color family so visually the drill
+       countdown bar and the live drill banner read as the same subject. */
+    .prog-bar--drill { background: linear-gradient(90deg, #ffd28c 0%, #ff8a3c 100%); }
     /* ── EMBED CLOCK TILE ──────────────────────────────── */
     .embed-clock-tile { display: none; }
     body.is-embed .embed-clock-tile {
@@ -995,6 +998,14 @@
               <span class="prog-pct"   id="weekPct">—</span>
             </div>
             <div class="prog-track"><div class="prog-bar prog-bar--week" id="weekFill" style="width:0%"></div></div>
+          </div>
+          <div class="prog-sep" id="drillSep" hidden></div>
+          <div class="prog-row" id="drillRow" hidden>
+            <div class="prog-meta">
+              <span class="prog-label" id="drillLabel">Till Next Drill</span>
+              <span class="prog-pct" id="drillPct">—</span>
+            </div>
+            <div class="prog-track"><div class="prog-bar prog-bar--drill" id="drillFill" style="width:0%"></div></div>
           </div>
           <div class="prog-sep"></div>
           <div class="prog-row">
@@ -2102,6 +2113,49 @@
       setFill('weekFill',     wkFrac, 'prog-bar--week');
       setTxt('weekPct',       wkRight);
       setTxt('weekProgLabel', wkLabel);
+
+      // ── 2b. NEXT SAFETY DRILL — rolling countdown ────────────
+      // Finds the next PLANNED_DRILLS entry whose date >= today. On drill day,
+      // bar stays full with "Today 🚨" until midnight, then auto-advances to
+      // the next drill. If no upcoming drills, the whole row hides.
+      // Stretch window = 15 school days (~3 weeks) so a drill further out
+      // reads as "coming" without overclaiming urgency, and anything inside
+      // 3 weeks visibly fills.
+      {
+        const drillRow = document.getElementById('drillRow');
+        const drillSep = document.getElementById('drillSep');
+        const upcoming = (typeof PLANNED_DRILLS !== 'undefined')
+          ? PLANNED_DRILLS.find(d => d.date >= dateStr)
+          : null;
+        if (upcoming) {
+          const sdLeft = schoolDays.filter(d => d >= dateStr && d < upcoming.date).length;
+          const isToday = upcoming.date === dateStr;
+          const STRETCH = 15;
+          const frac = isToday ? 1 : Math.max(0, Math.min(1, (STRETCH - sdLeft) / STRETCH));
+          // Short label from bannerLabel: strip emoji + take first word pair.
+          // "🌎 SHAKEOUT · DROP · COVER..." → "Shakeout"
+          // "🔒 SECURE DRILL · STAY INSIDE..." → "Secure Drill"
+          const nameMatch = upcoming.bannerLabel
+            .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}️]/gu, '')
+            .trim()
+            .split('·')[0]
+            .trim();
+          const nameNice = nameMatch
+            .toLowerCase()
+            .replace(/\b\w/g, c => c.toUpperCase());
+          const right = isToday
+            ? '🚨 Today'
+            : sdLeft === 1 ? '1 School Day' : `${sdLeft} School Days`;
+          setFill('drillFill', frac, 'prog-bar--drill');
+          setTxt('drillLabel', `Till ${nameNice} 🚨`);
+          setTxt('drillPct', right);
+          drillRow.hidden = false;
+          drillSep.hidden = false;
+        } else {
+          drillRow.hidden = true;
+          drillSep.hidden = true;
+        }
+      }
 
       // ── 3. GRADUATION ───────────────────────────────────────
       const total      = schoolDays.length;
