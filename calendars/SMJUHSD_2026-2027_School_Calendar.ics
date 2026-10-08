@@ -710,9 +710,9 @@ END:VEVENT
 BEGIN:VEVENT
 UID:smjuhsd-drill-20261015-shakeout@pvhs
 SUMMARY:Great California Shakeout (Earthquake Drill)
-DTSTART;TZID=America/Los_Angeles:20261015T101500
-DTEND;TZID=America/Los_Angeles:20261015T102500
-DESCRIPTION:SRP: Shelter + Evacuate. Drop\, Cover\, then Evacuate to the appropriate zone. Utilize Red/Green/Med Cards. Submit attendance.
+DTSTART;TZID=America/Los_Angeles:20261015T104500
+DTEND;TZID=America/Los_Angeles:20261015T111000
+DESCRIPTION:SRP: Shelter + Evacuate. PA announcement at 10:45 AM. Drop/Cover/Hold ~30 sec\, then PA signals Evacuate. Bring RED evacuation folder + room-number sign to your evacuation zone. Submit Student Accountability Form to Zone Leader (East end of zone). Supervise students until All Clear is signaled via Informacast app + PA\, then escort back to class. Take attendance PRIOR to the drill.
 CATEGORIES:DRILL
 STATUS:CONFIRMED
 END:VEVENT

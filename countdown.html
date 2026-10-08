@@ -1244,11 +1244,18 @@
         bannerLabel: '🔒 SECURE DRILL · STAY INSIDE · Tap for actions',
         headsMsg:    '⏰ Secure Drill in 5 min. SECURE: Bring everyone indoors · Lock outside doors · Account for students · Business as usual.',
         startMsg:    '🔒 SECURE now (~10 min): Everyone indoors · Doors locked · Increase situational awareness · Account for students · Business as usual.' },
-      { date: '2026-10-15', startTime: '10:15', endTime: '10:25',
+      // Oct 15 Shakeout — Monica Pallan email 10/8/26:
+      // 10:45 AM PA announcement → Drop/Cover/Hold ~30s → PA signals Evacuate →
+      // staff bring RED evac folder + room-# signs to zone → hand Student
+      // Accountability Form to Zone Leader (East end of zone) → supervise
+      // until All Clear via Informacast app + PA → escort students back.
+      // Window extended to 11:10 to cover the full evacuate + accountability
+      // + all-clear sequence; actual All Clear time varies.
+      { date: '2026-10-15', startTime: '10:45', endTime: '11:10',
         srpAction:   'SHELTER',
-        bannerLabel: '🌎 EARTHQUAKE DRILL · DROP · COVER · HOLD · Tap for actions',
-        headsMsg:    '⏰ Shakeout in 5 min. SHELTER (earthquake): Prepare to Drop, Cover, Hold · then EVACUATE to your zone · Bring roster + Red/Green/Med cards.',
-        startMsg:    '🌎 SHAKEOUT now: Drop · Cover · Hold · then EVACUATE to zone · Account for all students · Notify if missing/extra/injured.' }
+        bannerLabel: '🌎 SHAKEOUT · DROP · COVER · HOLD · EVACUATE · Tap for actions',
+        headsMsg:    '⏰ Shakeout 10:45: Take attendance NOW · Bring RED folder + room-# sign · Drop/Cover/Hold ~30s then EVACUATE to zone · Hand Accountability Form to Zone Leader (East end).',
+        startMsg:    '🌎 SHAKEOUT NOW: Drop/Cover/Hold ~30s · then EVACUATE to zone with RED folder + room-# sign · Hand Accountability Form to Zone Leader (East end) · Wait for All Clear (Informacast + PA).' }
     ];
     function findActiveDrill(dateStr, totalSec) {
       return PLANNED_DRILLS.find(d => {
