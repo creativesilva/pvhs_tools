@@ -776,6 +776,75 @@
     .install-modal-cta:active { opacity: 0.85; }
     .install-modal-note { font-size: 9.5px; color: var(--muted); text-align: center; opacity: 0.7; margin: 0; }
 
+    /* ── MOVE NOTICE MODAL ─────────────────────────────────
+       Only shown on the legacy creativesilva.github.io deployment,
+       so users can hop to www.schoolflo.org/pvhs_tools/ before this
+       URL is retired on 2026-10-31. Pops up at the end of each
+       class period, dismissible for the day, gone after Oct 31. */
+    .move-modal[hidden] { display: none; }
+    .move-modal {
+      position: absolute; inset: 0; z-index: 24;
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .move-modal-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(1,12,12,0.86);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    }
+    .move-dialog {
+      position: relative; width: min(100%, 360px);
+      border-radius: 24px; border: 1px solid rgba(0,220,220,0.3);
+      background: linear-gradient(180deg, rgba(6,32,32,0.96), rgba(4,22,22,0.96));
+      box-shadow: 0 28px 54px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,180,180,0.08) inset;
+      padding: 20px; display: flex; flex-direction: column; gap: 12px;
+      max-height: calc(100% - 20px); overflow-y: auto;
+      text-align: center;
+    }
+    .move-close {
+      position: absolute; top: 10px; right: 10px;
+      appearance: none; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.7); border-radius: 99px; width: 28px; height: 28px;
+      font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .move-emoji { font-size: 34px; line-height: 1; margin: 2px 0 0; }
+    .move-title {
+      font-size: 15px; font-weight: 900; color: #fff;
+      text-transform: uppercase; letter-spacing: 0.1em; margin: 0;
+    }
+    .move-sub {
+      font-size: 12.5px; font-weight: 500; color: #d4f4f4;
+      line-height: 1.45; margin: 0;
+    }
+    .move-url {
+      display: block; width: 100%;
+      padding: 12px 10px;
+      border-radius: 14px;
+      background: rgba(0,180,180,0.14); border: 1px solid rgba(0,220,220,0.4);
+      color: #4be1e1; font-size: 13px; font-weight: 800;
+      text-decoration: none; letter-spacing: 0.02em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      word-break: break-all;
+    }
+    .move-url:active { background: rgba(0,180,180,0.22); }
+    .move-cta {
+      appearance: none; display: block; width: 100%; text-decoration: none; text-align: center;
+      background: linear-gradient(135deg, #007474 0%, #009898 100%);
+      border: none; border-radius: 14px; padding: 13px;
+      color: #fff; font-size: 12px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.12em; cursor: pointer;
+    }
+    .move-cta:active { opacity: 0.85; }
+    .move-retire {
+      font-size: 10.5px; font-weight: 700; color: #ffb84b;
+      margin: 2px 0 0; letter-spacing: 0.04em;
+    }
+    .move-dismiss-row {
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+      font-size: 10px; color: var(--muted); margin: 2px 0 0;
+    }
+    .move-dismiss-row input { accent-color: #009898; cursor: pointer; }
+    .move-dismiss-row label { cursor: pointer; user-select: none; }
+
     /* ── FEEDBACK MODAL ─────────────────────────────────── */
     .feedback-modal[hidden] { display: none; }
     .feedback-modal {
@@ -1045,6 +1114,28 @@
             <button class="sched-sheet-close" id="schedSheetClose" type="button">✕</button>
           </div>
           <div class="sched-sheet-body" id="schedSheetBody"></div>
+        </div>
+      </div>
+
+      <!-- MOVE NOTICE MODAL
+           Legacy-deployment only (creativesilva.github.io). Pops up at the end
+           of each class period to nudge users toward www.schoolflo.org/pvhs_tools/
+           before this URL retires on 2026-10-31. Dismiss persists for the day
+           via localStorage. The entire IIFE below also no-ops after Oct 31. -->
+      <div id="moveModal" class="move-modal" hidden>
+        <div class="move-modal-backdrop" id="moveBackdrop"></div>
+        <div class="move-dialog">
+          <button id="moveClose" class="move-close" type="button" aria-label="Close">✕</button>
+          <div class="move-emoji">🚀</div>
+          <p class="move-title">PVHS Tools Is Moving</p>
+          <p class="move-sub">We're switching to a new home. Tap the link below (or the button) to open it, and bookmark it for next time.</p>
+          <a id="moveUrlLink" class="move-url" href="https://www.schoolflo.org/pvhs_tools/" target="_blank" rel="noopener">www.schoolflo.org/pvhs_tools</a>
+          <a id="moveCta" class="move-cta" href="https://www.schoolflo.org/pvhs_tools/" target="_blank" rel="noopener">Open New App →</a>
+          <p id="moveRetire" class="move-retire">This version retires on Oct 31, 2026.</p>
+          <div class="move-dismiss-row">
+            <input type="checkbox" id="moveDismissToday">
+            <label for="moveDismissToday">Don't show again today</label>
+          </div>
         </div>
       </div>
 
@@ -2636,6 +2727,97 @@
       });
     })();
 
+    // ── MOVE NOTICE MODAL (legacy deployment migration prompt) ─────────────
+    // Fires on the LEGACY creativesilva.github.io host only, at the moment
+    // each class period ends (period block → non-period block transition).
+    // Dismiss persists for the day via localStorage. Entire listener no-ops
+    // after the retirement date (RETIRE_DATE below), so once the legacy host
+    // is actually taken down there is no stale UI left in the code to clean up
+    // (and if it stays live past Oct 31, the pop-up just quietly stops).
+    (function() {
+      const RETIRE_DATE = '2026-10-31';
+      const LEGACY_HOST = 'creativesilva.github.io';
+      const NEW_URL     = 'https://www.schoolflo.org/pvhs_tools/';
+      const modal = document.getElementById('moveModal');
+      if (!modal) return;
+
+      // Only show on the legacy host. On schoolflo.org (or local dev / embed)
+      // the pop-up never arms, so the modal stays as inert markup.
+      if (window.location.hostname !== LEGACY_HOST) return;
+
+      // Hard stop after the retirement date so the pop-up doesn't nag past the cutoff.
+      function _todayStr() { return getNow().dateStr; }
+      if (_todayStr() > RETIRE_DATE) return;
+
+      // Human-readable "retires in N days" line (updated each time we show).
+      function _updateRetireLine() {
+        const el = document.getElementById('moveRetire');
+        if (!el) return;
+        const today = new Date(_todayStr() + 'T00:00:00');
+        const retire = new Date(RETIRE_DATE + 'T00:00:00');
+        const days = Math.max(0, Math.round((retire - today) / 86400000));
+        const dateFmt = new Intl.DateTimeFormat('en-US', { timeZone, month:'short', day:'numeric', year:'numeric' }).format(retire);
+        if (days === 0)      el.textContent = `⚠️ This version retires TODAY (${dateFmt}).`;
+        else if (days === 1) el.textContent = `⚠️ This version retires TOMORROW (${dateFmt}).`;
+        else                 el.textContent = `This version retires in ${days} days — on ${dateFmt}.`;
+      }
+
+      function _dismissKey() { return `pvhs_move_dismissed_${_todayStr()}`; }
+      function _isDismissedToday() {
+        try { return localStorage.getItem(_dismissKey()) === '1'; } catch { return false; }
+      }
+      function _dismissForToday() {
+        try { localStorage.setItem(_dismissKey(), '1'); } catch {}
+      }
+
+      function openModal() {
+        _updateRetireLine();
+        const chk = document.getElementById('moveDismissToday');
+        if (chk) chk.checked = false;
+        modal.hidden = false;
+      }
+      function closeModal() {
+        const chk = document.getElementById('moveDismissToday');
+        if (chk?.checked) _dismissForToday();
+        modal.hidden = true;
+      }
+      document.getElementById('moveClose')?.addEventListener('click', closeModal);
+      document.getElementById('moveBackdrop')?.addEventListener('click', closeModal);
+      // Opening the new app counts as acknowledging the move — don't nag again today.
+      document.getElementById('moveCta')?.addEventListener('click', () => { _dismissForToday(); modal.hidden = true; });
+      document.getElementById('moveUrlLink')?.addEventListener('click', () => { _dismissForToday(); modal.hidden = true; });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
+
+      // Transition detector: watch the current block label every second. When
+      // the previous tick was inside a PERIOD block and now we are NOT in a
+      // PERIOD block (passing / lunch / nutrition / after-school), that is
+      // the "end of class period" moment — fire the pop-up.
+      let _prevPeriodLabel = null;
+      function _currentPeriodLabel() {
+        const now = getNow();
+        if (!schoolDays.includes(now.dateStr)) return null;
+        const blocks = getScheduleBlocks(now.dateStr);
+        for (const b of blocks) {
+          const s = parseToSec(b.s), e = parseToSec(b.e);
+          if (now.totalSec >= s && now.totalSec < e) {
+            return isInstructionalPeriod(b.l) ? b.l : null;
+          }
+        }
+        return null;
+      }
+      setInterval(() => {
+        // Cheap post-retirement guard so the loop stops working even if the page
+        // stays open overnight into Nov 1.
+        if (_todayStr() > RETIRE_DATE) return;
+        const cur = _currentPeriodLabel();
+        if (_prevPeriodLabel && cur === null) {
+          // Just transitioned out of a period.
+          if (!_isDismissedToday() && modal.hidden) openModal();
+        }
+        _prevPeriodLabel = cur;
+      }, 1000);
+    })();
+
     // ── SCHEDULE SHEET ─────────────────────────────────────────────────────
     (function() {
       const sheet = document.getElementById('schedSheet');
@@ -2931,7 +3113,7 @@
       }
       function overlayOpen() {
         const ids = ['maintModal','installModal','installBanner','verAnnounceSheet',
-          'newsModal','newsChooser','embedModal','feedbackModal','srpModal',
+          'newsModal','newsChooser','embedModal','feedbackModal','srpModal','moveModal',
           'schedSheet','calAnnounceSheet','a2hsPrompt','directoryChooser'];
         if (ids.some(id => { const el = document.getElementById(id); return el && !el.hidden; })) return true;
         const lb = document.getElementById('newsLightbox');
