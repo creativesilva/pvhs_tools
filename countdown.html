@@ -2766,14 +2766,29 @@
         body.innerHTML = fallSection + springSection + gradSection;
       }
 
-      // Render a card-by-card outline of the day's schedule (Base Camp, PD Day, Workday).
-      // Static overview — every card looks the same. No "NOW" tracking here (the countdown
-      // clock on the main screen already handles current-block awareness).
+      // Render the day's schedule for a specialDayMap entry (Base Camp, PD Day,
+      // Workday, Rally, Graduation, etc.). Two layouts:
+      //   - Card list  → blocks that carry per-block location info (Base Camp,
+      //                  PD Day, Workday). Each block shows time / icon / loc.
+      //   - Clean table → blocks with no location (Rally). Matches the official
+      //                  bell-schedule PDF look: 2 columns, passing periods
+      //                  hidden. Reuses the standard renderTable() so drill
+      //                  sub-rows etc. come for free.
       function renderSpecialDay(dateStr, headerLabel) {
         titleEl.textContent = headerLabel;
         const blocks = getScheduleBlocks(dateStr);
         const d = new Date(dateStr + 'T12:00:00');
         const dayStr = new Intl.DateTimeFormat('en-US', {timeZone, weekday:'long', month:'long', day:'numeric', year:'numeric'}).format(d);
+        const hasLocations = blocks.some(b => b.loc && b.loc !== '—');
+
+        if (!hasLocations) {
+          // Rally and similar: use the standard bell-schedule table.
+          body.innerHTML = `
+            <p style="font-size:10px;color:var(--muted);text-align:center;margin:0 0 10px;opacity:.8;text-transform:uppercase;letter-spacing:.12em">${dayStr}</p>
+            ${renderTable(blocks, dateStr)}
+          `;
+          return;
+        }
 
         const cards = blocks.map(b => {
           const loc  = b.loc && b.loc !== '—' ? `<p style="font-size:10.5px;color:var(--muted);margin:2px 0 0;line-height:1.35">${b.loc}</p>` : '';
