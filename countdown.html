@@ -838,13 +838,6 @@
       font-size: 10.5px; font-weight: 700; color: #ffb84b;
       margin: 2px 0 0; letter-spacing: 0.04em;
     }
-    .move-dismiss-row {
-      display: flex; align-items: center; justify-content: center; gap: 7px;
-      font-size: 10px; color: var(--muted); margin: 2px 0 0;
-    }
-    .move-dismiss-row input { accent-color: #009898; cursor: pointer; }
-    .move-dismiss-row label { cursor: pointer; user-select: none; }
-
     /* ── FEEDBACK MODAL ─────────────────────────────────── */
     .feedback-modal[hidden] { display: none; }
     .feedback-modal {
@@ -1132,10 +1125,6 @@
           <a id="moveUrlLink" class="move-url" href="https://www.schoolflo.org/pvhs_tools/" target="_blank" rel="noopener">www.schoolflo.org/pvhs_tools</a>
           <a id="moveCta" class="move-cta" href="https://www.schoolflo.org/pvhs_tools/" target="_blank" rel="noopener">Open New App →</a>
           <p id="moveRetire" class="move-retire">This version retires on Oct 31, 2026.</p>
-          <div class="move-dismiss-row">
-            <input type="checkbox" id="moveDismissToday">
-            <label for="moveDismissToday">Don't show again today</label>
-          </div>
         </div>
       </div>
 
@@ -2762,36 +2751,41 @@
         else                 el.textContent = `This version retires in ${days} days — on ${dateFmt}.`;
       }
 
-      function _dismissKey() { return `pvhs_move_dismissed_${_todayStr()}`; }
-      function _isDismissedToday() {
-        try { return localStorage.getItem(_dismissKey()) === '1'; } catch { return false; }
+      // 24-hour cooldown: the first period-end transition after each 24h
+      // window shows the pop-up once. Previously it fired at EVERY period
+      // transition (up to 7x per school day) which was too much. Now even
+      // if a teacher only has the app open for a single day, they see it
+      // once. If they leave it open for days, it reappears each new day
+      // but no more than once per 24h window.
+      const COOLDOWN_MS = 24 * 60 * 60 * 1000;
+      const LAST_SHOWN_KEY = 'pvhs_move_last_shown_ms';
+      function _lastShownMs() {
+        try { return parseInt(localStorage.getItem(LAST_SHOWN_KEY), 10) || 0; } catch { return 0; }
       }
-      function _dismissForToday() {
-        try { localStorage.setItem(_dismissKey(), '1'); } catch {}
+      function _markShownNow() {
+        try { localStorage.setItem(LAST_SHOWN_KEY, String(Date.now())); } catch {}
+      }
+      function _inCooldown() {
+        return (Date.now() - _lastShownMs()) < COOLDOWN_MS;
       }
 
       function openModal() {
         _updateRetireLine();
-        const chk = document.getElementById('moveDismissToday');
-        if (chk) chk.checked = false;
+        _markShownNow();
         modal.hidden = false;
       }
-      function closeModal() {
-        const chk = document.getElementById('moveDismissToday');
-        if (chk?.checked) _dismissForToday();
-        modal.hidden = true;
-      }
+      function closeModal() { modal.hidden = true; }
       document.getElementById('moveClose')?.addEventListener('click', closeModal);
       document.getElementById('moveBackdrop')?.addEventListener('click', closeModal);
-      // Opening the new app counts as acknowledging the move — don't nag again today.
-      document.getElementById('moveCta')?.addEventListener('click', () => { _dismissForToday(); modal.hidden = true; });
-      document.getElementById('moveUrlLink')?.addEventListener('click', () => { _dismissForToday(); modal.hidden = true; });
+      document.getElementById('moveCta')?.addEventListener('click', closeModal);
+      document.getElementById('moveUrlLink')?.addEventListener('click', closeModal);
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
 
       // Transition detector: watch the current block label every second. When
       // the previous tick was inside a PERIOD block and now we are NOT in a
       // PERIOD block (passing / lunch / nutrition / after-school), that is
-      // the "end of class period" moment — fire the pop-up.
+      // the "end of class period" moment — eligible to fire the pop-up, but
+      // the 24h cooldown gate below decides whether to actually show it.
       let _prevPeriodLabel = null;
       function _currentPeriodLabel() {
         const now = getNow();
@@ -2812,7 +2806,7 @@
         const cur = _currentPeriodLabel();
         if (_prevPeriodLabel && cur === null) {
           // Just transitioned out of a period.
-          if (!_isDismissedToday() && modal.hidden) openModal();
+          if (!_inCooldown() && modal.hidden) openModal();
         }
         _prevPeriodLabel = cur;
       }, 1000);
