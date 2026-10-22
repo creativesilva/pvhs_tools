@@ -670,12 +670,15 @@
       body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .content {
         display: grid;
         grid-template-columns: 1.15fr 1fr;
-        grid-template-rows: 34px auto auto 1fr;
+        /* 4 rows: header, info/timer-top, bars/timer-mid (fills), buttons/bars-bottom.
+           Row 2 is capped by max-content on info-strip so a tall weather line can't
+           push bars out of view. Row 3 (1fr) absorbs any slack and keeps bars tall. */
+        grid-template-rows: 34px auto 1fr auto;
         grid-template-areas:
-          "header  header"
-          "timer   buttons"
-          "timer   info"
-          "timer   bars";
+          "header   header"
+          "timer    info"
+          "timer    bars"
+          "buttons  bars";
         gap: 6px;
         column-gap: 10px;
         overflow: hidden;
@@ -705,17 +708,28 @@
       body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .period-card .status-row {
         font-size: 10px;
       }
-      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .sched-btn-row  { grid-area: buttons; margin: 0; }
-      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .sched-btn      { padding: 7px 4px; font-size: 8.5px; }
+      /* Buttons now sit UNDER the timer on the LEFT (user's layout request):
+         left panel has room, and freeing the right column means the bars get
+         more vertical space before clipping. */
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .sched-btn-row  {
+        grid-area: buttons; margin: 0;
+      }
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .sched-btn      { padding: 6px 4px; font-size: 8.5px; }
       body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .sched-btn-icon { font-size: 14px; }
+      /* School Days + Weather: compact + responsive. Row 2 is content-sized but
+         we shrink the content so it stays short and doesn't eat into bars. */
+      /* Compact enough to naturally fit in ~60px; grid row 2 is `auto` so it
+         takes just what it needs, and bars get the rest via row 3 `1fr`.
+         No max-height — that was clipping the top label. */
       body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .card.info-strip {
         grid-area: info;
-        padding: 7px 10px;
+        padding: 6px 10px;
       }
-      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .info-strip .info-number { font-size: 26px; margin: 1px 0; }
-      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .info-strip .info-main   { font-size: 14px; margin: 1px 0; }
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .info-strip .info-cell { padding: 1px 4px; }
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .info-strip .info-number { font-size: 20px; margin: 0; line-height: 1.05; }
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .info-strip .info-main   { font-size: 12px; margin: 0; line-height: 1.1; }
       body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .info-strip .info-label,
-      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .info-strip .info-sub   { font-size: 7.5px; }
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .info-strip .info-sub   { font-size: 7px; line-height: 1.15; }
       body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .card.progress-card {
         grid-area: bars;
         padding: 7px 10px 8px;

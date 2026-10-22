@@ -23,8 +23,12 @@ const SCHOOL_YEAR = {
   lastDayStudents:   "2027-06-09",                          // Last instructional day
   graduation:        "2027-06-10",                          // Ceremony day (staff day)
   finals: {
-    fall:   { start: "2026-12-16", end: "2026-12-18", stretchFrom: "2026-11-30" },
-    spring: { start: "2027-06-07", end: "2027-06-09", stretchFrom: "2027-04-05" }
+    // stretchFrom = where the "Till Fall/Spring Finals" progress bar
+    // starts filling. Set to the start of each semester so the bar
+    // tracks visible progress all semester long instead of only
+    // sprinting the last two weeks.
+    fall:   { start: "2026-12-16", end: "2026-12-18", stretchFrom: "2026-08-13" },
+    spring: { start: "2027-06-07", end: "2027-06-09", stretchFrom: "2027-01-14" }
   }
 };
 
