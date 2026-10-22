@@ -294,6 +294,7 @@
     /* ── PROGRESS BARS ─────────────────────────────────── */
     .progress-card { padding: 8px 14px 9px; flex-shrink: 0; }
     .prog-row  { display: flex; flex-direction: column; gap: 3px; }
+    .prog-row[hidden], .prog-sep[hidden] { display: none; }
     .prog-sep  { height: 1px; background: rgba(255,255,255,0.07); margin: 4px 0; }
     .prog-meta { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
     .prog-label { font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em; color: var(--muted); opacity: 0.88; }
@@ -635,6 +636,95 @@
       padding-right: max(var(--app-spacing), env(safe-area-inset-right));
       padding-bottom: 18px;
       padding-left: max(var(--app-spacing), env(safe-area-inset-left));
+    }
+
+    /* ── LANDSCAPE DESK-MOUNT MODE ────────────────────────────────────
+       When the phone is mounted horizontally under a monitor (MagSafe
+       charger stand, etc.) the viewport is landscape with a short
+       height. Portrait stacking relegates the timer AND the progress
+       bars below the fold. This mode splits the screen into a two
+       column layout: giant timer in the left ~55%, quick-view buttons
+       + info strip + progress bars stacked in the right ~45%.
+
+       Trigger: landscape orientation + short height (≤500px). Does
+       NOT activate in embed contexts (classroom.screen / etc.) which
+       have their own fit rules. */
+    @media (orientation: landscape) and (max-height: 500px) {
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) {
+        touch-action: pan-y;
+      }
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .frame {
+        padding: env(safe-area-inset-top) max(8px, env(safe-area-inset-right)) env(safe-area-inset-bottom) max(8px, env(safe-area-inset-left));
+      }
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .app {
+        width: 100%; height: 100%;
+        max-width: 100%; max-height: 100%;
+        border-radius: 18px;
+        padding: 8px 10px 10px;
+      }
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .ghost-logo {
+        /* Shift panther silhouette to the left column so it visually anchors
+           the timer side without peeking through the info stack. */
+        top: 58%; left: 28%; width: 55%; opacity: 0.06;
+      }
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .content {
+        display: grid;
+        grid-template-columns: 1.15fr 1fr;
+        grid-template-rows: 34px auto auto 1fr;
+        grid-template-areas:
+          "header  header"
+          "timer   buttons"
+          "timer   info"
+          "timer   bars";
+        gap: 6px;
+        column-gap: 10px;
+        overflow: hidden;
+        align-items: stretch;
+      }
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .top-row    { grid-area: header; height: 34px; margin: 0; }
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .embed-clock-tile { display: none !important; }
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .period-card {
+        grid-area: timer;
+        height: 100%;
+        justify-content: center;
+        padding: 10px 12px !important;
+        gap: 2px;
+      }
+      /* Make the timer dominate the left column — fills most of the
+         available height. clamp lets it scale across phone widths. */
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .period-card .timer {
+        font-size: clamp(96px, 20vw, 160px);
+        line-height: 0.88;
+        margin: 2px 0 4px;
+      }
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .period-card .block-label {
+        font-size: 13px;
+        letter-spacing: 0.08em;
+      }
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .period-card .subtext,
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .period-card .status-row {
+        font-size: 10px;
+      }
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .sched-btn-row  { grid-area: buttons; margin: 0; }
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .sched-btn      { padding: 7px 4px; font-size: 8.5px; }
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .sched-btn-icon { font-size: 14px; }
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .card.info-strip {
+        grid-area: info;
+        padding: 7px 10px;
+      }
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .info-strip .info-number { font-size: 26px; margin: 1px 0; }
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .info-strip .info-main   { font-size: 14px; margin: 1px 0; }
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .info-strip .info-label,
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .info-strip .info-sub   { font-size: 7.5px; }
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .card.progress-card {
+        grid-area: bars;
+        padding: 7px 10px 8px;
+        overflow: hidden;
+      }
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .progress-card .prog-sep { margin: 2px 0; }
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .progress-card .prog-label { font-size: 7.5px; letter-spacing: 0.1em; }
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .progress-card .prog-pct { font-size: 8.5px; }
+      body:not(.is-embed):not(.is-embed-mini):not(.is-embed-mini-cs) .progress-card .prog-track { height: 4px; }
     }
 
     /* NATIVE APP OVERRIDE (Option B) */
