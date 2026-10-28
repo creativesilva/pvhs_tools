@@ -244,9 +244,11 @@
 
     /* ── PRIMARY NAV (Countdown & Directory) ─────────── */
     .primary-nav { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+    /* Hero Countdown + Directory tiles. Grow a touch on tall iPhones but
+       stay a hero (not a giant block). clamp keeps iPhone SE sane. */
     .primary-btn {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 10px 6px; height: 56px; border-radius: 18px; text-decoration: none; color: #fff;
+      padding: 10px 6px; height: clamp(56px, 7vh, 72px); border-radius: 18px; text-decoration: none; color: #fff;
       background: rgba(0,180,180,0.07); border: 1px solid rgba(0,210,210,0.16);
       backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); text-align: center;
       gap: 3px; transition: background 0.2s, transform 0.1s;
@@ -257,10 +259,17 @@
     .primary-btn .quick-link-label { font-size: 10px; font-weight: 800; letter-spacing: 0.13em; color: #b8f4f4; }
 
     .section-label { width: 100%; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.18em; color: var(--muted); opacity: 0.65; margin-bottom: 4px; text-align: center; }
-    .quick-links-grid { display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 48px; gap: 5px; width: 100%; }
+    /* Quick-links grid grows modestly on tall iPhones so the stack feels
+       less top-clumped, but caps at 72px per row so the tiles don't look
+       empty and the quote still gets its own breathing room at the bottom. */
+    .quick-links-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      grid-auto-rows: minmax(48px, 72px);
+      gap: 5px; width: 100%;
+    }
     .quick-link-btn {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 6px 6px; height: 48px; border-radius: 16px; text-decoration: none; color: #fff;
+      padding: 6px 6px; min-height: 48px; border-radius: 16px; text-decoration: none; color: #fff;
       background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04);
       backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); text-align: center;
       gap: 3px; transition: background 0.2s;
